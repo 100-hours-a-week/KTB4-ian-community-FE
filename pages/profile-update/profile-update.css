@@ -1,0 +1,20 @@
+.profile-update-page {
+  padding-top: 48px;
+}
+
+.profile-form .button {
+  width: 100%;
+}
+
+.profile-delete {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.profile-delete button {
+  font-size: 14px;
+}
+
+.profile-toast-space {
+  min-height: 44px;
+}

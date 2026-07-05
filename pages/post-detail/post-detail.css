@@ -1,0 +1,154 @@
+.post-detail__title {
+  margin-bottom: 14px;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+}
+
+.post-detail__header {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+.post-detail__meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post-author img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.post-author__name {
+  font-weight: 700;
+}
+
+.post-author__date {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.post-detail__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.post-detail__image {
+  width: 100%;
+  margin: 24px 0;
+  background: var(--color-border);
+}
+
+.post-detail__image img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.post-detail__content {
+  min-height: 150px;
+  white-space: pre-wrap;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.post-stats {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+.post-stat {
+  min-width: 96px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: #d9d9d9;
+  text-align: center;
+}
+
+.post-stat strong {
+  display: block;
+  font-size: 18px;
+}
+
+.post-stat span {
+  font-size: 12px;
+}
+
+.comment-form {
+  margin: 28px 0 24px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 18px;
+  border: 0;
+  resize: vertical;
+}
+
+.comment-form__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comment {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 10px;
+}
+
+.comment__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.comment__header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.comment__author {
+  font-weight: 700;
+}
+
+.comment__date {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.comment__text {
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+
+.comment__actions {
+  display: flex;
+  gap: 5px;
+}

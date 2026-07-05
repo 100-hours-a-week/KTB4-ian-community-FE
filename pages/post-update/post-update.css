@@ -1,0 +1,28 @@
+.post-editor {
+  width: 100%;
+}
+
+.post-editor__image {
+  margin-top: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-border);
+}
+
+.post-editor__image img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+}
+
+.post-editor__file {
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+}
+
+.post-editor .button {
+  width: 100%;
+}

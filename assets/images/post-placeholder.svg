@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" role="img" aria-labelledby="title">
+  <title id="title">게시글 기본 이미지</title>
+  <rect width="800" height="420" fill="#d9d9d9"/>
+  <circle cx="650" cy="115" r="45" fill="#c0c0c0"/>
+  <path d="M0 360l190-170 125 110 110-90 210 150z" fill="#b5b5b5"/>
+</svg>

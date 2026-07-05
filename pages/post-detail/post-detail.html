@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="아무 말 대잔치 커뮤니티 게시글 상세 페이지입니다."
+  >
+  <link rel="stylesheet" href="../../styles/common.css">
+  <link rel="stylesheet" href="./post-detail.css">
+  <script type="module" src="./post-detail.js"></script>
+  <title>게시글 상세 | 아무 말 대잔치</title>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+
+    <button
+      class="site-header__back"
+      type="button"
+      aria-label="이전 페이지로 이동"
+      data-back-button
+    >
+      ‹
+    </button>
+
+    <a class="site-header__title" href="../posts/posts.html">아무 말 대잔치</a>
+
+    <div class="site-header__profile">
+      <button
+        class="profile-button"
+        type="button"
+        aria-label="회원 메뉴 열기"
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-profile-button
+      >
+        <img src="../../assets/images/profile-default.svg" alt="">
+      </button>
+
+      <nav class="profile-menu" aria-label="회원 메뉴" data-profile-menu>
+        <a href="../profile-update/profile-update.html">회원정보수정</a>
+        <a href="../password-update/password-update.html">비밀번호수정</a>
+        <button type="button" data-logout-button>로그아웃</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+
+  <main class="page">
+    <article class="post-detail" data-post-detail>
+      <header class="post-detail__header">
+        <h2 class="post-detail__title" data-post-title>게시글 제목</h2>
+
+        <div class="post-detail__meta-row">
+          <div class="post-author">
+            <img
+              src="../../assets/images/profile-default.svg"
+              alt=""
+              data-author-image
+            >
+            <div>
+              <p class="post-author__name" data-author-name>작성자</p>
+              <time class="post-author__date" data-created-at>
+                2026-07-05 12:00
+              </time>
+            </div>
+          </div>
+
+          <div class="post-detail__actions">
+            <a
+              class="button button--small button--dark"
+              href="../post-update/post-update.html"
+              data-update-link
+            >
+              수정
+            </a>
+            <button
+              class="button button--small button--dark"
+              type="button"
+              data-delete-post
+            >
+              삭제
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="post-detail__image">
+        <img
+          src="../../assets/images/post-placeholder.svg"
+          alt="게시글 첨부 이미지"
+          data-post-image
+        >
+      </div>
+
+      <p class="post-detail__content" data-post-content>
+        게시글 내용이 표시됩니다.
+      </p>
+
+      <section class="post-stats" aria-label="게시글 통계">
+        <button class="post-stat" type="button" data-like-button>
+          <strong data-like-count>0</strong>
+          <span>좋아요수</span>
+        </button>
+        <div class="post-stat">
+          <strong data-view-count>0</strong>
+          <span>조회수</span>
+        </div>
+        <div class="post-stat">
+          <strong data-comment-count>0</strong>
+          <span>댓글</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="comment-title">
+        <h3 class="sr-only" id="comment-title">댓글</h3>
+
+        <form class="comment-form" data-comment-form>
+          <label class="sr-only" for="comment">댓글 작성</label>
+          <textarea
+            id="comment"
+            name="comment"
+            placeholder="댓글을 남겨주세요!"
+            data-comment-input
+          ></textarea>
+          <div class="comment-form__footer">
+            <button
+              class="button button--small button--primary"
+              type="submit"
+            >
+              댓글 등록
+            </button>
+          </div>
+        </form>
+
+        <div class="comment-list" data-comment-list></div>
+      </section>
+    </article>
+  </main>
+
+  <div class="modal" data-delete-modal>
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-post-title"
+    >
+      <h3 class="modal__title" id="delete-post-title">게시글을 삭제하시겠습니까?</h3>
+      <p class="modal__description">삭제한 내용은 복구할 수 없습니다.</p>
+      <div class="modal__actions">
+        <button class="button button--dark" type="button" data-cancel-delete>
+          취소
+        </button>
+        <button class="button button--primary" type="button" data-confirm-delete>
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" role="status" data-toast></div>
+</body>
+</html>
