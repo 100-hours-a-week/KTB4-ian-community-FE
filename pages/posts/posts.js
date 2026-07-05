@@ -9,60 +9,38 @@ initProfileMenu();
 initLogout();
 
 const postList = document.querySelector("[data-post-list]");
-
-const fallbackPosts = [
-  {
-    postId: 1,
-    title: "첫 번째 게시글 제목입니다.",
-    likeCount: 5,
-    commentCount: 3,
-    viewCount: 123,
-    authorName: "더미 작성자 1",
-    createdAt: "2026-07-05 12:00",
-  },
-  {
-    postId: 2,
-    title: "두 번째 게시글 제목입니다.",
-    likeCount: 12,
-    commentCount: 8,
-    viewCount: 2048,
-    authorName: "더미 작성자 2",
-    createdAt: "2026-07-04 18:30",
-  },
-  {
-    postId: 3,
-    title: "세 번째 게시글 제목입니다.",
-    likeCount: 1,
-    commentCount: 0,
-    viewCount: 47,
-    authorName: "더미 작성자 3",
-    createdAt: "2026-07-03 09:20",
-  },
-];
+const userId = sessionStorage.getItem("userId");
 
 function createPostCard(post) {
+  const postId = post.postId ?? post.post_id;
+  const likeCount = post.likeCount ?? post.like_count;
+  const commentCount = post.commentCount ?? post.comment_count;
+  const viewCount = post.viewCount ?? post.view_count;
+  const authorName = post.authorName ?? post.author_name ?? post.nickname;
+  const createdAt = post.createdAt ?? post.created_at;
+  const profileImage = post.profileImage ?? post.profile_image;
   const article = document.createElement("article");
   article.className = "post-card card";
 
   article.innerHTML = `
     <a
       class="post-card__link"
-      href="../post-detail/post-detail.html?postId=${post.postId}"
+      href="../post-detail/post-detail.html?postId=${postId}${userId ? `&userId=${userId}` : ""}"
     >
       <div class="post-card__body">
         <h3 class="post-card__title">${post.title}</h3>
         <div class="post-card__meta">
           <div class="post-card__counts">
-            <span>좋아요 ${formatCount(post.likeCount)}</span>
-            <span>댓글 ${formatCount(post.commentCount)}</span>
-            <span>조회수 ${formatCount(post.viewCount)}</span>
+            <span>좋아요 ${formatCount(likeCount)}</span>
+            <span>댓글 ${formatCount(commentCount)}</span>
+            <span>조회수 ${formatCount(viewCount)}</span>
           </div>
-          <time>${post.createdAt ?? ""}</time>
+          <time>${createdAt ?? ""}</time>
         </div>
       </div>
       <div class="post-card__author">
-        <img src="../../assets/images/profile-default.svg" alt="">
-        <span>${post.authorName ?? "알 수 없음"}</span>
+        <img src="${profileImage ?? "../../assets/images/profile-default.svg"}" alt="">
+        <span>${authorName ?? "알 수 없음"}</span>
       </div>
     </a>
   `;
@@ -71,15 +49,22 @@ function createPostCard(post) {
 }
 
 function renderPosts(posts) {
+  if (!posts.length) {
+    postList.innerHTML = `<p class="helper-text">작성된 게시글이 없습니다.</p>`;
+    return;
+  }
+
   postList.replaceChildren(...posts.map(createPostCard));
 }
 
 async function loadPosts() {
   try {
     const response = await apiRequest("/api/posts");
-    const posts = Array.isArray(response) ? response : response?.content;
+    const posts = Array.isArray(response)
+      ? response
+      : response?.data?.content ?? response?.content;
 
-    renderPosts(posts?.length ? posts : fallbackPosts);
+    renderPosts(posts ?? []);
   } catch (error) {
     console.error(error);
   

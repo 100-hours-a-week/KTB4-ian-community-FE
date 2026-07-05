@@ -12,6 +12,9 @@ initLogout();
 initBackButton("../posts/posts.html");
 
 const postId = getQueryParam("postId") ?? "1";
+const userId = getQueryParam("userId") ?? sessionStorage.getItem("userId") ?? "1";
+let currentUser = null;
+let currentPostLiked = false;
 
 const elements = {
   title: document.querySelector("[data-post-title]"),
@@ -27,76 +30,68 @@ const elements = {
   commentList: document.querySelector("[data-comment-list]"),
 };
 
-const fallbackPost = {
-  postId,
-  title: "첫 번째 게시글 제목입니다.",
-  authorName: "더미 작성자 1",
-  createdAt: "2026-07-05 12:00",
-  content:
-    "게시글 내용입니다.\n\n이 영역에는 서버에서 조회한 게시글 본문이 표시됩니다.",
-  likeCount: 5,
-  viewCount: 123,
-  commentCount: 2,
-  comments: [
-    {
-      commentId: 1,
-      authorName: "댓글 작성자 1",
-      content: "첫 번째 댓글입니다.",
-      createdAt: "2026-07-05 12:30",
-    },
-    {
-      commentId: 2,
-      authorName: "댓글 작성자 2",
-      content: "두 번째 댓글입니다.",
-      createdAt: "2026-07-05 13:10",
-    },
-  ],
-};
-
 function renderPost(post) {
+  const authorName = post.authorName ?? post.author_name ?? post.nickname;
+  const createdAt = post.createdAt ?? post.created_at;
+  const likeCount = post.likeCount ?? post.like_count;
+  const viewCount = post.viewCount ?? post.view_count;
+  const commentCount = post.commentCount ?? post.comment_count;
+  const comments = post.comments ?? post.comment ?? [];
+  const profileImage =
+    post.profileImageUrl ?? post.profileImage ?? post.profile_image;
+  const imageUrl = post.imageUrl ?? post.image_url;
+  currentPostLiked = Boolean(post.liked);
+
   elements.title.textContent = post.title;
-  elements.authorName.textContent = post.authorName ?? "알 수 없음";
-  elements.createdAt.textContent = post.createdAt ?? "";
+  elements.authorName.textContent = authorName ?? "알 수 없음";
+  elements.createdAt.textContent = createdAt ?? "";
   elements.content.textContent = post.content ?? "";
-  elements.likeCount.textContent = post.likeCount ?? 0;
-  elements.viewCount.textContent = post.viewCount ?? 0;
-  elements.commentCount.textContent =
-    post.commentCount ?? post.comments?.length ?? 0;
+  elements.likeCount.textContent = likeCount ?? 0;
+  elements.viewCount.textContent = viewCount ?? 0;
+  elements.commentCount.textContent = commentCount ?? comments.length ?? 0;
   elements.updateLink.href =
     `../post-update/post-update.html?postId=${postId}`;
 
-  if (post.profileImageUrl) {
-    elements.authorImage.src = post.profileImageUrl;
+  if (profileImage) {
+    elements.authorImage.src = profileImage;
   }
 
-  if (post.imageUrl) {
-    elements.image.src = post.imageUrl;
+  elements.image.closest(".post-detail__image").hidden = !imageUrl;
+
+  if (imageUrl) {
+    elements.image.src = imageUrl;
   }
 
-  renderComments(post.comments ?? []);
+  renderComments(comments);
   document.title = `${post.title} | 아무 말 대잔치`;
 }
 
 function createCommentElement(comment) {
+  const commentId = comment.commentId ?? comment.comment_id;
+  const authorName = comment.authorName ?? comment.author_name ?? comment.nickname;
+  const createdAt = comment.createdAt ?? comment.created_at;
+  const content = comment.content ?? comment.comment;
+  const profileImage =
+    comment.profileImageUrl ?? comment.profileImage ?? comment.profile_image;
   const article = document.createElement("article");
   article.className = "comment";
-  article.dataset.commentId = comment.commentId;
+  article.dataset.commentId = commentId;
 
   article.innerHTML = `
     <img
       class="comment__avatar"
-      src="../../assets/images/profile-default.svg"
+      src="${profileImage ?? "../../assets/images/profile-default.svg"}"
       alt=""
     >
     <div>
       <div class="comment__header">
-        <span class="comment__author">${comment.authorName ?? "알 수 없음"}</span>
-        <time class="comment__date">${comment.createdAt ?? ""}</time>
+        <span class="comment__author">${authorName ?? "알 수 없음"}</span>
+        <time class="comment__date">${createdAt ?? ""}</time>
       </div>
-      <p class="comment__text">${comment.content}</p>
+      <p class="comment__text">${content}</p>
     </div>
     <div class="comment__actions">
-      <button class="button button--small button--dark" type="button">
+      <button class="button button--small button--dark" type="button" data-edit-comment>
         수정
       </button>
       <button
@@ -118,11 +113,23 @@ function renderComments(comments) {
 
 async function loadPost() {
   try {
-    const post = await apiRequest(`/api/posts/${postId}`);
+    const post = await apiRequest(`/api/posts/${postId}?userId=${userId}`);
     renderPost(post);
   } catch (error) {
     console.warn(error.message);
-    renderPost(fallbackPost);
+    showToast(error.message);
+  }
+}
+
+async function loadCurrentUser() {
+  try {
+    currentUser = await apiRequest(`/api/users/${userId}`);
+    sessionStorage.setItem("nickname", currentUser.nickname ?? "");
+    if (currentUser.profileImage) {
+      sessionStorage.setItem("profileImage", currentUser.profileImage);
+    }
+  } catch (error) {
+    console.warn(error.message);
   }
 }
 
@@ -130,12 +137,13 @@ document
   .querySelector("[data-like-button]")
   .addEventListener("click", async () => {
     try {
-      const response = await apiRequest(`/api/posts/${postId}/likes`, {
+      const response = await apiRequest(`/api/posts/${postId}/likes?userId=${userId}`, {
         method: "POST",
       });
 
+      currentPostLiked = Boolean(response?.liked);
       elements.likeCount.textContent =
-        response?.likeCount ?? Number(elements.likeCount.textContent) + 1;
+        response?.like_count ?? response?.likeCount ?? Number(elements.likeCount.textContent) + 1;
     } catch (error) {
       showToast(error.message);
     }
@@ -154,10 +162,17 @@ commentForm.addEventListener("submit", async (event) => {
   }
 
   try {
-    const comment = await apiRequest(`/api/posts/${postId}/comments`, {
+    const response = await apiRequest(`/api/posts/${postId}/comments/users/${userId}`, {
       method: "POST",
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ comment: content }),
     });
+    const comment = {
+      comment_id: typeof response === "number" ? response : response?.comment_id,
+      comment: content,
+      nickname: currentUser?.nickname ?? sessionStorage.getItem("nickname") ?? "알 수 없음",
+      profile_image: currentUser?.profileImage ?? sessionStorage.getItem("profileImage"),
+      created_at: new Date().toISOString(),
+    };
 
     elements.commentList.append(createCommentElement(comment));
     elements.commentCount.textContent =
@@ -169,17 +184,41 @@ commentForm.addEventListener("submit", async (event) => {
 });
 
 elements.commentList.addEventListener("click", async (event) => {
-  const button = event.target.closest("[data-delete-comment]");
+  const editButton = event.target.closest("[data-edit-comment]");
+  const deleteButton = event.target.closest("[data-delete-comment]");
 
-  if (!button) {
+  if (!editButton && !deleteButton) {
     return;
   }
 
-  const commentElement = button.closest("[data-comment-id]");
+  const commentElement = event.target.closest("[data-comment-id]");
   const commentId = commentElement.dataset.commentId;
+  const commentText = commentElement.querySelector(".comment__text");
+
+  if (editButton) {
+    const nextComment = window.prompt("댓글을 수정해주세요.", commentText.textContent)?.trim();
+
+    if (!nextComment || nextComment === commentText.textContent) {
+      return;
+    }
+
+    try {
+      await apiRequest(`/api/posts/${postId}/comments/${commentId}/users/${userId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ comment: nextComment }),
+      });
+      commentText.textContent = nextComment;
+    } catch (error) {
+      showToast(error.message);
+    }
+
+    return;
+  }
 
   try {
-    await apiRequest(`/api/comments/${commentId}`, { method: "DELETE" });
+    await apiRequest(`/api/posts/${postId}/comments/${commentId}/users/${userId}`, {
+      method: "DELETE",
+    });
     commentElement.remove();
     elements.commentCount.textContent = Math.max(
       0,
@@ -202,7 +241,7 @@ document.querySelector("[data-cancel-delete]").addEventListener("click", () => {
 
 document.querySelector("[data-confirm-delete]").addEventListener("click", async () => {
   try {
-    await apiRequest(`/api/posts/${postId}`, { method: "DELETE" });
+    await apiRequest(`/api/posts/${postId}?userId=${userId}`, { method: "DELETE" });
     window.location.href = "../posts/posts.html";
   } catch (error) {
     deleteModal.classList.remove("is-open");
@@ -210,4 +249,4 @@ document.querySelector("[data-confirm-delete]").addEventListener("click", async 
   }
 });
 
-loadPost();
+loadCurrentUser().finally(loadPost);

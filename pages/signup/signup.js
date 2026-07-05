@@ -24,6 +24,7 @@ const nicknameError = document.querySelector("[data-nickname-error]");
 
 const passwordPattern =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=])[A-Za-z\d!@#$%^&*()_+\-=]{8,20}$/;
+const defaultProfileImage = "../../assets/images/profile-default.svg";
 
 profileInput.addEventListener("change", () => {
   const [file] = profileInput.files;
@@ -96,7 +97,9 @@ form.addEventListener("submit", async (event) => {
   const request = {
     email: emailInput.value.trim(),
     password: passwordInput.value,
+    password_confirm: passwordConfirmInput.value,
     nickname: nicknameInput.value.trim(),
+    profile_image: defaultProfileImage,
   };
 
   formData.append(

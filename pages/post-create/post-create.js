@@ -45,21 +45,24 @@ form.addEventListener("submit", async (event) => {
   }
 
   const userId = sessionStorage.getItem("userId") ?? "1";
-  const formData = new FormData();
-  formData.append("title", titleInput.value.trim());
-  formData.append("content", contentInput.value.trim());
+  const request = {
+    title: titleInput.value.trim(),
+    content: contentInput.value.trim(),
+  };
 
   if (imageInput.files[0]) {
-    formData.append("image", imageInput.files[0]);
+    request.imageUrl = URL.createObjectURL(imageInput.files[0]);
   }
 
   try {
     const response = await apiRequest(`/api/posts/${userId}`, {
       method: "POST",
-      body: formData,
+      body: JSON.stringify(request),
     });
 
-    const postId = response?.postId ?? response?.id;
+    const postId = typeof response === "number"
+      ? response
+      : response?.postId ?? response?.id;
     window.location.href = postId
       ? `../post-detail/post-detail.html?postId=${postId}`
       : "../posts/posts.html";

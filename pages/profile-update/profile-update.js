@@ -23,20 +23,38 @@ async function loadProfile() {
 
     emailElement.textContent = user.email ?? "";
     nicknameInput.value = user.nickname ?? "";
+    sessionStorage.setItem("nickname", user.nickname ?? "");
 
-    if (user.profileImageUrl) {
-      profilePreview.src = user.profileImageUrl;
+    const profileImage = user.profileImageUrl ?? user.profileImage;
+
+    if (profileImage) {
+      profilePreview.src = profileImage;
+      sessionStorage.setItem("profileImage", profileImage);
     }
   } catch (error) {
     console.warn(error.message);
   }
 }
 
-profileInput.addEventListener("change", () => {
+profileInput.addEventListener("change", async () => {
   const [file] = profileInput.files;
 
-  if (file) {
-    profilePreview.src = URL.createObjectURL(file);
+  if (!file) {
+    return;
+  }
+
+  const profileImage = URL.createObjectURL(file);
+  profilePreview.src = profileImage;
+
+  try {
+    await apiRequest(`/api/users/${userId}/profile-image`, {
+      method: "PATCH",
+      body: JSON.stringify({ profile_image: profileImage }),
+    });
+    sessionStorage.setItem("profileImage", profileImage);
+    showToast("프로필 사진이 수정되었습니다.");
+  } catch (error) {
+    setError(nicknameInput, nicknameError, `*${error.message}`);
   }
 });
 
@@ -62,16 +80,7 @@ form.addEventListener("submit", async (event) => {
       body: JSON.stringify({ nickname }),
     });
 
-    if (profileInput.files[0]) {
-      const formData = new FormData();
-      formData.append("profileImage", profileInput.files[0]);
-
-      await apiRequest(`/api/users/${userId}/profile-image`, {
-        method: "PATCH",
-        body: formData,
-      });
-    }
-
+    sessionStorage.setItem("nickname", nickname);
     showToast("수정 완료");
   } catch (error) {
     setError(nicknameInput, nicknameError, `*${error.message}`);

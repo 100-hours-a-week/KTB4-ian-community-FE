@@ -58,7 +58,10 @@ form.addEventListener("submit", async (event) => {
   try {
     await apiRequest(`/api/users/${userId}/password`, {
       method: "PATCH",
-      body: JSON.stringify({ password: passwordInput.value }),
+      body: JSON.stringify({
+        password: passwordInput.value,
+        password_confirm: passwordConfirmInput.value,
+      }),
     });
 
     form.reset();

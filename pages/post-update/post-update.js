@@ -13,6 +13,7 @@ initLogout();
 initBackButton("../posts/posts.html");
 
 const postId = getQueryParam("postId") ?? "1";
+const userId = sessionStorage.getItem("userId") ?? "1";
 const form = document.querySelector("[data-post-form]");
 const titleInput = form.elements.title;
 const contentInput = form.elements.content;
@@ -23,17 +24,18 @@ const contentError = document.querySelector("[data-content-error]");
 
 async function loadPost() {
   try {
-    const post = await apiRequest(`/api/posts/${postId}`);
+    const post = await apiRequest(`/api/posts/${postId}?userId=${userId}`);
+    const imageUrl = post.imageUrl ?? post.image_url;
 
     titleInput.value = post.title ?? "";
     contentInput.value = post.content ?? "";
+    currentImage.hidden = !imageUrl;
 
-    if (post.imageUrl) {
-      currentImage.src = post.imageUrl;
+    if (imageUrl) {
+      currentImage.src = imageUrl;
     }
   } catch (error) {
-    titleInput.value = "수정할 게시글 제목입니다.";
-    contentInput.value = "수정할 게시글 내용입니다.";
+    showToast(error.message);
   }
 }
 
@@ -41,6 +43,7 @@ imageInput.addEventListener("change", () => {
   const [file] = imageInput.files;
 
   if (file) {
+    currentImage.hidden = false;
     currentImage.src = URL.createObjectURL(file);
   }
 });
@@ -68,18 +71,19 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
-  const formData = new FormData();
-  formData.append("title", titleInput.value.trim());
-  formData.append("content", contentInput.value.trim());
+  const request = {
+    title: titleInput.value.trim(),
+    content: contentInput.value.trim(),
+  };
 
   if (imageInput.files[0]) {
-    formData.append("image", imageInput.files[0]);
+    request.imageUrl = URL.createObjectURL(imageInput.files[0]);
   }
 
   try {
-    await apiRequest(`/api/posts/${postId}`, {
+    await apiRequest(`/api/posts/${postId}?userId=${userId}`, {
       method: "PATCH",
-      body: formData,
+      body: JSON.stringify(request),
     });
 
     showToast("게시글이 수정되었습니다.");
