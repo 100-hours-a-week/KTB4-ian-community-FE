@@ -1,4 +1,4 @@
-import { apiRequest, setError } from "../../scripts/common.js";
+import { apiRequest, issueCsrfToken, setError } from "../../scripts/common.js";
 
 const form = document.querySelector("[data-login-form]");
 const emailInput = form.elements.email;
@@ -52,6 +52,8 @@ form.addEventListener("submit", async (event) => {
       }),
     });
 
+    await issueCsrfToken();
+
     if (response?.userId) {
       sessionStorage.setItem("userId", String(response.userId));
     }
@@ -65,3 +67,16 @@ form.addEventListener("submit", async (event) => {
     );
   }
 });
+
+async function initializeLoginPage() {
+  try {
+    await issueCsrfToken();
+  } catch (error) {
+    console.warn(
+      error.message ||
+        "CSRF 토큰 초기화에 실패했습니다.",
+    );
+  }
+}
+
+initializeLoginPage();

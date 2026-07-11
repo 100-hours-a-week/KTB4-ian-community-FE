@@ -1,21 +1,101 @@
 const API_PORT = "8080";
-const API_HOST = window.location.hostname || "localhost";
-const API_BASE_URL = `http://${API_HOST}:${API_PORT}`;
+const API_HOST =
+  window.location.hostname || "localhost";
+const API_BASE_URL =
+  `http://${API_HOST}:${API_PORT}`;
+
+function getCookie(name) {
+  const target = `${name}=`;
+
+  const cookie = document.cookie
+    .split("; ")
+    .find((item) =>
+      item.startsWith(target),
+    );
+
+  if (!cookie) {
+    return null;
+  }
+
+  return decodeURIComponent(
+    cookie.substring(target.length),
+  );
+}
+
+export async function issueCsrfToken() {
+  const response = await fetch(
+    `${API_BASE_URL}/api/csrf`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "CSRF 토큰을 발급받지 못했습니다.",
+    );
+  }
+}
+
+async function getCsrfToken() {
+  let token = getCookie("XSRF-TOKEN");
+
+  if (token) {
+    return token;
+  }
+
+  await issueCsrfToken();
+
+  token = getCookie("XSRF-TOKEN");
+
+  if (!token) {
+    throw new Error(
+      "XSRF-TOKEN 쿠키를 확인할 수 없습니다.",
+    );
+  }
+
+  return token;
+}
+
 
 export async function apiRequest(path, options = {}) {
   let response;
 
+  const method = (
+    options.method ?? "GET"
+  ).toUpperCase();
+
+  const headers = {
+    ...(!(options.body instanceof FormData)
+      ? { "Content-Type": "application/json" }
+      : {}),
+    ...options.headers,
+  };
+
+  const unsafeMethods = new Set([
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+  ]);
+
+  if (unsafeMethods.has(method)) {
+    const csrfToken = await getCsrfToken();
+
+    headers["X-XSRF-TOKEN"] = csrfToken;
+  }
+
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      credentials: "include",
-      headers: {
-        ...(!(options.body instanceof FormData)
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...options.headers,
+    response = await fetch(
+      `${API_BASE_URL}${path}`,
+      {
+        ...options,
+        method,
+        credentials: "include",
+        headers,
       },
-      ...options,
-    });
+    );
   } catch (error) {
     if (error instanceof TypeError) {
       throw new Error(
@@ -30,22 +110,29 @@ export async function apiRequest(path, options = {}) {
     return null;
   }
 
-  const contentType = response.headers.get("content-type") ?? "";
-  const body = contentType.includes("application/json")
+  const contentType =
+    response.headers.get("content-type") ?? "";
+
+  const body = contentType.includes(
+    "application/json",
+  )
     ? await response.json()
     : await response.text();
 
   if (!response.ok) {
     const message =
       typeof body === "object" && body !== null
-        ? body.message ?? "요청 처리에 실패했습니다."
-        : body || "요청 처리에 실패했습니다.";
+        ? body.message ??
+          "요청 처리에 실패했습니다."
+        : body ||
+          "요청 처리에 실패했습니다.";
 
     throw new Error(message);
   }
 
   return body;
 }
+
 
 export function initProfileMenu() {
   const button = document.querySelector("[data-profile-button]");
@@ -67,6 +154,7 @@ export function initProfileMenu() {
   });
 }
 
+
 export function initBackButton(fallbackUrl) {
   const button = document.querySelector("[data-back-button]");
 
@@ -84,24 +172,41 @@ export function initBackButton(fallbackUrl) {
   });
 }
 
+
 export function initLogout() {
-  const button = document.querySelector("[data-logout-button]");
+  const button =
+    document.querySelector(
+      "[data-logout-button]",
+    );
 
   if (!button) {
     return;
   }
 
-  button.addEventListener("click", async () => {
-    try {
-      await apiRequest("/api/users/logout", { method: "POST" });
-    } catch (error) {
-      console.warn(error.message);
-    } finally {
-      sessionStorage.clear();
-      window.location.href = "../login/login.html";
-    }
-  });
+  button.addEventListener(
+    "click",
+    async () => {
+      try {
+        await apiRequest(
+          "/api/users/logout",
+          {
+            method: "POST",
+          },
+        );
+
+        await issueCsrfToken();
+      } catch (error) {
+        console.warn(error.message);
+      } finally {
+        sessionStorage.clear();
+
+        window.location.href =
+          "../login/login.html";
+      }
+    },
+  );
 }
+
 
 export function setError(input, errorElement, message) {
   input.setAttribute("aria-invalid", String(Boolean(message)));
@@ -123,9 +228,11 @@ export function showToast(message) {
   }, 1800);
 }
 
+
 export function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
+
 
 export function formatCount(value) {
   const number = Number(value) || 0;
