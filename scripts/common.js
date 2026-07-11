@@ -1,20 +1,57 @@
 const API_PORT = "8080";
-const API_HOST = window.location.hostname || "localhost";
+const API_HOST = window.location.hostname || "127.0.0.1";
 const API_BASE_URL = `http://${API_HOST}:${API_PORT}`;
+const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+function getCookie(name) {
+  const prefix = `${encodeURIComponent(name)}=`;
+  const cookie = document.cookie
+    .split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(prefix));
+
+  return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : null;
+}
+
+async function ensureCsrfToken() {
+  if (getCookie("XSRF-TOKEN")) {
+    return;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/csrf`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!response.ok || !getCookie("XSRF-TOKEN")) {
+    throw new Error("CSRF 토큰을 발급받지 못했습니다.");
+  }
+}
 
 export async function apiRequest(path, options = {}) {
   let response;
+  const method = (options.method ?? "GET").toUpperCase();
 
   try {
+    if (UNSAFE_METHODS.has(method)) {
+      await ensureCsrfToken();
+    }
+
+    const headers = {
+      ...(!(options.body instanceof FormData)
+        ? { "Content-Type": "application/json" }
+        : {}),
+      ...(UNSAFE_METHODS.has(method)
+        ? { "X-XSRF-TOKEN": getCookie("XSRF-TOKEN") }
+        : {}),
+      ...options.headers,
+    };
+
     response = await fetch(`${API_BASE_URL}${path}`, {
-      credentials: "include",
-      headers: {
-        ...(!(options.body instanceof FormData)
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...options.headers,
-      },
       ...options,
+      method,
+      credentials: "include",
+      headers,
     });
   } catch (error) {
     if (error instanceof TypeError) {
