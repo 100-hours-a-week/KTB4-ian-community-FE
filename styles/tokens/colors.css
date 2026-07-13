@@ -1,144 +1,219 @@
 /*
- * Primitive color
- *
- * Tailwind 클래스 예시:
- * bg-primary-500
- * text-grayscale-900
- * border-grayscale-200
+ * Generated from Figma Local Variables.
+ * Collections: Primitive (Mode 1), Sementic (Mode 1).
+ * Figma variable paths are preserved as kebab-case CSS variable names.
  */
- @theme static {
-  /* Primary */
-  --color-primary-50: #efeffd;
-  --color-primary-100: #ccccf9;
-  --color-primary-200: #b4b4f6;
-  --color-primary-300: #9192f2;
-  --color-primary-400: #7c7def;
-  --color-primary-500: #5b5ceb;
-  --color-primary-600: #5354d6;
-  --color-primary-700: #4141a7;
-  --color-primary-800: #323381;
-  --color-primary-900: #262763;
 
-  /* Grayscale */
-  --color-grayscale-50: #fafafa;
-  --color-grayscale-100: #f5f5f5;
-  --color-grayscale-200: #e5e5e5;
-  --color-grayscale-300: #d4d4d4;
-  --color-grayscale-400: #a1a1a1;
-  --color-grayscale-500: #737373;
-  --color-grayscale-600: #525252;
-  --color-grayscale-700: #404040;
-  --color-grayscale-800: #262626;
-  --color-grayscale-900: #171717;
-  --color-grayscale-950: #0a0a0a;
-  --color-grayscale-1000: #000000;
+@theme static {
+  /* Primitive / Orange */
+  --color-orange-50: #fff8f3;
+  --color-orange-100: #ffd4b7;
+  --color-orange-200: #ffc095;
+  --color-orange-300: #ffa364;
+  --color-orange-400: #ff9146;
+  --color-orange-500: #ff7518;
+  --color-orange-600: #e86a16;
+  --color-orange-700: #b55311;
+  --color-orange-800: #8c400d;
+  --color-orange-900: #6b310a;
+  --color-orange-950: #301605;
 
-  /* Base */
-  --color-white: #ffffff;
+  /* Primitive / neutral */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a1a1a1;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
+
+  /* Primitive / Red */
+  --color-red-50: #ffe8e8;
+  --color-red-100: #ffdcdc;
+  --color-red-200: #ffb7b7;
+  --color-red-300: #ff1818;
+  --color-red-400: #e61616;
+  --color-red-500: #cc1313;
+  --color-red-600: #bf1212;
+  --color-red-700: #990e0e;
+  --color-red-800: #730b0b;
+  --color-red-900: #590808;
+  --color-red-950: #330505;
+
+  /* Primitive / Blue */
+  --color-blue-50: #e8eeff;
+  --color-blue-100: #dce6ff;
+  --color-blue-200: #b7ccff;
+  --color-blue-300: #1859ff;
+  --color-blue-400: #1650e6;
+  --color-blue-500: #1347cc;
+  --color-blue-600: #1243bf;
+  --color-blue-700: #0e3599;
+  --color-blue-800: #0b2873;
+  --color-blue-900: #081f59;
+  --color-blue-950: #051233;
+
+  /* Primitive / Green */
+  --color-green-50: #e9fae6;
+  --color-green-100: #def7d9;
+  --color-green-200: #baeeb0;
+  --color-green-300: #22c900;
+  --color-green-400: #1fb500;
+  --color-green-500: #1ba100;
+  --color-green-600: #1a9700;
+  --color-green-700: #147900;
+  --color-green-800: #0f5a00;
+  --color-green-900: #0c4600;
+  --color-green-950: #072800;
+
+  /* Primitive / Yellow */
+  --color-yellow-50: #fffce8;
+  --color-yellow-100: #fffadc;
+  --color-yellow-200: #fff5b7;
+  --color-yellow-300: #ffe018;
+  --color-yellow-400: #e6ca16;
+  --color-yellow-500: #ccb313;
+  --color-yellow-600: #bfa812;
+  --color-yellow-700: #99860e;
+  --color-yellow-800: #73650b;
+  --color-yellow-900: #594e08;
+  --color-yellow-950: #332d05;
+
+  /* Primitive / Black, White */
   --color-black: #000000;
-
-  /* Status */
-  --color-error: #ff1818;
-  --color-info: #1650e6;
-  --color-success: #1fb500;
-  --color-warning: #ffe018;
-
-  /* Alpha */
-  --color-black-alpha-88: rgb(0 0 0 / 88%);
-  --color-black-alpha-61: rgb(0 0 0 / 61%);
-  --color-black-alpha-28: rgb(0 0 0 / 28%);
-  --color-black-alpha-16: rgb(0 0 0 / 16%);
-
-  --color-white-alpha-88: rgb(255 255 255 / 88%);
-  --color-white-alpha-61: rgb(255 255 255 / 61%);
-  --color-white-alpha-28: rgb(255 255 255 / 28%);
-  --color-white-alpha-16: rgb(255 255 255 / 16%);
-
-  /*
-   * Semantic color
-   *
-   * Tailwind 클래스 예시:
-   * bg-brand
-   * hover:bg-brand-hover
-   * text-content-primary
-   * bg-surface-secondary
-   * border-line-default
-   */
-
-  /* Brand */
-  --color-brand: var(--color-primary-500);
-  --color-brand-hover: var(--color-primary-300);
-  --color-brand-pressed: var(--color-primary-700);
-  --color-brand-selected: var(--color-primary-500);
-  --color-brand-subtle: var(--color-primary-50);
-
-  /* Text & Icon */
-  --color-content-primary: var(--color-grayscale-900);
-  --color-content-secondary: var(--color-grayscale-500);
-  --color-content-tertiary: var(--color-grayscale-400);
-  --color-content-disabled: var(--color-grayscale-300);
-  --color-content-inverse: var(--color-white);
-
-  /* Background */
-  --color-surface-primary: var(--color-white);
-  --color-surface-secondary: var(--color-grayscale-50);
-  --color-surface-tertiary: var(--color-grayscale-100);
-  --color-surface-quaternary: var(--color-grayscale-200);
-
-  /* Border */
-  --color-line-default: var(--color-grayscale-200);
-  --color-line-strong: var(--color-grayscale-400);
+  --color-white: #ffffff;
 }
 
-/*
- * 기존 common.css와 페이지별 CSS가 사용하던 변수의 호환 계층입니다.
- *
- * 기존 CSS를 한 번에 전부 수정하지 않아도 됩니다.
- */
 :root {
-  /* Text & Icon */
-  --color-text-primary: var(--color-content-primary);
-  --color-text-secondary: var(--color-content-secondary);
-  --color-text-tertiary: var(--color-content-tertiary);
-  --color-text-disable: var(--color-content-disabled);
+  /* Sementic / Color/Text */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-500);
+  --color-text-tertiary: var(--color-neutral-400);
+  --color-text-error: var(--color-red-300);
+  --color-text-info: var(--color-blue-400);
+  --color-text-success: var(--color-green-400);
+  --color-text-warning: var(--color-yellow-300);
+  --color-text-disabled: var(--color-neutral-300);
+  --color-text-interactive-primary: var(--color-orange-500);
+  --color-text-interactive-primary-hover: var(--color-orange-300);
+  --color-text-interactive-primary-press: var(--color-orange-700);
+  --color-text-interactive-primary-select: var(--color-orange-500);
+  --color-text-interactive-secondary: var(--color-neutral-500);
+  --color-text-interactive-inverse: var(--color-neutral-50);
+  --color-text-opacity-normal: color-mix(in srgb, var(--color-black) 88%, transparent);
+  --color-text-opacity-alternative: color-mix(in srgb, var(--color-black) 61%, transparent);
+  --color-text-opacity-assistive: color-mix(in srgb, var(--color-black) 28%, transparent);
+  --color-text-opacity-default: color-mix(in srgb, var(--color-black) 16%, transparent);
 
-  /* Brand */
-  --color-primary: var(--color-brand);
-  --color-primary-hover: var(--color-brand-hover);
-  --color-primary-press: var(--color-brand-pressed);
-  --color-primary-select: var(--color-brand-selected);
-  --color-primary-light: var(--color-brand-subtle);
+  /* Sementic / Color/Bg (Figma spellings Teritray and Fourty are preserved) */
+  --color-bg-primary: var(--color-white);
+  --color-bg-secondary: var(--color-neutral-50);
+  --color-bg-teritray: var(--color-neutral-100);
+  --color-bg-fourty: var(--color-neutral-200);
+  --color-bg-error: var(--color-red-50);
+  --color-bg-info: var(--color-blue-50);
+  --color-bg-success: var(--color-green-50);
+  --color-bg-warning: var(--color-yellow-50);
+  --color-bg-disabled: var(--color-neutral-100);
+  --color-bg-interactive-primary: var(--color-orange-500);
+  --color-bg-interactive-primary-hover: var(--color-orange-300);
+  --color-bg-interactive-primary-press: var(--color-orange-700);
+  --color-bg-interactive-primary-select: var(--color-orange-500);
+  --color-bg-interactive-primary-light: var(--color-orange-50);
+  --color-bg-interactive-secondary: var(--color-neutral-200);
+  --color-bg-interactive-inverse: var(--color-neutral-50);
+  --color-bg-opacity-normal: color-mix(in srgb, var(--color-neutral-200) 88%, transparent);
+  --color-bg-opacity-alternative: color-mix(in srgb, var(--color-neutral-200) 61%, transparent);
+  --color-bg-opacity-assistive: color-mix(in srgb, var(--color-neutral-200) 28%, transparent);
+  --color-bg-opacity-default: color-mix(in srgb, var(--color-neutral-200) 16%, transparent);
 
-  --color-secondary: var(--color-content-secondary);
-  --color-inverse: var(--color-content-inverse);
+  /* Sementic / Color/Icon */
+  --color-icon-primary: var(--color-neutral-900);
+  --color-icon-secondary: var(--color-neutral-500);
+  --color-icon-teritray: var(--color-neutral-400);
+  --color-icon-error: var(--color-red-300);
+  --color-icon-info: var(--color-blue-400);
+  --color-icon-success: var(--color-green-400);
+  --color-icon-warning: var(--color-yellow-300);
+  --color-icon-disabled: var(--color-neutral-300);
+  --color-icon-interactive-primary: var(--color-orange-500);
+  --color-icon-interactive-primary-hover: var(--color-orange-300);
+  --color-icon-interactive-primary-press: var(--color-orange-700);
+  --color-icon-interactive-primary-select: var(--color-orange-500);
+  --color-icon-interactive-secondary: var(--color-neutral-500);
+  --color-icon-interactive-inverse: var(--color-neutral-50);
+  --color-icon-opacity-normal: color-mix(in srgb, var(--color-black) 88%, transparent);
+  --color-icon-opacity-alternative: color-mix(in srgb, var(--color-black) 61%, transparent);
+  --color-icon-opacity-assistive: color-mix(in srgb, var(--color-black) 28%, transparent);
+  --color-icon-opacity-default: color-mix(in srgb, var(--color-black) 16%, transparent);
 
-  /* Background */
-  --bg-primary: var(--color-surface-primary);
-  --bg-secondary: var(--color-surface-secondary);
-  --bg-tertiary: var(--color-surface-tertiary);
-  --bg-quaternary: var(--color-surface-quaternary);
+  /* Sementic / Color/Border */
+  --color-border-primary: var(--color-neutral-300);
+  --color-border-secondary: var(--color-neutral-200);
+  --color-border-teritray: var(--color-neutral-100);
+  --color-border-error: var(--color-red-300);
+  --color-border-info: var(--color-blue-400);
+  --color-border-success: var(--color-green-400);
+  --color-border-warning: var(--color-yellow-300);
+  --color-border-white: var(--color-white);
+  --color-border-black: var(--color-black);
+  --color-border-interactive-primary: var(--color-orange-500);
+  --color-border-interactive-primary-hover: var(--color-orange-300);
+  --color-border-interactive-primary-press: var(--color-orange-700);
+  --color-border-interactive-primary-select: var(--color-orange-500);
+  --color-border-interactive-secondary: var(--color-neutral-500);
+  --color-border-interactive-inverse: var(--color-neutral-50);
+  --color-border-opacity-normal: color-mix(in srgb, var(--color-black) 88%, transparent);
+  --color-border-opacity-alternative: color-mix(in srgb, var(--color-black) 61%, transparent);
+  --color-border-opacity-assistive: color-mix(in srgb, var(--color-black) 28%, transparent);
+  --color-border-opacity-default: color-mix(in srgb, var(--color-black) 16%, transparent);
 
-  /*
-   * 기존 코드 호환용입니다.
-   * 신규 코드에서는 --bg-quaternary를 사용하세요.
-   */
-  --bg-forty: var(--bg-quaternary);
-
-  /* 기존 공통 CSS 호환 */
-  --color-background: var(--color-surface-secondary);
-  --color-surface: var(--color-surface-primary);
-  --color-border: var(--color-line-default);
-  --color-border-strong: var(--color-line-strong);
-  --color-danger: var(--color-error);
-
-  /* Alpha */
-  --black-alpha-88: var(--color-black-alpha-88);
-  --black-alpha-61: var(--color-black-alpha-61);
-  --black-alpha-28: var(--color-black-alpha-28);
-  --black-alpha-16: var(--color-black-alpha-16);
-
-  --white-alpha-88: var(--color-white-alpha-88);
-  --white-alpha-61: var(--color-white-alpha-61);
-  --white-alpha-28: var(--color-white-alpha-28);
-  --white-alpha-16: var(--color-white-alpha-16);
+  /* Existing application compatibility aliases; not additional Figma tokens. */
+  --color-primary-50: var(--color-orange-50);
+  --color-primary-100: var(--color-orange-100);
+  --color-primary-200: var(--color-orange-200);
+  --color-primary-300: var(--color-orange-300);
+  --color-primary-400: var(--color-orange-400);
+  --color-primary-500: var(--color-orange-500);
+  --color-primary-600: var(--color-orange-600);
+  --color-primary-700: var(--color-orange-700);
+  --color-primary-800: var(--color-orange-800);
+  --color-primary-900: var(--color-orange-900);
+  --color-grayscale-50: var(--color-neutral-50);
+  --color-grayscale-100: var(--color-neutral-100);
+  --color-grayscale-200: var(--color-neutral-200);
+  --color-grayscale-300: var(--color-neutral-300);
+  --color-grayscale-400: var(--color-neutral-400);
+  --color-grayscale-500: var(--color-neutral-500);
+  --color-grayscale-600: var(--color-neutral-600);
+  --color-grayscale-700: var(--color-neutral-700);
+  --color-grayscale-800: var(--color-neutral-800);
+  --color-grayscale-900: var(--color-neutral-900);
+  --color-grayscale-950: var(--color-neutral-950);
+  --color-grayscale-1000: var(--color-black);
+  --color-error: var(--color-text-error);
+  --color-info: var(--color-text-info);
+  --color-success: var(--color-text-success);
+  --color-warning: var(--color-text-warning);
+  --color-text-disable: var(--color-text-disabled);
+  --color-primary: var(--color-text-interactive-primary);
+  --color-primary-hover: var(--color-text-interactive-primary-hover);
+  --color-primary-press: var(--color-text-interactive-primary-press);
+  --color-primary-select: var(--color-text-interactive-primary-select);
+  --color-primary-light: var(--color-bg-interactive-primary-light);
+  --color-secondary: var(--color-text-interactive-secondary);
+  --color-inverse: var(--color-text-interactive-inverse);
+  --bg-primary: var(--color-bg-primary);
+  --bg-secondary: var(--color-bg-secondary);
+  --bg-tertiary: var(--color-bg-teritray);
+  --bg-forty: var(--color-bg-fourty);
+  --color-background: var(--color-bg-secondary);
+  --color-surface: var(--color-bg-primary);
+  --color-border: var(--color-border-secondary);
+  --color-border-strong: var(--color-border-primary);
+  --color-danger: var(--color-text-error);
 }

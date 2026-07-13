@@ -5,8 +5,7 @@
 @import "tailwindcss";
 
 /* 디자인 토큰 */
-@import "./tokens/colors.css";
-@import "./tokens/typography.css";
+@import "./tokens/index.css";
 
 /*
  * 기존 공통 스타일도 Tailwind 출력 파일에 포함합니다.

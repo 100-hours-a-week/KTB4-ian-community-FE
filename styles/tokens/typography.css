@@ -1,11 +1,10 @@
-@theme static {
-  /* ========================================
-   * Font family
-   * ======================================== */
+/* Generated from Figma Typography Variables and Local Text Styles. KO mode only. */
 
-  --font-sans:
-    "Wanted Sans Variable",
+:root {
+  /* Typography / font-family/font-famliy */
+  --font-family-font-famliy:
     "Wanted Sans",
+    "Wanted Sans Variable",
     -apple-system,
     BlinkMacSystemFont,
     system-ui,
@@ -15,116 +14,545 @@
     "Malgun Gothic",
     sans-serif;
 
-  --font-wanted:
-    "Wanted Sans Variable",
-    "Wanted Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    "Segoe UI",
-    "Apple SD Gothic Neo",
-    "Noto Sans KR",
-    "Malgun Gothic",
-    sans-serif;
+  /* Typography / font-family/font-famliy 2 (currently unused by Local Text Styles) */
+  --font-family-font-famliy-2: var(--font-family-font-famliy);
 
-  /* ========================================
-   * Font weight
-   * ======================================== */
+  --font-weight-bold: 700; /* Typography / font-weight/bold */
+  --font-weight-semibold: 600; /* Typography / font-weight/semibold */
+  --font-weight-medium: 500; /* Typography / font-weight/medium */
+  --font-weight-regular: 400; /* Typography / font-weight/regular */
 
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-size-title1: 28px;
+  --line-height-title1: 38px;
+  --letter-spacing-title1: 0.23px;
+  --font-size-title2: 24px;
+  --line-height-title2: 32px;
+  --letter-spacing-title2: -0.23px;
+  --font-size-title3: 20px;
+  --line-height-title3: 28px;
+  --letter-spacing-title3: -0.12px;
+  --font-size-heading-1: 18px;
+  --line-height-heading-1: 26px;
+  --letter-spacing-heading-1: -0.09px;
 
-  /* ========================================
-   * Title
-   * ======================================== */
+  --font-size-body1: 16px;
+  --line-height-body1-normal: 24px;
+  --line-height-body1-reading: 26px;
+  --letter-spacing-body1: 0.057px;
+  --font-size-body2: 15px;
+  --line-height-body2-normal: 22px;
+  --line-height-body2-reading: 24px;
+  --letter-spacing-body2: 0.1px;
+  --font-size-body3: 14px;
+  --line-height-body3-normal: 20px;
+  --line-height-body3-reading: 22px;
+  --letter-spacing-body3: 0.145px;
 
-  --text-title-1: 28px;
-  --text-title-1--line-height: 38px;
-  --text-title-1--letter-spacing: 0.23px;
+  --font-size-label1: 13px;
+  --line-height-label1-normal: 18px;
+  --line-height-label1-reading: 20px;
+  --letter-spacing-label1: 0.252px;
+  --font-size-label2: 12px;
+  --line-height-label2-normal: 16px;
+  --line-height-label2-reading: 18px;
+  --letter-spacing-label2: 0.252px;
+  --font-size-caption: 11px;
+  --line-height-caption: 14px;
+  --letter-spacing-caption: 0.311px;
+}
 
-  --text-title-2: 24px;
-  --text-title-2--line-height: 32px;
-  --text-title-2--letter-spacing: -0.23px;
+/* Tailwind CSS v4 integration used by the existing global font stack. */
+@theme inline {
+  --font-sans: var(--font-family-font-famliy);
+}
 
-  --text-title-3: 20px;
-  --text-title-3--line-height: 28px;
-  --text-title-3--letter-spacing: -0.12px;
+/* Figma Local Text Styles: Title */
+.typography-title1-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-title1);
+  letter-spacing: var(--letter-spacing-title1);
+}
 
-  /* ========================================
-   * Heading
-   * ======================================== */
+.typography-title1-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-title1);
+  letter-spacing: var(--letter-spacing-title1);
+}
 
-  --text-heading-1: 18px;
-  --text-heading-1--line-height: 26px;
-  --text-heading-1--letter-spacing: -0.09px;
+.typography-title1-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-title1);
+  letter-spacing: var(--letter-spacing-title1);
+}
 
-  /* ========================================
-   * Body 1
-   * ======================================== */
+.typography-title1-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-title1);
+  letter-spacing: var(--letter-spacing-title1);
+}
 
-  --text-body-1: 16px;
-  --text-body-1--line-height: 24px;
-  --text-body-1--letter-spacing: 0.06px;
+.typography-title2-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-title2);
+  letter-spacing: var(--letter-spacing-title2);
+}
 
-  --text-body-1-reading: 16px;
-  --text-body-1-reading--line-height: 26px;
-  --text-body-1-reading--letter-spacing: 0.06px;
+.typography-title2-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-title2);
+  letter-spacing: var(--letter-spacing-title2);
+}
 
-  /* ========================================
-   * Body 2
-   * ======================================== */
+.typography-title2-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title2);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-title2);
+  letter-spacing: var(--letter-spacing-title2);
+}
 
-  --text-body-2: 15px;
-  --text-body-2--line-height: 22px;
-  --text-body-2--letter-spacing: 0.1px;
+.typography-title2-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-title2);
+  letter-spacing: var(--letter-spacing-title2);
+}
 
-  --text-body-2-reading: 15px;
-  --text-body-2-reading--line-height: 24px;
-  --text-body-2-reading--letter-spacing: 0.1px;
+.typography-title3-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-title3);
+  letter-spacing: var(--letter-spacing-title3);
+}
 
-  /* ========================================
-   * Body 3
-   * ======================================== */
+.typography-title3-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-title3);
+  letter-spacing: var(--letter-spacing-title3);
+}
 
-  --text-body-3: 14px;
-  --text-body-3--line-height: 20px;
-  --text-body-3--letter-spacing: 0.14px;
+.typography-title3-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-title3);
+  letter-spacing: var(--letter-spacing-title3);
+}
 
-  --text-body-3-reading: 14px;
-  --text-body-3-reading--line-height: 22px;
-  --text-body-3-reading--letter-spacing: 0.14px;
+.typography-title3-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-title3);
+  letter-spacing: var(--letter-spacing-title3);
+}
 
-  /* ========================================
-   * Label 1
-   * ======================================== */
+/* Figma Local Text Styles: Heading 1 */
+.typography-heading-1-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-heading-1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading-1);
+  letter-spacing: var(--letter-spacing-heading-1);
+}
 
-  --text-label-1: 13px;
-  --text-label-1--line-height: 18px;
-  --text-label-1--letter-spacing: 0.25px;
+.typography-heading-1-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-heading-1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading-1);
+  letter-spacing: var(--letter-spacing-heading-1);
+}
 
-  --text-label-1-reading: 13px;
-  --text-label-1-reading--line-height: 20px;
-  --text-label-1-reading--letter-spacing: 0.25px;
+.typography-heading-1-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-heading-1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-heading-1);
+  letter-spacing: var(--letter-spacing-heading-1);
+}
 
-  /* ========================================
-   * Label 2
-   * ======================================== */
+.typography-heading-1-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-heading-1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-heading-1);
+  letter-spacing: var(--letter-spacing-heading-1);
+}
 
-  --text-label-2: 12px;
-  --text-label-2--line-height: 16px;
-  --text-label-2--letter-spacing: 0.25px;
+/* Figma Local Text Styles: Body1 (Figma spelling Nomal is preserved) */
+.typography-body1-nomal-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body1-normal);
+  letter-spacing: var(--letter-spacing-body1);
+}
 
-  --text-label-2-reading: 12px;
-  --text-label-2-reading--line-height: 18px;
-  --text-label-2-reading--letter-spacing: 0.25px;
+.typography-body1-nomal-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body1-normal);
+  letter-spacing: var(--letter-spacing-body1);
+}
 
-  /* ========================================
-   * Caption
-   * ======================================== */
+.typography-body1-nomal-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body1-normal);
+  letter-spacing: var(--letter-spacing-body1);
+}
 
-  --text-caption: 11px;
-  --text-caption--line-height: 14px;
-  --text-caption--letter-spacing: 0.31px;
+.typography-body1-nomal-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body1-normal);
+  letter-spacing: var(--letter-spacing-body1);
+}
+
+.typography-body1-reading-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body1-reading);
+  letter-spacing: var(--letter-spacing-body1);
+}
+
+.typography-body1-reading-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body1-reading);
+  letter-spacing: var(--letter-spacing-body1);
+}
+
+.typography-body1-reading-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body1-reading);
+  letter-spacing: var(--letter-spacing-body1);
+}
+
+.typography-body1-reading-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body1-reading);
+  letter-spacing: var(--letter-spacing-body1);
+}
+
+/* Figma Local Text Styles: Body2 (Figma spelling Nomal is preserved) */
+.typography-body2-nomal-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body2-normal);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+.typography-body2-nomal-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body2-normal);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+.typography-body2-nomal-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body2-normal);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+.typography-body2-nomal-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body2-normal);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+.typography-body2-reading-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body2-reading);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+.typography-body2-reading-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body2-reading);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+/* Entire style is hardcoded in Figma; 0.96px intentionally differs from the body2 token. */
+.typography-body2-reading-medium {
+  font-family: "Wanted Sans", "Wanted Sans Variable", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.96px;
+}
+
+.typography-body2-reading-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body2-reading);
+  letter-spacing: var(--letter-spacing-body2);
+}
+
+/* Figma Local Text Styles: Body3 */
+.typography-body3-normal-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body3-normal);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-normal-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body3-normal);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-normal-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body3-normal);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-normal-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body3-normal);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-reading-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body3-reading);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-reading-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body3-reading);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-reading-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body3-reading);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+.typography-body3-reading-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-body3);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body3-reading);
+  letter-spacing: var(--letter-spacing-body3);
+}
+
+/* Figma Local Text Styles: Label1 */
+.typography-label1-normal-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-label1-normal);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+/* Only font-family is variable-bound in Figma. */
+.typography-label1-normal-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0.252px;
+}
+
+.typography-label1-normal-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-label1-normal);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+/* Figma spelling Regualr is preserved in the class name. */
+.typography-label1-normal-regualr {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-label1-normal);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+.typography-label1-reading-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-label1-reading);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+.typography-label1-reading-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-label1-reading);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+.typography-label1-reading-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-label1-reading);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+.typography-label1-reading-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-label1-reading);
+  letter-spacing: var(--letter-spacing-label1);
+}
+
+/* Figma Local Text Styles: Label2 */
+.typography-label2-normal-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-label2-normal);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-normal-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-label2-normal);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-normal-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-label2-normal);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-normal-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-label2-normal);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-reading-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-label2-reading);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-reading-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-label2-reading);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-reading-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-label2-reading);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+.typography-label2-reading-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-label2-reading);
+  letter-spacing: var(--letter-spacing-label2);
+}
+
+/* Figma Local Text Styles: Caption */
+.typography-caption-bold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
+}
+
+.typography-caption-semibold {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
+}
+
+.typography-caption-medium {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
+}
+
+.typography-caption-regular {
+  font-family: var(--font-family-font-famliy);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
 }
