@@ -1,76 +1,114 @@
-.posts-intro {
-  margin-bottom: 28px;
-  text-align: center;
-}
-
-.posts-intro strong {
-  display: block;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.posts-intro p {
-  margin-top: 4px;
-  font-size: 20px;
-}
-
-.posts-toolbar {
+.posts-header {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 18px;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 16px 16px;
+}
+
+.posts-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.posts-prompt__message {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-tertiary);
+}
+
+.posts-prompt .button {
+  min-height: 34px;
+  flex: 0 0 auto;
 }
 
 .post-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .post-card {
-  overflow: hidden;
+  border-top: 1px solid var(--color-border-secondary);
+  background: var(--color-bg-primary);
 }
 
 .post-card__link {
-  display: block;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  padding: 16px;
 }
 
 .post-card__body {
-  padding: 20px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-inline: 4px;
 }
 
 .post-card__title {
-  margin-bottom: 10px;
   overflow: hidden;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-font-family);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-label2-reading);
+  letter-spacing: var(--letter-spacing-label2);
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 20px;
 }
 
 .post-card__meta {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: var(--color-text-secondary);
-  font-size: 13px;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-font-family);
+  font-size: var(--font-size-label2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-label2-normal);
+  letter-spacing: var(--letter-spacing-label2);
 }
 
 .post-card__counts {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .post-card__author {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 22px;
-  border-top: 1px solid var(--color-border);
-  font-size: 14px;
-  font-weight: 700;
+  gap: 8px;
+  padding: 0 4px 8px;
+  font-family: var(--font-family-font-family);
+  font-size: var(--font-size-label1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-label1-normal);
+  letter-spacing: var(--letter-spacing-label1);
 }
 
 .post-card__author img {
   width: 34px;
   height: 34px;
-  border-radius: 50%;
+  border: 1.5px solid var(--color-border-secondary);
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.post-list > .helper-text {
+  display: grid;
+  min-height: 520px;
+  place-items: center;
+  padding: 32px;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .posts-prompt__message span {
+    max-width: 132px;
+  }
 }

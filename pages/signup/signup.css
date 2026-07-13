@@ -1,17 +1,7 @@
-.signup-page {
-  padding-top: 48px;
+.signup-panel {
+  gap: 52px;
 }
 
-.signup-form .button {
-  width: 100%;
-}
-
-.signup-profile {
-  margin-bottom: 8px;
-}
-
-.signup-profile .form-label {
-  display: block;
-  margin-bottom: 10px;
-  text-align: left;
+.signup-panel .helper-text:empty {
+  display: none;
 }

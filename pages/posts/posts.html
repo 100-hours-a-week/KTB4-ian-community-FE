@@ -3,58 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta
-    name="description"
-    content="아무 말 대잔치 커뮤니티 게시글 목록입니다."
-  >
+  <meta name="description" content="PULSE 커뮤니티 피드입니다.">
   <link rel="stylesheet" href="../../styles/tailwind-output.css">
   <link rel="stylesheet" href="./posts.css">
   <script type="module" src="./posts.js"></script>
-  <title>게시글 목록 | 아무 말 대잔치</title>
+  <title>피드 | PULSE</title>
 </head>
 <body>
-
-<header class="site-header">
-  <div class="site-header__inner">
-
-    <a class="site-header__title" href="../posts/posts.html">아무 말 대잔치</a>
-
-    <div class="site-header__profile">
-      <button
-        class="profile-button"
-        type="button"
-        aria-label="회원 메뉴 열기"
-        aria-haspopup="true"
-        aria-expanded="false"
-        data-profile-button
-      >
-        <img src="../../assets/images/profile-default.svg" alt="">
-      </button>
-
-      <nav class="profile-menu" aria-label="회원 메뉴" data-profile-menu>
-        <a href="../profile-update/profile-update.html">회원정보수정</a>
-        <a href="../password-update/password-update.html">비밀번호수정</a>
-        <button type="button" data-logout-button>로그아웃</button>
-      </nav>
+  <aside class="app-lnb" aria-label="주요 메뉴">
+    <img class="app-lnb__logo" src="../../assets/images/logo.png" alt="PULSE">
+    <div class="app-lnb__content">
+      <div class="app-lnb__groups">
+        <nav class="app-lnb__group typography-label1-normal-medium" aria-label="피드 메뉴">
+          <a class="app-lnb__item" href="./posts.html" aria-current="page">
+            <img class="app-lnb__icon" src="../../assets/icons/home-fill.svg" alt="">피드
+          </a>
+          <a class="app-lnb__item" href="../post-create/post-create.html">
+            <span class="app-lnb__icon app-lnb__plus" aria-hidden="true">＋</span>새로운 피드 작성
+          </a>
+          <a class="app-lnb__item" href="../bookmarks/bookmarks.html">
+            <img class="app-lnb__icon" src="../../assets/icons/receipt-stroke.svg" alt="">북마크
+          </a>
+        </nav>
+        <nav class="app-lnb__group typography-label1-normal-medium" aria-label="회원정보 메뉴">
+          <p class="app-lnb__label typography-caption-medium">회원정보</p>
+          <a class="app-lnb__item" href="../profile-update/profile-update.html">
+            <img class="app-lnb__icon" src="../../assets/icons/mypage-stroke.svg" alt="">프로필 편집
+          </a>
+          <a class="app-lnb__item" href="../password-update/password-update.html">
+            <img class="app-lnb__icon" src="../../assets/icons/Lock.svg" alt="">비밀번호 변경
+          </a>
+        </nav>
+      </div>
+      <div class="app-lnb__user">
+        <div class="app-lnb__identity typography-label1-normal-semibold">
+          <img class="app-lnb__avatar" src="../../assets/images/profile-default.svg" alt="">dlkfjls
+        </div>
+        <button class="app-lnb__logout typography-caption-medium" type="button" data-logout-button>로그아웃</button>
+      </div>
     </div>
-  </div>
-</header>
+  </aside>
 
-
-  <main class="page">
+  <main class="page page-card">
     <section aria-labelledby="posts-title">
-      <div class="posts-intro">
-        <h2 class="sr-only" id="posts-title">게시글 목록</h2>
-        <p>안녕하세요,</p>
-        <strong>아무 말 대잔치 게시판 입니다.</strong>
-      </div>
-
-      <div class="posts-toolbar">
-        <a class="button button--primary" href="../post-create/post-create.html">
-          게시글 작성
-        </a>
-      </div>
-
+      <header class="posts-header">
+        <h1 class="page-title typography-title3-bold" id="posts-title">피드</h1>
+        <div class="posts-prompt">
+          <div class="posts-prompt__message typography-label1-normal-medium">
+            <img class="avatar--small" src="../../assets/images/profile-default.svg" alt="">
+            <span>새로운 게시물을 작성해보세요</span>
+          </div>
+          <a class="button button--outline typography-label2-normal-semibold" href="../post-create/post-create.html">피드 게시하기</a>
+        </div>
+      </header>
       <div class="post-list" data-post-list aria-live="polite"></div>
     </section>
   </main>

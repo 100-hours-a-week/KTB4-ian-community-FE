@@ -3,124 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta
-    name="description"
-    content="아무 말 대잔치 커뮤니티 회원정보 수정 페이지입니다."
-  >
+  <meta name="description" content="PULSE 프로필 편집 페이지입니다.">
   <link rel="stylesheet" href="../../styles/tailwind-output.css">
   <link rel="stylesheet" href="./profile-update.css">
   <script type="module" src="./profile-update.js"></script>
-  <title>회원정보 수정 | 아무 말 대잔치</title>
+  <title>프로필 편집 | PULSE</title>
 </head>
 <body>
-
-<header class="site-header">
-  <div class="site-header__inner">
-
-    <a class="site-header__title" href="../posts/posts.html">아무 말 대잔치</a>
-
-    <div class="site-header__profile">
-      <button
-        class="profile-button"
-        type="button"
-        aria-label="회원 메뉴 열기"
-        aria-haspopup="true"
-        aria-expanded="false"
-        data-profile-button
-      >
-        <img src="../../assets/images/profile-default.svg" alt="">
-      </button>
-
-      <nav class="profile-menu" aria-label="회원 메뉴" data-profile-menu>
-        <a href="../profile-update/profile-update.html">회원정보수정</a>
-        <a href="../password-update/password-update.html">비밀번호수정</a>
-        <button type="button" data-logout-button>로그아웃</button>
-      </nav>
-    </div>
+  <div class="feed-backdrop" aria-hidden="true">
+    <aside class="app-lnb"><img class="app-lnb__logo" src="../../assets/images/logo.png" alt=""><nav class="app-lnb__group typography-label1-normal-medium"><span class="app-lnb__item" aria-current="page"><img class="app-lnb__icon" src="../../assets/icons/home-fill.svg" alt="">피드</span><span class="app-lnb__item"><span class="app-lnb__icon">＋</span>새로운 피드 작성</span><span class="app-lnb__item"><img class="app-lnb__icon" src="../../assets/icons/receipt-stroke.svg" alt="">북마크</span></nav></aside>
+    <div class="page page-card profile-backdrop"><h1 class="typography-title3-bold">피드</h1><div class="profile-backdrop__prompt"></div><div class="profile-backdrop__media"></div></div>
   </div>
-</header>
-
-
-  <main class="page page--narrow profile-update-page">
-    <section aria-labelledby="profile-title">
-      <h2 class="page-title" id="profile-title">회원정보 수정</h2>
-
+  <main class="modal-page">
+    <section class="modal-page__dialog profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+      <header class="page-header"><a class="page-header__back" href="../posts/posts.html" aria-label="피드로 돌아가기">←</a><h1 class="page-title typography-title3-bold" id="profile-title">프로필 편집</h1></header>
       <form class="form profile-form" data-profile-form novalidate>
-        <div class="form-field">
-          <span class="form-label">프로필 사진*</span>
-
-          <div class="avatar-upload">
-            <div class="avatar">
-              <img
-                src="../../assets/images/profile-default.svg"
-                alt="현재 프로필 이미지"
-                data-profile-preview
-              >
-            </div>
-            <label class="avatar-upload__button" for="profile-image">변경</label>
-            <input
-              class="file-input"
-              id="profile-image"
-              name="profileImage"
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              data-profile-input
-            >
-          </div>
+        <div class="avatar-upload">
+          <div class="avatar"><img src="../../assets/images/profile-default.svg" alt="현재 프로필 이미지" data-profile-preview></div>
+          <label class="avatar-upload__button" for="profile-image" aria-label="프로필 사진 변경"><img src="../../assets/icons/edit_profile_image.svg" alt=""></label>
+          <input class="file-input" id="profile-image" name="profileImage" type="file" accept="image/png,image/jpeg,image/webp" data-profile-input>
         </div>
-
-        <div class="form-field">
-          <span class="form-label">이메일</span>
-          <p data-email>email@email.com</p>
-        </div>
-
-        <div class="form-field">
-          <label class="form-label" for="nickname">닉네임</label>
-          <input
-            class="form-input"
-            id="nickname"
-            name="nickname"
-            type="text"
-            maxlength="10"
-            value="더미 작성자 1"
-            aria-describedby="nickname-error"
-          >
-          <p class="helper-text" id="nickname-error" data-nickname-error></p>
-        </div>
-
-        <button class="button button--primary" type="submit">
-          수정하기
-        </button>
+        <div class="form-field"><span class="sr-only">이메일</span><p class="typography-body3-normal-medium" data-email>email@email.com</p></div>
+        <div class="form-field"><label class="sr-only" for="nickname">닉네임</label><input class="form-input typography-body3-normal-medium" id="nickname" name="nickname" type="text" maxlength="10" value="더미 작성자 1" placeholder="닉네임" aria-describedby="nickname-error"><p class="helper-text typography-label2-normal-regular" id="nickname-error" data-nickname-error></p></div>
+        <button class="button button--primary typography-body1-normal-bold" type="submit">저장하기</button>
       </form>
-
-      <div class="profile-delete">
-        <button type="button" data-delete-account>회원 탈퇴</button>
-      </div>
-
-      <div class="profile-toast-space"></div>
+      <div class="profile-delete"><button class="typography-body3-normal-regular" type="button" data-delete-account>회원탈퇴</button></div>
     </section>
   </main>
-
-  <div class="modal" data-delete-modal>
-    <div
-      class="modal__dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="delete-user-title"
-    >
-      <h3 class="modal__title" id="delete-user-title">회원 탈퇴 하시겠습니까?</h3>
-      <p class="modal__description">작성한 게시글과 댓글은 유지될 수 있습니다.</p>
-      <div class="modal__actions">
-        <button class="button button--dark" type="button" data-cancel-delete>
-          취소
-        </button>
-        <button class="button button--primary" type="button" data-confirm-delete>
-          확인
-        </button>
-      </div>
-    </div>
-  </div>
-
+  <div class="modal" data-delete-modal><div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="delete-user-title"><h2 class="modal__title typography-title3-bold" id="delete-user-title">회원 탈퇴 하시겠습니까?</h2><p class="modal__description typography-body3-normal-regular">작성한 게시글과 댓글은 유지될 수 있습니다.</p><div class="modal__actions"><button class="button button--dark" type="button" data-cancel-delete>취소</button><button class="button button--primary" type="button" data-confirm-delete>확인</button></div></div></div>
   <div class="toast" role="status" data-toast></div>
 </body>
 </html>

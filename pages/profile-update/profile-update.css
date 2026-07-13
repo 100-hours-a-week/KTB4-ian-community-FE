@@ -1,20 +1,36 @@
-.profile-update-page {
-  padding-top: 48px;
+.profile-backdrop {
+  min-height: 760px;
+  padding: 20px 16px;
+}
+
+.profile-backdrop__prompt {
+  height: 62px;
+  margin-top: 24px;
+  border-block: 1px solid var(--color-border-secondary);
+}
+
+.profile-backdrop__media {
+  height: 228px;
+  margin-top: 64px;
+  border-radius: var(--radius-media);
+  background: var(--color-bg-tertiary);
+}
+
+.profile-form {
+  gap: 16px;
+  padding: 32px 16px 0;
+}
+
+.profile-form .avatar-upload {
+  margin-bottom: 16px;
 }
 
 .profile-form .button {
-  width: 100%;
+  min-height: 48px;
 }
 
 .profile-delete {
-  margin-top: 18px;
+  padding: 24px 16px;
+  color: var(--color-text-secondary);
   text-align: center;
-}
-
-.profile-delete button {
-  font-size: 14px;
-}
-
-.profile-toast-space {
-  min-height: 44px;
 }

@@ -3,165 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta
-    name="description"
-    content="아무 말 대잔치 커뮤니티 게시글 상세 페이지입니다."
-  >
+  <meta name="description" content="PULSE 커뮤니티 피드 상세 페이지입니다.">
   <link rel="stylesheet" href="../../styles/tailwind-output.css">
   <link rel="stylesheet" href="./post-detail.css">
   <script type="module" src="./post-detail.js"></script>
-  <title>게시글 상세 | 아무 말 대잔치</title>
+  <title>피드 상세보기 | PULSE</title>
 </head>
 <body>
-
-<header class="site-header">
-  <div class="site-header__inner">
-
-    <button
-      class="site-header__back"
-      type="button"
-      aria-label="이전 페이지로 이동"
-      data-back-button
-    >
-      ‹
-    </button>
-
-    <a class="site-header__title" href="../posts/posts.html">아무 말 대잔치</a>
-
-    <div class="site-header__profile">
-      <button
-        class="profile-button"
-        type="button"
-        aria-label="회원 메뉴 열기"
-        aria-haspopup="true"
-        aria-expanded="false"
-        data-profile-button
-      >
-        <img src="../../assets/images/profile-default.svg" alt="">
-      </button>
-
-      <nav class="profile-menu" aria-label="회원 메뉴" data-profile-menu>
-        <a href="../profile-update/profile-update.html">회원정보수정</a>
-        <a href="../password-update/password-update.html">비밀번호수정</a>
-        <button type="button" data-logout-button>로그아웃</button>
-      </nav>
+  <aside class="app-lnb" aria-label="주요 메뉴">
+    <img class="app-lnb__logo" src="../../assets/images/logo.png" alt="PULSE">
+    <div class="app-lnb__content">
+      <div class="app-lnb__groups">
+        <nav class="app-lnb__group typography-label1-normal-medium" aria-label="피드 메뉴">
+          <a class="app-lnb__item" href="../posts/posts.html" aria-current="page"><img class="app-lnb__icon" src="../../assets/icons/home-fill.svg" alt="">피드</a>
+          <a class="app-lnb__item" href="../post-create/post-create.html"><span class="app-lnb__icon" aria-hidden="true">＋</span>새로운 피드 작성</a>
+          <a class="app-lnb__item" href="../bookmarks/bookmarks.html"><img class="app-lnb__icon" src="../../assets/icons/receipt-stroke.svg" alt="">북마크</a>
+        </nav>
+        <nav class="app-lnb__group typography-label1-normal-medium" aria-label="회원정보 메뉴">
+          <p class="app-lnb__label typography-caption-medium">회원정보</p>
+          <a class="app-lnb__item" href="../profile-update/profile-update.html"><img class="app-lnb__icon" src="../../assets/icons/mypage-stroke.svg" alt="">프로필 편집</a>
+          <a class="app-lnb__item" href="../password-update/password-update.html"><img class="app-lnb__icon" src="../../assets/icons/Lock.svg" alt="">비밀번호 변경</a>
+        </nav>
+      </div>
+      <div class="app-lnb__user">
+        <div class="app-lnb__identity typography-label1-normal-semibold"><img class="app-lnb__avatar" src="../../assets/images/profile-default.svg" alt="">dlkfjls</div>
+        <button class="app-lnb__logout typography-caption-medium" type="button" data-logout-button>로그아웃</button>
+      </div>
     </div>
-  </div>
-</header>
+  </aside>
 
-
-  <main class="page">
+  <main class="page page-card">
+    <header class="page-header">
+      <button class="page-header__back" type="button" aria-label="이전 페이지로 이동" data-back-button>←</button>
+      <h1 class="page-title typography-title3-bold">피드 상세보기</h1>
+    </header>
     <article class="post-detail" data-post-detail>
       <header class="post-detail__header">
-        <h2 class="post-detail__title" data-post-title>게시글 제목</h2>
-
+        <h2 class="sr-only" data-post-title>게시글 제목</h2>
         <div class="post-detail__meta-row">
           <div class="post-author">
-            <img
-              src="../../assets/images/profile-default.svg"
-              alt=""
-              data-author-image
-            >
-            <div>
-              <p class="post-author__name" data-author-name>작성자</p>
-              <time class="post-author__date" data-created-at>
-                2026-07-05 12:00
-              </time>
-            </div>
+            <img src="../../assets/images/profile-default.svg" alt="" data-author-image>
+            <p class="post-author__name typography-label1-normal-semibold" data-author-name>작성자</p>
           </div>
-
-          <div class="post-detail__actions">
-            <a
-              class="button button--small button--dark"
-              href="../post-update/post-update.html"
-              data-update-link
-            >
-              수정
-            </a>
-            <button
-              class="button button--small button--dark"
-              type="button"
-              data-delete-post
-            >
-              삭제
-            </button>
-          </div>
+          <time class="post-author__date typography-label2-normal-regular" data-created-at>방금 전</time>
+        </div>
+        <div class="post-detail__actions">
+          <a class="button button--small button--outline typography-label2-normal-semibold" href="../post-update/post-update.html" data-update-link>수정</a>
+          <button class="button button--small button--outline typography-label2-normal-semibold" type="button" data-delete-post>삭제</button>
         </div>
       </header>
-
       <div class="post-detail__image">
-        <img
-          src="../../assets/images/post-placeholder.svg"
-          alt="게시글 첨부 이미지"
-          data-post-image
-        >
+        <img src="../../assets/images/loginAndSignup_image.png" alt="게시글 첨부 이미지" data-post-image>
       </div>
-
-      <p class="post-detail__content" data-post-content>
-        게시글 내용이 표시됩니다.
-      </p>
-
-      <section class="post-stats" aria-label="게시글 통계">
-        <button class="post-stat" type="button" data-like-button>
-          <strong data-like-count>0</strong>
-          <span>좋아요수</span>
+      <p class="post-detail__content typography-label2-reading-regular" data-post-content>게시글 내용이 표시됩니다.</p>
+      <div class="post-detail__submeta typography-label2-normal-regular">조회 <span data-view-count>0</span> · 방금 전</div>
+      <section class="post-stats" aria-label="게시글 반응">
+        <button class="post-stat typography-label1-normal-regular" type="button" data-like-button aria-label="좋아요">
+          <img src="../../assets/icons/heart-stroke.svg" alt=""><span data-like-count>0</span>
         </button>
-        <div class="post-stat">
-          <strong data-view-count>0</strong>
-          <span>조회수</span>
-        </div>
-        <div class="post-stat">
-          <strong data-comment-count>0</strong>
-          <span>댓글</span>
-        </div>
+        <div class="post-stat typography-label1-normal-regular"><img src="../../assets/icons/Comment.svg" alt="댓글"><span data-comment-count>0</span></div>
+        <div class="post-stat post-stat--bookmark"><img src="../../assets/icons/receipt-stroke.svg" alt="북마크"></div>
       </section>
-
-      <section aria-labelledby="comment-title">
+      <section class="comments" aria-labelledby="comment-title">
         <h3 class="sr-only" id="comment-title">댓글</h3>
-
         <form class="comment-form" data-comment-form>
           <label class="sr-only" for="comment">댓글 작성</label>
-          <textarea
-            id="comment"
-            name="comment"
-            placeholder="댓글을 남겨주세요!"
-            data-comment-input
-          ></textarea>
-          <div class="comment-form__footer">
-            <button
-              class="button button--small button--primary"
-              type="submit"
-            >
-              댓글 등록
-            </button>
-          </div>
+          <textarea class="typography-label2-reading-regular" id="comment" name="comment" placeholder="지금 댓글을 작성해보세요" data-comment-input></textarea>
+          <button class="comment-submit" type="submit" aria-label="댓글 등록"><img src="../../assets/icons/direction_top.svg" alt=""></button>
         </form>
-
         <div class="comment-list" data-comment-list></div>
       </section>
     </article>
   </main>
 
   <div class="modal" data-delete-modal>
-    <div
-      class="modal__dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="delete-post-title"
-    >
-      <h3 class="modal__title" id="delete-post-title">게시글을 삭제하시겠습니까?</h3>
-      <p class="modal__description">삭제한 내용은 복구할 수 없습니다.</p>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="delete-post-title">
+      <h3 class="modal__title typography-title3-bold" id="delete-post-title">게시글을 삭제하시겠습니까?</h3>
+      <p class="modal__description typography-body3-normal-regular">삭제한 내용은 복구할 수 없습니다.</p>
       <div class="modal__actions">
-        <button class="button button--dark" type="button" data-cancel-delete>
-          취소
-        </button>
-        <button class="button button--primary" type="button" data-confirm-delete>
-          확인
-        </button>
+        <button class="button button--dark" type="button" data-cancel-delete>취소</button>
+        <button class="button button--primary" type="button" data-confirm-delete>확인</button>
       </div>
     </div>
   </div>
-
   <div class="toast" role="status" data-toast></div>
 </body>
 </html>
