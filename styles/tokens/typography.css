@@ -1,8 +1,8 @@
 /* Generated from Figma Typography Variables and Local Text Styles. KO mode only. */
 
 :root {
-  /* Typography / font-family/font-famliy */
-  --font-family-font-famliy:
+  /* Typography / font-family/font-family */
+  --font-family-font-family:
     "Wanted Sans",
     "Wanted Sans Variable",
     -apple-system,
@@ -14,8 +14,8 @@
     "Malgun Gothic",
     sans-serif;
 
-  /* Typography / font-family/font-famliy 2 (currently unused by Local Text Styles) */
-  --font-family-font-famliy-2: var(--font-family-font-famliy);
+  /* Typography / font-family/font-family 2 (currently unused by Local Text Styles) */
+  --font-family-font-family-2: var(--font-family-font-family);
 
   --font-weight-bold: 700; /* Typography / font-weight/bold */
   --font-weight-semibold: 600; /* Typography / font-weight/semibold */
@@ -63,12 +63,12 @@
 
 /* Tailwind CSS v4 integration used by the existing global font stack. */
 @theme inline {
-  --font-sans: var(--font-family-font-famliy);
+  --font-sans: var(--font-family-font-family);
 }
 
 /* Figma Local Text Styles: Title */
 .typography-title1-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-title1);
@@ -76,7 +76,7 @@
 }
 
 .typography-title1-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title1);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-title1);
@@ -84,7 +84,7 @@
 }
 
 .typography-title1-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title1);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-title1);
@@ -92,7 +92,7 @@
 }
 
 .typography-title1-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title1);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-title1);
@@ -100,7 +100,7 @@
 }
 
 .typography-title2-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title2);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-title2);
@@ -108,7 +108,7 @@
 }
 
 .typography-title2-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title2);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-title2);
@@ -116,7 +116,7 @@
 }
 
 .typography-title2-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title2);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-title2);
@@ -124,7 +124,7 @@
 }
 
 .typography-title2-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title2);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-title2);
@@ -132,7 +132,7 @@
 }
 
 .typography-title3-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title3);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-title3);
@@ -140,7 +140,7 @@
 }
 
 .typography-title3-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title3);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-title3);
@@ -148,7 +148,7 @@
 }
 
 .typography-title3-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title3);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-title3);
@@ -156,7 +156,7 @@
 }
 
 .typography-title3-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-title3);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-title3);
@@ -165,7 +165,7 @@
 
 /* Figma Local Text Styles: Heading 1 */
 .typography-heading-1-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-heading-1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-heading-1);
@@ -173,7 +173,7 @@
 }
 
 .typography-heading-1-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-heading-1);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-heading-1);
@@ -181,7 +181,7 @@
 }
 
 .typography-heading-1-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-heading-1);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-heading-1);
@@ -189,40 +189,40 @@
 }
 
 .typography-heading-1-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-heading-1);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-heading-1);
   letter-spacing: var(--letter-spacing-heading-1);
 }
 
-/* Figma Local Text Styles: Body1 (Figma spelling Nomal is preserved) */
-.typography-body1-nomal-bold {
-  font-family: var(--font-family-font-famliy);
+/* Figma Local Text Styles: Body1 (Figma spelling Normal is preserved) */
+.typography-body1-normal-bold {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body1-normal);
   letter-spacing: var(--letter-spacing-body1);
 }
 
-.typography-body1-nomal-semibold {
-  font-family: var(--font-family-font-famliy);
+.typography-body1-normal-semibold {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-body1-normal);
   letter-spacing: var(--letter-spacing-body1);
 }
 
-.typography-body1-nomal-medium {
-  font-family: var(--font-family-font-famliy);
+.typography-body1-normal-medium {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body1-normal);
   letter-spacing: var(--letter-spacing-body1);
 }
 
-.typography-body1-nomal-regular {
-  font-family: var(--font-family-font-famliy);
+.typography-body1-normal-regular {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body1-normal);
@@ -230,7 +230,7 @@
 }
 
 .typography-body1-reading-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body1-reading);
@@ -238,7 +238,7 @@
 }
 
 .typography-body1-reading-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-body1-reading);
@@ -246,7 +246,7 @@
 }
 
 .typography-body1-reading-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body1-reading);
@@ -254,40 +254,40 @@
 }
 
 .typography-body1-reading-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body1);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body1-reading);
   letter-spacing: var(--letter-spacing-body1);
 }
 
-/* Figma Local Text Styles: Body2 (Figma spelling Nomal is preserved) */
-.typography-body2-nomal-bold {
-  font-family: var(--font-family-font-famliy);
+/* Figma Local Text Styles: Body2 (Figma spelling Normal is preserved) */
+.typography-body2-normal-bold {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body2-normal);
   letter-spacing: var(--letter-spacing-body2);
 }
 
-.typography-body2-nomal-semibold {
-  font-family: var(--font-family-font-famliy);
+.typography-body2-normal-semibold {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-body2-normal);
   letter-spacing: var(--letter-spacing-body2);
 }
 
-.typography-body2-nomal-medium {
-  font-family: var(--font-family-font-famliy);
+.typography-body2-normal-medium {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body2-normal);
   letter-spacing: var(--letter-spacing-body2);
 }
 
-.typography-body2-nomal-regular {
-  font-family: var(--font-family-font-famliy);
+.typography-body2-normal-regular {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body2-normal);
@@ -295,7 +295,7 @@
 }
 
 .typography-body2-reading-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body2-reading);
@@ -303,7 +303,7 @@
 }
 
 .typography-body2-reading-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-body2-reading);
@@ -320,7 +320,7 @@
 }
 
 .typography-body2-reading-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body2);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body2-reading);
@@ -329,7 +329,7 @@
 
 /* Figma Local Text Styles: Body3 */
 .typography-body3-normal-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body3-normal);
@@ -337,7 +337,7 @@
 }
 
 .typography-body3-normal-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-body3-normal);
@@ -345,7 +345,7 @@
 }
 
 .typography-body3-normal-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body3-normal);
@@ -353,7 +353,7 @@
 }
 
 .typography-body3-normal-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body3-normal);
@@ -361,7 +361,7 @@
 }
 
 .typography-body3-reading-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body3-reading);
@@ -369,7 +369,7 @@
 }
 
 .typography-body3-reading-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-body3-reading);
@@ -377,7 +377,7 @@
 }
 
 .typography-body3-reading-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body3-reading);
@@ -385,7 +385,7 @@
 }
 
 .typography-body3-reading-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-body3);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body3-reading);
@@ -394,7 +394,7 @@
 
 /* Figma Local Text Styles: Label1 */
 .typography-label1-normal-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-label1-normal);
@@ -403,7 +403,7 @@
 
 /* Only font-family is variable-bound in Figma. */
 .typography-label1-normal-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: 13px;
   font-weight: 600;
   line-height: 18px;
@@ -411,16 +411,16 @@
 }
 
 .typography-label1-normal-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-label1-normal);
   letter-spacing: var(--letter-spacing-label1);
 }
 
-/* Figma spelling Regualr is preserved in the class name. */
-.typography-label1-normal-regualr {
-  font-family: var(--font-family-font-famliy);
+/* Figma spelling Regular is preserved in the class name. */
+.typography-label1-normal-regular {
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-label1-normal);
@@ -428,7 +428,7 @@
 }
 
 .typography-label1-reading-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-label1-reading);
@@ -436,7 +436,7 @@
 }
 
 .typography-label1-reading-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-label1-reading);
@@ -444,7 +444,7 @@
 }
 
 .typography-label1-reading-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-label1-reading);
@@ -452,7 +452,7 @@
 }
 
 .typography-label1-reading-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label1);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-label1-reading);
@@ -461,7 +461,7 @@
 
 /* Figma Local Text Styles: Label2 */
 .typography-label2-normal-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-label2-normal);
@@ -469,7 +469,7 @@
 }
 
 .typography-label2-normal-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-label2-normal);
@@ -477,7 +477,7 @@
 }
 
 .typography-label2-normal-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-label2-normal);
@@ -485,7 +485,7 @@
 }
 
 .typography-label2-normal-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-label2-normal);
@@ -493,7 +493,7 @@
 }
 
 .typography-label2-reading-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-label2-reading);
@@ -501,7 +501,7 @@
 }
 
 .typography-label2-reading-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-label2-reading);
@@ -509,7 +509,7 @@
 }
 
 .typography-label2-reading-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-label2-reading);
@@ -517,7 +517,7 @@
 }
 
 .typography-label2-reading-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-label2);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-label2-reading);
@@ -526,7 +526,7 @@
 
 /* Figma Local Text Styles: Caption */
 .typography-caption-bold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-caption);
@@ -534,7 +534,7 @@
 }
 
 .typography-caption-semibold {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-caption);
@@ -542,7 +542,7 @@
 }
 
 .typography-caption-medium {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-caption);
@@ -550,7 +550,7 @@
 }
 
 .typography-caption-regular {
-  font-family: var(--font-family-font-famliy);
+  font-family: var(--font-family-font-family);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-caption);
