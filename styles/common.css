@@ -114,12 +114,25 @@
     BlinkMacSystemFont,
     sans-serif;
 
-  --header-height: 104px;
-  --content-width: 592px;
+  
+  /* LNB */
+  --header-width: 180px;
+  --LNB-button-width: 180px;
+  --LNB-button-hight: 28px;
+
+
+  /* icon */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 28px;
+  --icon-xxl: 32px;
+
   --form-width: 392px;
 
+
   --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-md: 8px; 
   --radius-lg: 12px;
   --shadow-card: 0 4px 10px rgb(0 0 0 / 0.08);
 }

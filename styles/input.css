@@ -1,0 +1,7 @@
+@import "pretendard/dist/web/static/pretendard.css";
+@import "tailwindcss";
+@import "./common.css";
+
+@theme {
+  --font-sans: "Pretendard", sans-serif;
+}
