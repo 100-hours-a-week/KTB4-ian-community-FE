@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@source "../pages";
+@source "../scripts";
+@source "../index.html";
+
+
+@theme {
+  --font-sans:
+    "Pretendard",
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+
+  --color-primary-50: #efeffd;
+  --color-primary-100: #ccccf9;
+  --color-primary-200: #b4b4f6;
+  --color-primary-300: #9192f2;
+  --color-primary-400: #7c7def;
+  --color-primary-500: #5b5ceb;
+  --color-primary-600: #5354d6;
+  --color-primary-700: #4141a7;
+  --color-primary-800: #323381;
+  --color-primary-900: #262763;
+
+  --color-grayscale-50: #fafafa;
+  --color-grayscale-100: #f5f5f5;
+  --color-grayscale-200: #e5e5e5;
+  --color-grayscale-300: #d4d4d4;
+  --color-grayscale-400: #a1a1a1;
+  --color-grayscale-500: #737373;
+  --color-grayscale-600: #525252;
+  --color-grayscale-700: #404040;
+  --color-grayscale-800: #262626;
+  --color-grayscale-900: #171717;
+  --color-grayscale-950: #0a0a0a;
+}

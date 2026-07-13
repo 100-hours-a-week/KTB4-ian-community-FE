@@ -30,6 +30,8 @@
     "to-regex-range": "^5.0.1"
   },
   "scripts": {
+    "dev:css": "tailwindcss -i ./styles/tailwind.css -o ./styles/tailwind-output.css --watch",
+    "build:css": "tailwindcss -i ./styles/tailwind.css -o ./styles/tailwind-output.css --minify",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
