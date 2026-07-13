@@ -5,18 +5,17 @@
  */
 
 @theme static {
-  /* Primitive / Orange */
-  --color-orange-50: #fff8f3;
-  --color-orange-100: #ffd4b7;
-  --color-orange-200: #ffc095;
-  --color-orange-300: #ffa364;
-  --color-orange-400: #ff9146;
-  --color-orange-500: #ff7518;
-  --color-orange-600: #e86a16;
-  --color-orange-700: #b55311;
-  --color-orange-800: #8c400d;
-  --color-orange-900: #6b310a;
-  --color-orange-950: #301605;
+  /* Primitive / Brand */
+  --color-brand-50: #efeffd;
+  --color-brand-100: #ccccf9;
+  --color-brand-200: #b4b4f6;
+  --color-brand-300: #9192f2;
+  --color-brand-400: #7c7def;
+  --color-brand-500: #5b5ceb;
+  --color-brand-600: #5354d6;
+  --color-brand-700: #4141a7;
+  --color-brand-800: #323381;
+  --color-brand-900: #262763;
 
   /* Primitive / neutral */
   --color-neutral-50: #fafafa;
@@ -98,10 +97,10 @@
   --color-text-success: var(--color-green-400);
   --color-text-warning: var(--color-yellow-300);
   --color-text-disabled: var(--color-neutral-300);
-  --color-text-interactive-primary: var(--color-orange-500);
-  --color-text-interactive-primary-hover: var(--color-orange-300);
-  --color-text-interactive-primary-press: var(--color-orange-700);
-  --color-text-interactive-primary-select: var(--color-orange-500);
+  --color-text-interactive-primary: var(--color-brand-500);
+  --color-text-interactive-primary-hover: var(--color-brand-300);
+  --color-text-interactive-primary-press: var(--color-brand-700);
+  --color-text-interactive-primary-select: var(--color-brand-500);
   --color-text-interactive-secondary: var(--color-neutral-500);
   --color-text-interactive-inverse: var(--color-neutral-50);
   --color-text-opacity-normal: color-mix(in srgb, var(--color-black) 88%, transparent);
@@ -119,11 +118,11 @@
   --color-bg-success: var(--color-green-50);
   --color-bg-warning: var(--color-yellow-50);
   --color-bg-disabled: var(--color-neutral-100);
-  --color-bg-interactive-primary: var(--color-orange-500);
-  --color-bg-interactive-primary-hover: var(--color-orange-300);
-  --color-bg-interactive-primary-press: var(--color-orange-700);
-  --color-bg-interactive-primary-select: var(--color-orange-500);
-  --color-bg-interactive-primary-light: var(--color-orange-50);
+  --color-bg-interactive-primary: var(--color-brand-500);
+  --color-bg-interactive-primary-hover: var(--color-brand-300);
+  --color-bg-interactive-primary-press: var(--color-brand-700);
+  --color-bg-interactive-primary-select: var(--color-brand-500);
+  --color-bg-interactive-primary-light: var(--color-brand-50);
   --color-bg-interactive-secondary: var(--color-neutral-200);
   --color-bg-interactive-inverse: var(--color-neutral-50);
   --color-bg-opacity-normal: color-mix(in srgb, var(--color-neutral-200) 88%, transparent);
@@ -140,10 +139,10 @@
   --color-icon-success: var(--color-green-400);
   --color-icon-warning: var(--color-yellow-300);
   --color-icon-disabled: var(--color-neutral-300);
-  --color-icon-interactive-primary: var(--color-orange-500);
-  --color-icon-interactive-primary-hover: var(--color-orange-300);
-  --color-icon-interactive-primary-press: var(--color-orange-700);
-  --color-icon-interactive-primary-select: var(--color-orange-500);
+  --color-icon-interactive-primary: var(--color-brand-500);
+  --color-icon-interactive-primary-hover: var(--color-brand-300);
+  --color-icon-interactive-primary-press: var(--color-brand-700);
+  --color-icon-interactive-primary-select: var(--color-brand-500);
   --color-icon-interactive-secondary: var(--color-neutral-500);
   --color-icon-interactive-inverse: var(--color-neutral-50);
   --color-icon-opacity-normal: color-mix(in srgb, var(--color-black) 88%, transparent);
@@ -161,10 +160,10 @@
   --color-border-warning: var(--color-yellow-300);
   --color-border-white: var(--color-white);
   --color-border-black: var(--color-black);
-  --color-border-interactive-primary: var(--color-orange-500);
-  --color-border-interactive-primary-hover: var(--color-orange-300);
-  --color-border-interactive-primary-press: var(--color-orange-700);
-  --color-border-interactive-primary-select: var(--color-orange-500);
+  --color-border-interactive-primary: var(--color-brand-500);
+  --color-border-interactive-primary-hover: var(--color-brand-300);
+  --color-border-interactive-primary-press: var(--color-brand-700);
+  --color-border-interactive-primary-select: var(--color-brand-500);
   --color-border-interactive-secondary: var(--color-neutral-500);
   --color-border-interactive-inverse: var(--color-neutral-50);
   --color-border-opacity-normal: color-mix(in srgb, var(--color-black) 88%, transparent);
@@ -173,16 +172,16 @@
   --color-border-opacity-default: color-mix(in srgb, var(--color-black) 16%, transparent);
 
   /* Existing application compatibility aliases; not additional Figma tokens. */
-  --color-primary-50: var(--color-orange-50);
-  --color-primary-100: var(--color-orange-100);
-  --color-primary-200: var(--color-orange-200);
-  --color-primary-300: var(--color-orange-300);
-  --color-primary-400: var(--color-orange-400);
-  --color-primary-500: var(--color-orange-500);
-  --color-primary-600: var(--color-orange-600);
-  --color-primary-700: var(--color-orange-700);
-  --color-primary-800: var(--color-orange-800);
-  --color-primary-900: var(--color-orange-900);
+  --color-primary-50: var(--color-brand-50);
+  --color-primary-100: var(--color-brand-100);
+  --color-primary-200: var(--color-brand-200);
+  --color-primary-300: var(--color-brand-300);
+  --color-primary-400: var(--color-brand-400);
+  --color-primary-500: var(--color-brand-500);
+  --color-primary-600: var(--color-brand-600);
+  --color-primary-700: var(--color-brand-700);
+  --color-primary-800: var(--color-brand-800);
+  --color-primary-900: var(--color-brand-900);
   --color-grayscale-50: var(--color-neutral-50);
   --color-grayscale-100: var(--color-neutral-100);
   --color-grayscale-200: var(--color-neutral-200);
