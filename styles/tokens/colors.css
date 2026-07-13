@@ -1,6 +1,6 @@
 /*
  * Generated from Figma Local Variables.
- * Collections: Primitive (Mode 1), Sementic (Mode 1).
+ * Collections: Primitive (Mode 1), Semantic (Mode 1).
  * Figma variable paths are preserved as kebab-case CSS variable names.
  */
 
@@ -89,7 +89,7 @@
 }
 
 :root {
-  /* Sementic / Color/Text */
+  /* Semantic / Color/Text */
   --color-text-primary: var(--color-neutral-900);
   --color-text-secondary: var(--color-neutral-500);
   --color-text-tertiary: var(--color-neutral-400);
@@ -109,11 +109,11 @@
   --color-text-opacity-assistive: color-mix(in srgb, var(--color-black) 28%, transparent);
   --color-text-opacity-default: color-mix(in srgb, var(--color-black) 16%, transparent);
 
-  /* Sementic / Color/Bg (Figma spellings Teritray and Fourty are preserved) */
+  /* Semantic / Color/Bg (Figma spellings Tertiary and Forty are preserved) */
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-neutral-50);
-  --color-bg-teritray: var(--color-neutral-100);
-  --color-bg-fourty: var(--color-neutral-200);
+  --color-bg-tertiary: var(--color-neutral-100);
+  --color-bg-forty: var(--color-neutral-200);
   --color-bg-error: var(--color-red-50);
   --color-bg-info: var(--color-blue-50);
   --color-bg-success: var(--color-green-50);
@@ -131,10 +131,10 @@
   --color-bg-opacity-assistive: color-mix(in srgb, var(--color-neutral-200) 28%, transparent);
   --color-bg-opacity-default: color-mix(in srgb, var(--color-neutral-200) 16%, transparent);
 
-  /* Sementic / Color/Icon */
+  /* Semantic / Color/Icon */
   --color-icon-primary: var(--color-neutral-900);
   --color-icon-secondary: var(--color-neutral-500);
-  --color-icon-teritray: var(--color-neutral-400);
+  --color-icon-tertiary: var(--color-neutral-400);
   --color-icon-error: var(--color-red-300);
   --color-icon-info: var(--color-blue-400);
   --color-icon-success: var(--color-green-400);
@@ -151,10 +151,10 @@
   --color-icon-opacity-assistive: color-mix(in srgb, var(--color-black) 28%, transparent);
   --color-icon-opacity-default: color-mix(in srgb, var(--color-black) 16%, transparent);
 
-  /* Sementic / Color/Border */
+  /* Semantic / Color/Border */
   --color-border-primary: var(--color-neutral-300);
   --color-border-secondary: var(--color-neutral-200);
-  --color-border-teritray: var(--color-neutral-100);
+  --color-border-tertiary: var(--color-neutral-100);
   --color-border-error: var(--color-red-300);
   --color-border-info: var(--color-blue-400);
   --color-border-success: var(--color-green-400);
@@ -209,8 +209,8 @@
   --color-inverse: var(--color-text-interactive-inverse);
   --bg-primary: var(--color-bg-primary);
   --bg-secondary: var(--color-bg-secondary);
-  --bg-tertiary: var(--color-bg-teritray);
-  --bg-forty: var(--color-bg-fourty);
+  --bg-tertiary: var(--color-bg-tertiary);
+  --bg-forty: var(--color-bg-forty);
   --color-background: var(--color-bg-secondary);
   --color-surface: var(--color-bg-primary);
   --color-border: var(--color-border-secondary);

@@ -286,8 +286,8 @@
   }
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-neutral-50);
-  --color-bg-teritray: var(--color-neutral-100);
-  --color-bg-fourty: var(--color-neutral-200);
+  --color-bg-tertiary: var(--color-neutral-100);
+  --color-bg-forty: var(--color-neutral-200);
   --color-bg-error: var(--color-red-50);
   --color-bg-info: var(--color-blue-50);
   --color-bg-success: var(--color-green-50);
@@ -318,7 +318,7 @@
   }
   --color-icon-primary: var(--color-neutral-900);
   --color-icon-secondary: var(--color-neutral-500);
-  --color-icon-teritray: var(--color-neutral-400);
+  --color-icon-tertiary: var(--color-neutral-400);
   --color-icon-error: var(--color-red-300);
   --color-icon-info: var(--color-blue-400);
   --color-icon-success: var(--color-green-400);
@@ -348,7 +348,7 @@
   }
   --color-border-primary: var(--color-neutral-300);
   --color-border-secondary: var(--color-neutral-200);
-  --color-border-teritray: var(--color-neutral-100);
+  --color-border-tertiary: var(--color-neutral-100);
   --color-border-error: var(--color-red-300);
   --color-border-info: var(--color-blue-400);
   --color-border-success: var(--color-green-400);
@@ -413,8 +413,8 @@
   --color-inverse: var(--color-text-interactive-inverse);
   --bg-primary: var(--color-bg-primary);
   --bg-secondary: var(--color-bg-secondary);
-  --bg-tertiary: var(--color-bg-teritray);
-  --bg-forty: var(--color-bg-fourty);
+  --bg-tertiary: var(--color-bg-tertiary);
+  --bg-forty: var(--color-bg-forty);
   --color-background: var(--color-bg-secondary);
   --color-surface: var(--color-bg-primary);
   --color-border: var(--color-border-secondary);
