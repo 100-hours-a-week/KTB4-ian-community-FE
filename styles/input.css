@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/*
+ * Wanted Sans 파일을 프로젝트에 직접 저장한 경우
+ * 실제 파일명과 경로에 맞게 수정하세요.
+ */
+@font-face {
+  font-family: "Wanted Sans";
+  src: url("/assets/fonts/WantedSansVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@theme {
+  /* ==============================
+   * Font family
+   * class: font-wanted
+   * ============================== */
+  --font-wanted:
+    "Wanted Sans",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  /* ==============================
+   * Font weight
+   * ============================== */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ==============================
+   * Title
+   * ============================== */
+
+  /* class: text-title-1 */
+  --text-title-1: 28px;
+  --text-title-1--line-height: 38px;
+  --text-title-1--letter-spacing: 0.23px;
+
+  /* class: text-title-2 */
+  --text-title-2: 24px;
+  --text-title-2--line-height: 32px;
+  --text-title-2--letter-spacing: -0.23px;
+
+  /* class: text-title-3 */
+  --text-title-3: 20px;
+  --text-title-3--line-height: 28px;
+  --text-title-3--letter-spacing: -0.12px;
+
+  /* ==============================
+   * Heading
+   * ============================== */
+
+  /* class: text-heading-1 */
+  --text-heading-1: 18px;
+  --text-heading-1--line-height: 26px;
+  --text-heading-1--letter-spacing: -0.09px;
+
+  /* ==============================
+   * Body
+   * 기본 line-height는 normal
+   * ============================== */
+
+  /* class: text-body-1 */
+  --text-body-1: 16px;
+  --text-body-1--line-height: 24px;
+  --text-body-1--letter-spacing: 0.06px;
+
+  /* class: leading-body-1-reading */
+  --leading-body-1-reading: 26px;
+
+  /* class: text-body-2 */
+  --text-body-2: 15px;
+  --text-body-2--line-height: 22px;
+  --text-body-2--letter-spacing: 0.1px;
+
+  /* class: leading-body-2-reading */
+  --leading-body-2-reading: 24px;
+
+  /* class: text-body-3 */
+  --text-body-3: 14px;
+  --text-body-3--line-height: 20px;
+  --text-body-3--letter-spacing: 0.14px;
+
+  /* class: leading-body-3-reading */
+  --leading-body-3-reading: 22px;
+
+  /* ==============================
+   * Label
+   * 기본 line-height는 normal
+   * ============================== */
+
+  /* class: text-label-1 */
+  --text-label-1: 13px;
+  --text-label-1--line-height: 18px;
+  --text-label-1--letter-spacing: 0.25px;
+
+  /* class: leading-label-1-reading */
+  --leading-label-1-reading: 20px;
+
+  /* class: text-label-2 */
+  --text-label-2: 12px;
+  --text-label-2--line-height: 16px;
+  --text-label-2--letter-spacing: 0.25px;
+
+  /* class: leading-label-2-reading */
+  --leading-label-2-reading: 18px;
+
+  /* ==============================
+   * Caption
+   * ============================== */
+
+  /* class: text-caption */
+  --text-caption: 11px;
+  --text-caption--line-height: 14px;
+  --text-caption--letter-spacing: 0.31px;
+}
+
+/* 프로젝트 전체 기본 폰트 */
+@layer base {
+  html {
+    font-family: var(--font-wanted);
+  }
+
+  body,
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+}
