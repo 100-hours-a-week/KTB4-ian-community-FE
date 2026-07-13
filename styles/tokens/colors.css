@@ -1,0 +1,144 @@
+/*
+ * Primitive color
+ *
+ * Tailwind 클래스 예시:
+ * bg-primary-500
+ * text-grayscale-900
+ * border-grayscale-200
+ */
+ @theme static {
+  /* Primary */
+  --color-primary-50: #efeffd;
+  --color-primary-100: #ccccf9;
+  --color-primary-200: #b4b4f6;
+  --color-primary-300: #9192f2;
+  --color-primary-400: #7c7def;
+  --color-primary-500: #5b5ceb;
+  --color-primary-600: #5354d6;
+  --color-primary-700: #4141a7;
+  --color-primary-800: #323381;
+  --color-primary-900: #262763;
+
+  /* Grayscale */
+  --color-grayscale-50: #fafafa;
+  --color-grayscale-100: #f5f5f5;
+  --color-grayscale-200: #e5e5e5;
+  --color-grayscale-300: #d4d4d4;
+  --color-grayscale-400: #a1a1a1;
+  --color-grayscale-500: #737373;
+  --color-grayscale-600: #525252;
+  --color-grayscale-700: #404040;
+  --color-grayscale-800: #262626;
+  --color-grayscale-900: #171717;
+  --color-grayscale-950: #0a0a0a;
+  --color-grayscale-1000: #000000;
+
+  /* Base */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Status */
+  --color-error: #ff1818;
+  --color-info: #1650e6;
+  --color-success: #1fb500;
+  --color-warning: #ffe018;
+
+  /* Alpha */
+  --color-black-alpha-88: rgb(0 0 0 / 88%);
+  --color-black-alpha-61: rgb(0 0 0 / 61%);
+  --color-black-alpha-28: rgb(0 0 0 / 28%);
+  --color-black-alpha-16: rgb(0 0 0 / 16%);
+
+  --color-white-alpha-88: rgb(255 255 255 / 88%);
+  --color-white-alpha-61: rgb(255 255 255 / 61%);
+  --color-white-alpha-28: rgb(255 255 255 / 28%);
+  --color-white-alpha-16: rgb(255 255 255 / 16%);
+
+  /*
+   * Semantic color
+   *
+   * Tailwind 클래스 예시:
+   * bg-brand
+   * hover:bg-brand-hover
+   * text-content-primary
+   * bg-surface-secondary
+   * border-line-default
+   */
+
+  /* Brand */
+  --color-brand: var(--color-primary-500);
+  --color-brand-hover: var(--color-primary-300);
+  --color-brand-pressed: var(--color-primary-700);
+  --color-brand-selected: var(--color-primary-500);
+  --color-brand-subtle: var(--color-primary-50);
+
+  /* Text & Icon */
+  --color-content-primary: var(--color-grayscale-900);
+  --color-content-secondary: var(--color-grayscale-500);
+  --color-content-tertiary: var(--color-grayscale-400);
+  --color-content-disabled: var(--color-grayscale-300);
+  --color-content-inverse: var(--color-white);
+
+  /* Background */
+  --color-surface-primary: var(--color-white);
+  --color-surface-secondary: var(--color-grayscale-50);
+  --color-surface-tertiary: var(--color-grayscale-100);
+  --color-surface-quaternary: var(--color-grayscale-200);
+
+  /* Border */
+  --color-line-default: var(--color-grayscale-200);
+  --color-line-strong: var(--color-grayscale-400);
+}
+
+/*
+ * 기존 common.css와 페이지별 CSS가 사용하던 변수의 호환 계층입니다.
+ *
+ * 기존 CSS를 한 번에 전부 수정하지 않아도 됩니다.
+ */
+:root {
+  /* Text & Icon */
+  --color-text-primary: var(--color-content-primary);
+  --color-text-secondary: var(--color-content-secondary);
+  --color-text-tertiary: var(--color-content-tertiary);
+  --color-text-disable: var(--color-content-disabled);
+
+  /* Brand */
+  --color-primary: var(--color-brand);
+  --color-primary-hover: var(--color-brand-hover);
+  --color-primary-press: var(--color-brand-pressed);
+  --color-primary-select: var(--color-brand-selected);
+  --color-primary-light: var(--color-brand-subtle);
+
+  --color-secondary: var(--color-content-secondary);
+  --color-inverse: var(--color-content-inverse);
+
+  /* Background */
+  --bg-primary: var(--color-surface-primary);
+  --bg-secondary: var(--color-surface-secondary);
+  --bg-tertiary: var(--color-surface-tertiary);
+  --bg-quaternary: var(--color-surface-quaternary);
+
+  /*
+   * 기존 코드 호환용입니다.
+   * 신규 코드에서는 --bg-quaternary를 사용하세요.
+   */
+  --bg-forty: var(--bg-quaternary);
+
+  /* 기존 공통 CSS 호환 */
+  --color-background: var(--color-surface-secondary);
+  --color-surface: var(--color-surface-primary);
+  --color-border: var(--color-line-default);
+  --color-border-strong: var(--color-line-strong);
+  --color-danger: var(--color-error);
+
+  /* Alpha */
+  --black-alpha-88: var(--color-black-alpha-88);
+  --black-alpha-61: var(--color-black-alpha-61);
+  --black-alpha-28: var(--color-black-alpha-28);
+  --black-alpha-16: var(--color-black-alpha-16);
+
+  --white-alpha-88: var(--color-white-alpha-88);
+  --white-alpha-61: var(--color-white-alpha-61);
+  --white-alpha-28: var(--color-white-alpha-28);
+  --white-alpha-16: var(--color-white-alpha-16);
+}

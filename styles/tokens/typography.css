@@ -1,0 +1,130 @@
+@theme static {
+  /* ========================================
+   * Font family
+   * ======================================== */
+
+  --font-sans:
+    "Wanted Sans Variable",
+    "Wanted Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    "Segoe UI",
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    sans-serif;
+
+  --font-wanted:
+    "Wanted Sans Variable",
+    "Wanted Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    "Segoe UI",
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    sans-serif;
+
+  /* ========================================
+   * Font weight
+   * ======================================== */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ========================================
+   * Title
+   * ======================================== */
+
+  --text-title-1: 28px;
+  --text-title-1--line-height: 38px;
+  --text-title-1--letter-spacing: 0.23px;
+
+  --text-title-2: 24px;
+  --text-title-2--line-height: 32px;
+  --text-title-2--letter-spacing: -0.23px;
+
+  --text-title-3: 20px;
+  --text-title-3--line-height: 28px;
+  --text-title-3--letter-spacing: -0.12px;
+
+  /* ========================================
+   * Heading
+   * ======================================== */
+
+  --text-heading-1: 18px;
+  --text-heading-1--line-height: 26px;
+  --text-heading-1--letter-spacing: -0.09px;
+
+  /* ========================================
+   * Body 1
+   * ======================================== */
+
+  --text-body-1: 16px;
+  --text-body-1--line-height: 24px;
+  --text-body-1--letter-spacing: 0.06px;
+
+  --text-body-1-reading: 16px;
+  --text-body-1-reading--line-height: 26px;
+  --text-body-1-reading--letter-spacing: 0.06px;
+
+  /* ========================================
+   * Body 2
+   * ======================================== */
+
+  --text-body-2: 15px;
+  --text-body-2--line-height: 22px;
+  --text-body-2--letter-spacing: 0.1px;
+
+  --text-body-2-reading: 15px;
+  --text-body-2-reading--line-height: 24px;
+  --text-body-2-reading--letter-spacing: 0.1px;
+
+  /* ========================================
+   * Body 3
+   * ======================================== */
+
+  --text-body-3: 14px;
+  --text-body-3--line-height: 20px;
+  --text-body-3--letter-spacing: 0.14px;
+
+  --text-body-3-reading: 14px;
+  --text-body-3-reading--line-height: 22px;
+  --text-body-3-reading--letter-spacing: 0.14px;
+
+  /* ========================================
+   * Label 1
+   * ======================================== */
+
+  --text-label-1: 13px;
+  --text-label-1--line-height: 18px;
+  --text-label-1--letter-spacing: 0.25px;
+
+  --text-label-1-reading: 13px;
+  --text-label-1-reading--line-height: 20px;
+  --text-label-1-reading--letter-spacing: 0.25px;
+
+  /* ========================================
+   * Label 2
+   * ======================================== */
+
+  --text-label-2: 12px;
+  --text-label-2--line-height: 16px;
+  --text-label-2--letter-spacing: 0.25px;
+
+  --text-label-2-reading: 12px;
+  --text-label-2-reading--line-height: 18px;
+  --text-label-2-reading--letter-spacing: 0.25px;
+
+  /* ========================================
+   * Caption
+   * ======================================== */
+
+  --text-caption: 11px;
+  --text-caption--line-height: 14px;
+  --text-caption--letter-spacing: 0.31px;
+}
