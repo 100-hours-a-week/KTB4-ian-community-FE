@@ -1,4 +1,5 @@
 import { apiRequest, issueCsrfToken, setError } from "../../scripts/common.js";
+import { consumeReturnUrl } from "../../scripts/auth/session.js";
 
 const form = document.querySelector("[data-login-form]");
 const emailInput = form.elements.email;
@@ -44,6 +45,7 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
+    const submit = form.querySelector("button[type=submit]"); submit.disabled = true; submit.setAttribute("aria-busy", "true");
     const response = await apiRequest("/api/users/login", {
       method: "POST",
       body: JSON.stringify({
@@ -58,13 +60,14 @@ form.addEventListener("submit", async (event) => {
       sessionStorage.setItem("userId", String(response.userId));
     }
 
-    window.location.href = "../posts/posts.html";
+    window.location.href = consumeReturnUrl("../posts/posts.html");
   } catch (error) {
     setError(
       passwordInput,
       passwordError,
       `*${error.message || "아이디 또는 비밀번호를 확인해주세요."}`,
     );
+    const submit = form.querySelector("button[type=submit]"); submit.disabled = false; submit.removeAttribute("aria-busy");
   }
 });
 

@@ -1,252 +1,30 @@
-import {
-  apiRequest,
-  getQueryParam,
-  initBackButton,
-  initLogout,
-  initProfileMenu,
-  showToast,
-} from "../../scripts/common.js";
+import { postsApi } from "../../scripts/api/posts-api.js";
+import { mountLnb, getSessionUser } from "../../scripts/components/lnb.js";
+import { ModalManager } from "../../scripts/components/modal-manager.js";
+import { MenuManager } from "../../scripts/components/menu-manager.js";
+import { BookmarkStore } from "../../scripts/stores/bookmark-store.js";
+import { formatRelativeTime } from "../../scripts/utils/date.js";
+import { ICONS, setToggleIcon } from "../../scripts/utils/icons.js";
+import { mountSettingsModals } from "../../scripts/components/settings-modals.js";
 
-initProfileMenu();
-initLogout();
-initBackButton("../posts/posts.html");
-
-const postId = getQueryParam("postId") ?? "1";
-const userId = getQueryParam("userId") ?? sessionStorage.getItem("userId") ?? "1";
-let currentUser = null;
-let currentPostLiked = false;
-
-const elements = {
-  title: document.querySelector("[data-post-title]"),
-  authorName: document.querySelector("[data-author-name]"),
-  authorImage: document.querySelector("[data-author-image]"),
-  createdAt: document.querySelector("[data-created-at]"),
-  image: document.querySelector("[data-post-image]"),
-  content: document.querySelector("[data-post-content]"),
-  likeCount: document.querySelector("[data-like-count]"),
-  viewCount: document.querySelector("[data-view-count]"),
-  commentCount: document.querySelector("[data-comment-count]"),
-  updateLink: document.querySelector("[data-update-link]"),
-  commentList: document.querySelector("[data-comment-list]"),
-};
-
-function renderPost(post) {
-  const authorName = post.authorName ?? post.author_name ?? post.nickname;
-  const createdAt = post.createdAt ?? post.created_at;
-  const likeCount = post.likeCount ?? post.like_count;
-  const viewCount = post.viewCount ?? post.view_count;
-  const commentCount = post.commentCount ?? post.comment_count;
-  const comments = post.comments ?? post.comment ?? [];
-  const profileImage =
-    post.profileImageUrl ?? post.profileImage ?? post.profile_image;
-  const imageUrl = post.imageUrl ?? post.image_url;
-  currentPostLiked = Boolean(post.liked);
-
-  elements.title.textContent = post.title;
-  elements.authorName.textContent = authorName ?? "알 수 없음";
-  elements.createdAt.textContent = createdAt ?? "";
-  elements.content.textContent = post.content ?? "";
-  elements.likeCount.textContent = likeCount ?? 0;
-  elements.viewCount.textContent = viewCount ?? 0;
-  elements.commentCount.textContent = commentCount ?? comments.length ?? 0;
-  elements.updateLink.href =
-    `../post-update/post-update.html?postId=${postId}`;
-
-  if (profileImage) {
-    elements.authorImage.src = profileImage;
-  }
-
-  elements.image.closest(".post-detail__image").hidden = !imageUrl;
-
-  if (imageUrl) {
-    elements.image.src = imageUrl;
-  }
-
-  renderComments(comments);
-  document.title = `${post.title} | 아무 말 대잔치`;
+mountLnb({ activeItem: "feed" }); const postId = new URLSearchParams(location.search).get("postId") || "1"; const user = getSessionUser(); const modals = new ModalManager(); mountSettingsModals(modals); const menus = new MenuManager(); const bookmarks = new BookmarkStore(); let post; let selectedComment;
+const detail = document.querySelector("[data-post-detail]"); const commentsRoot = document.querySelector("[data-comment-list]"); const commentForm = document.querySelector("[data-comment-form]"); const commentSubmit = commentForm.querySelector("button");
+document.querySelector("[data-back]").addEventListener("click", () => history.length > 1 ? history.back() : location.assign("../posts/posts.html"));
+function renderPost() { const author = post.authorName ?? post.author_name ?? post.nickname ?? "알 수 없음"; const image = post.imageUrl ?? post.image_url; const liked = Boolean(post.liked); const saved = bookmarks.has(postId); detail.innerHTML = `<header class="post-detail__header"><div class="post-detail__meta-row"><div class="post-author"><img src="${post.profileImage ?? post.profile_image ?? "../../assets/images/profile-default.svg"}" alt=""><div><strong>${author}</strong><p class="post-author__date">조회 ${post.viewCount ?? post.view_count ?? 0} · ${formatRelativeTime(post.createdAt ?? post.created_at)}</p></div></div><button class="icon-button" data-post-more aria-label="피드 옵션" aria-expanded="false"><img src="${ICONS.more}" alt=""></button></div></header>${image ? `<img class="post-detail__media" src="${image}" alt="피드 첨부 이미지">` : ""}<p class="post-detail__content">${post.content || post.title || ""}</p><footer class="post-stats"><button class="post-stat" data-like aria-pressed="${liked}"><img src="${liked ? ICONS.like.active : ICONS.like.inactive}" alt=""><span>${post.likeCount ?? post.like_count ?? 0}</span></button><span class="post-stat"><img src="${ICONS.comment}" alt=""><span data-comment-count>${(post.comment ?? post.comments ?? []).length}</span></span><button class="post-stat post-stat--bookmark" data-bookmark aria-label="북마크" aria-pressed="${saved}"><img src="${saved ? ICONS.bookmark.active : ICONS.bookmark.inactive}" alt=""></button></footer>`; document.title = `${String(post.content || post.title || "피드").slice(0, 24)} | PULSE`;
+  detail.querySelector("[data-like]").addEventListener("click", async (event) => { const button = event.currentTarget; const active = button.getAttribute("aria-pressed") !== "true"; setToggleIcon(button, active, ICONS.like); try { const result = await postsApi.toggleLike(postId); button.querySelector("span").textContent = result.like_count ?? result.likeCount ?? Number(button.querySelector("span").textContent) + (active ? 1 : -1); } catch { setToggleIcon(button, !active, ICONS.like); } });
+  detail.querySelector("[data-bookmark]").addEventListener("click", (event) => setToggleIcon(event.currentTarget, bookmarks.toggle({ ...post, postId }), ICONS.bookmark));
+  detail.querySelector("[data-post-more]").addEventListener("click", (event) => menus.open({ anchor: event.currentTarget, menu: document.querySelector("[data-option-menu]"), context: { type: "post" } }));
 }
-
-function createCommentElement(comment) {
-  const commentId = comment.commentId ?? comment.comment_id;
-  const authorName = comment.authorName ?? comment.author_name ?? comment.nickname;
-  const createdAt = comment.createdAt ?? comment.created_at;
-  const content = comment.content ?? comment.comment;
-  const profileImage =
-    comment.profileImageUrl ?? comment.profileImage ?? comment.profile_image;
-  const article = document.createElement("article");
-  article.className = "comment";
-  article.dataset.commentId = commentId;
-
-  article.innerHTML = `
-    <img
-      class="comment__avatar"
-      src="${profileImage ?? "../../assets/images/profile-default.svg"}"
-      alt=""
-    >
-    <div>
-      <div class="comment__header">
-        <span class="comment__author">${authorName ?? "알 수 없음"}</span>
-        <time class="comment__date">${createdAt ?? ""}</time>
-      </div>
-      <p class="comment__text">${content}</p>
-    </div>
-    <div class="comment__actions">
-      <button class="button button--small button--dark" type="button" data-edit-comment>
-        수정
-      </button>
-      <button
-        class="button button--small button--dark"
-        type="button"
-        data-delete-comment
-      >
-        삭제
-      </button>
-    </div>
-  `;
-
-  return article;
-}
-
-function renderComments(comments) {
-  elements.commentList.replaceChildren(...comments.map(createCommentElement));
-}
-
-async function loadPost() {
-  try {
-    const post = await apiRequest(`/api/posts/${postId}?userId=${userId}`);
-    renderPost(post);
-  } catch (error) {
-    console.warn(error.message);
-    showToast(error.message);
-  }
-}
-
-async function loadCurrentUser() {
-  try {
-    currentUser = await apiRequest(`/api/users/${userId}`);
-    sessionStorage.setItem("nickname", currentUser.nickname ?? "");
-    if (currentUser.profileImage) {
-      sessionStorage.setItem("profileImage", currentUser.profileImage);
-    }
-  } catch (error) {
-    console.warn(error.message);
-  }
-}
-
-document
-  .querySelector("[data-like-button]")
-  .addEventListener("click", async () => {
-    try {
-      const response = await apiRequest(`/api/posts/${postId}/likes?userId=${userId}`, {
-        method: "POST",
-      });
-
-      currentPostLiked = Boolean(response?.liked);
-      elements.likeCount.textContent =
-        response?.like_count ?? response?.likeCount ?? Number(elements.likeCount.textContent) + 1;
-    } catch (error) {
-      showToast(error.message);
-    }
-  });
-
-const commentForm = document.querySelector("[data-comment-form]");
-const commentInput = document.querySelector("[data-comment-input]");
-
-commentForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const content = commentInput.value.trim();
-
-  if (!content) {
-    return;
-  }
-
-  try {
-    const response = await apiRequest(`/api/posts/${postId}/comments/users/${userId}`, {
-      method: "POST",
-      body: JSON.stringify({ comment: content }),
-    });
-    const comment = {
-      comment_id: typeof response === "number" ? response : response?.comment_id,
-      comment: content,
-      nickname: currentUser?.nickname ?? sessionStorage.getItem("nickname") ?? "알 수 없음",
-      profile_image: currentUser?.profileImage ?? sessionStorage.getItem("profileImage"),
-      created_at: new Date().toISOString(),
-    };
-
-    elements.commentList.append(createCommentElement(comment));
-    elements.commentCount.textContent =
-      Number(elements.commentCount.textContent) + 1;
-    commentInput.value = "";
-  } catch (error) {
-    showToast(error.message);
-  }
-});
-
-elements.commentList.addEventListener("click", async (event) => {
-  const editButton = event.target.closest("[data-edit-comment]");
-  const deleteButton = event.target.closest("[data-delete-comment]");
-
-  if (!editButton && !deleteButton) {
-    return;
-  }
-
-  const commentElement = event.target.closest("[data-comment-id]");
-  const commentId = commentElement.dataset.commentId;
-  const commentText = commentElement.querySelector(".comment__text");
-
-  if (editButton) {
-    const nextComment = window.prompt("댓글을 수정해주세요.", commentText.textContent)?.trim();
-
-    if (!nextComment || nextComment === commentText.textContent) {
-      return;
-    }
-
-    try {
-      await apiRequest(`/api/posts/${postId}/comments/${commentId}/users/${userId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ comment: nextComment }),
-      });
-      commentText.textContent = nextComment;
-    } catch (error) {
-      showToast(error.message);
-    }
-
-    return;
-  }
-
-  try {
-    await apiRequest(`/api/posts/${postId}/comments/${commentId}/users/${userId}`, {
-      method: "DELETE",
-    });
-    commentElement.remove();
-    elements.commentCount.textContent = Math.max(
-      0,
-      Number(elements.commentCount.textContent) - 1,
-    );
-  } catch (error) {
-    showToast(error.message);
-  }
-});
-
-const deleteModal = document.querySelector("[data-delete-modal]");
-
-document.querySelector("[data-delete-post]").addEventListener("click", () => {
-  deleteModal.classList.add("is-open");
-});
-
-document.querySelector("[data-cancel-delete]").addEventListener("click", () => {
-  deleteModal.classList.remove("is-open");
-});
-
-document.querySelector("[data-confirm-delete]").addEventListener("click", async () => {
-  try {
-    await apiRequest(`/api/posts/${postId}?userId=${userId}`, { method: "DELETE" });
-    window.location.href = "../posts/posts.html";
-  } catch (error) {
-    deleteModal.classList.remove("is-open");
-    showToast(error.message);
-  }
-});
-
-loadCurrentUser().finally(loadPost);
+function commentNode(comment) { const id = comment.commentId ?? comment.comment_id; const content = comment.content ?? comment.comment; const node = document.createElement("article"); node.className = "comment"; node.dataset.commentId = id; node.innerHTML = `<img class="comment__avatar" src="${comment.profileImage ?? comment.profile_image ?? "../../assets/images/profile-default.svg"}" alt=""><div><div class="comment__header"><strong>${comment.authorName ?? comment.nickname ?? "알 수 없음"}</strong><time>${formatRelativeTime(comment.createdAt ?? comment.created_at)}</time></div><p class="comment__text">${content}</p></div><button class="icon-button" data-comment-more aria-label="댓글 옵션" aria-expanded="false"><img src="${ICONS.more}" alt=""></button>`; node.querySelector("[data-comment-more]").addEventListener("click", (event) => menus.open({ anchor: event.currentTarget, menu: document.querySelector("[data-option-menu]"), context: { type: "comment", id, content, node } })); return node; }
+function renderComments() { commentsRoot.replaceChildren(...(post.comment ?? post.comments ?? []).map(commentNode)); }
+async function load() { try { post = await postsApi.detail(postId); renderPost(); renderComments(); } catch (error) { detail.innerHTML = `<div class="empty-state"><p>${error.message}</p></div>`; } }
+commentForm.elements.comment.addEventListener("input", () => commentSubmit.disabled = !commentForm.elements.comment.value.trim()); commentForm.addEventListener("submit", async (event) => { event.preventDefault(); const content = commentForm.elements.comment.value.trim(); if (!content) return; commentSubmit.disabled = true; try { const result = await postsApi.createComment(postId, user.userId || 0, content); const comment = { commentId: typeof result === "number" ? result : result.comment_id, comment: content, nickname: user.nickname, profileImage: user.profileImage, createdAt: new Date().toISOString() }; (post.comment ??= []).push(comment); commentsRoot.append(commentNode(comment)); commentForm.reset(); detail.querySelector("[data-comment-count]").textContent = post.comment.length; } catch (error) { document.querySelector("[data-comment-error]").textContent = error.message; commentSubmit.disabled = false; } });
+const optionMenu = document.querySelector("[data-option-menu]"); const editCommentModal = document.querySelector("[data-edit-comment-modal]"); const editCommentForm = document.querySelector("#edit-comment-form"); const editPostModal = document.querySelector("[data-edit-post]"); const editPostForm = document.querySelector("#edit-post-form");
+optionMenu.querySelector("[data-menu-edit]").addEventListener("click", () => { const context = menus.context; menus.close(); if (context.type === "post") { editPostForm.elements.content.value = post.content || ""; modals.open(editPostModal); editPostForm.elements.content.focus(); } else { selectedComment = context; editCommentForm.elements.comment.value = context.content; modals.open(editCommentModal); editCommentForm.elements.comment.focus(); } });
+editPostForm.elements.content.addEventListener("input", () => document.querySelector("[data-edit-post-submit]").disabled = editPostForm.elements.content.value.trim() === (post.content || "")); editPostForm.addEventListener("submit", async (event) => { event.preventDefault(); try { await postsApi.update(postId, { title: post.title || "피드", content: editPostForm.elements.content.value.trim(), imageUrl: post.imageUrl ?? null }); post.content = editPostForm.elements.content.value.trim(); modals.close("success"); renderPost(); } catch (error) { document.querySelector("[data-edit-post-error]").textContent = error.message; } });
+editCommentForm.elements.comment.addEventListener("input", () => document.querySelector("[data-edit-comment-submit]").disabled = !editCommentForm.elements.comment.value.trim() || editCommentForm.elements.comment.value.trim() === selectedComment?.content); editCommentForm.addEventListener("submit", async (event) => { event.preventDefault(); const content = editCommentForm.elements.comment.value.trim(); try { await postsApi.updateComment(postId, selectedComment.id, user.userId || 0, content); selectedComment.node.querySelector(".comment__text").textContent = content; modals.close("success"); } catch (error) { document.querySelector("[data-edit-comment-error]").textContent = error.message; } });
+document.querySelectorAll("[data-close-modal]").forEach((button) => button.addEventListener("click", () => modals.close("cancel")));
+const confirmModal = document.querySelector("[data-confirm-modal]"); let confirmAction; function confirmDelete(type, action) { document.querySelector("[data-confirm-title]").textContent = `${type} 삭제 하실건가요?`; document.querySelector("[data-confirm-description]").textContent = `삭제된 ${type}은 복구할 수 없습니다.`; confirmAction = action; modals.open(confirmModal); }
+optionMenu.querySelector("[data-menu-delete]").addEventListener("click", () => { const context = menus.context; menus.close(); if (context.type === "post") confirmDelete("피드", async () => { await postsApi.remove(postId); location.assign("../posts/posts.html"); }); else confirmDelete("댓글", async () => { await postsApi.removeComment(postId, context.id, user.userId || 0); context.node.remove(); }); });
+document.querySelector("[data-confirm-cancel]").addEventListener("click", () => modals.close("cancel")); document.querySelector("[data-confirm-action]").addEventListener("click", async () => { try { await confirmAction(); modals.close("success"); } catch (error) { document.querySelector("[data-confirm-description]").textContent = error.message; } });
+load();

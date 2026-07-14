@@ -1,3 +1,4 @@
 .empty-state {
   color: var(--color-text-tertiary);
 }
+[data-bookmark-list] { min-height: 600px; }

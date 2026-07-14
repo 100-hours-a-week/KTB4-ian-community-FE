@@ -1,3 +1,5 @@
+export { apiRequest, issueCsrfToken } from "./api/http-client.js";
+/* Legacy helpers below remain for existing pages during the module migration. */
 const API_PORT = "8080";
 const API_HOST =
   window.location.hostname || "localhost";
@@ -22,7 +24,7 @@ function getCookie(name) {
   );
 }
 
-export async function issueCsrfToken() {
+async function legacyIssueCsrfToken() {
   const response = await fetch(
     `${API_BASE_URL}/api/csrf`,
     {
@@ -45,7 +47,7 @@ async function getCsrfToken() {
     return token;
   }
 
-  await issueCsrfToken();
+  await legacyIssueCsrfToken();
 
   token = getCookie("XSRF-TOKEN");
 
@@ -59,7 +61,7 @@ async function getCsrfToken() {
 }
 
 
-export async function apiRequest(path, options = {}) {
+async function legacyApiRequest(path, options = {}) {
   let response;
 
   const method = (
@@ -187,14 +189,14 @@ export function initLogout() {
     "click",
     async () => {
       try {
-        await apiRequest(
+        await legacyApiRequest(
           "/api/users/logout",
           {
             method: "POST",
           },
         );
 
-        await issueCsrfToken();
+        await legacyIssueCsrfToken();
       } catch (error) {
         console.warn(error.message);
       } finally {

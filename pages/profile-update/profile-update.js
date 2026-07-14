@@ -47,7 +47,7 @@ profileInput.addEventListener("change", async () => {
   profilePreview.src = profileImage;
 
   try {
-    await apiRequest(`/api/users/${userId}/profile-image`, {
+    await apiRequest(`/api/users/${userId}/profile`, {
       method: "PATCH",
       body: JSON.stringify({ profile_image: profileImage }),
     });
@@ -99,7 +99,7 @@ document.querySelector("[data-cancel-delete]").addEventListener("click", () => {
 
 document.querySelector("[data-confirm-delete]").addEventListener("click", async () => {
   try {
-    await apiRequest(`/api/users/${userId}/delete`, { method: "DELETE" });
+    await apiRequest(`/api/users/${userId}`, { method: "DELETE" });
     sessionStorage.clear();
     window.location.href = "../login/login.html";
   } catch (error) {

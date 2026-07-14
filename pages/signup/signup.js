@@ -114,6 +114,7 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
+    const submit = form.querySelector("button[type=submit]"); submit.disabled = true; submit.setAttribute("aria-busy", "true");
     await apiRequest("/api/users/signup", {
       method: "POST",
       body: formData,
@@ -122,5 +123,6 @@ form.addEventListener("submit", async (event) => {
     window.location.href = "../login/login.html";
   } catch (error) {
     setError(emailInput, emailError, `*${error.message}`);
+    const submit = form.querySelector("button[type=submit]"); submit.disabled = false; submit.removeAttribute("aria-busy");
   }
 });

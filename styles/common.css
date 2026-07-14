@@ -29,6 +29,8 @@ body {
   color: var(--color-text-primary);
 }
 
+body.is-modal-open { overflow: hidden; }
+
 html:has(body.auth-body) {
   scrollbar-gutter: auto;
 }
@@ -389,7 +391,7 @@ img {
   display: none;
   place-items: center;
   padding: 16px;
-  background: color-mix(in srgb, var(--color-bg-interactive-secondary) 46%, transparent);
+  background: rgb(0 0 0 / 40%);
 }
 
 .modal.is-open {
@@ -398,11 +400,35 @@ img {
 
 .modal__dialog {
   width: min(480px, calc(100vw - 32px));
-  padding: 28px;
+  padding: 16px 24px 24px;
   border-radius: var(--radius-page);
   background: var(--color-bg-primary);
   text-align: center;
 }
+
+.modal[hidden] { display: none; }
+.modal--editor .modal__dialog { padding: 0; text-align: left; }
+.modal__header { display: flex; min-height: 64px; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--color-border-secondary); }
+.modal__body { padding: 16px; }
+.modal__actions .button { min-width: 212px; min-height: 48px; }
+.modal-menu { z-index: 260; width: 160px; overflow: hidden; border: 1px solid var(--color-border-secondary); border-radius: 8px; background: white; box-shadow: 0 8px 24px rgb(0 0 0 / 12%); }
+.modal-menu [role="menuitem"] { width: 100%; min-height: 38px; padding: 8px 12px; text-align: left; }
+.modal-menu [role="menuitem"]:hover { background: var(--color-bg-tertiary); }
+.icon-action { display: inline-flex; min-width: 28px; min-height: 28px; align-items: center; gap: 4px; color: var(--color-text-secondary); }
+.icon-action img { width: 20px; height: 20px; }
+.icon-action--bookmark { margin-left: auto; }
+.is-popping img { animation: icon-pop 180ms ease; }
+@keyframes icon-pop { 50% { transform: scale(1.2); } }
+@media (prefers-reduced-motion: reduce) { .is-popping img { animation: none; } }
+
+.feed-card { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px solid var(--color-border-secondary); }
+.feed-card__author { display: flex; align-items: center; gap: 8px; }
+.feed-card__author > img { width: 34px; height: 34px; border: 1.5px solid var(--color-border-secondary); border-radius: 50%; object-fit: cover; }
+.feed-card__author p { color: var(--color-text-tertiary); }
+.feed-card__media-link { width: 100%; }
+.feed-card__media { width: 100%; max-height: 600px; aspect-ratio: 280 / 180; border-radius: 12px; object-fit: cover; }
+.feed-card__content { width: 100%; color: var(--color-text-primary); text-align: left; white-space: pre-wrap; }
+.feed-card__actions { display: flex; align-items: center; gap: 16px; }
 
 .modal__title {
   margin-bottom: 12px;
@@ -485,15 +511,15 @@ img {
 
 .auth-shell {
   display: grid;
-  min-height: 100vh;
-  grid-template-columns: 1fr 1fr;
+  min-height: 100dvh;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   background: var(--color-bg-primary);
 }
 
 .auth-artwork {
   width: 100%;
   height: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   object-fit: cover;
 }
 
