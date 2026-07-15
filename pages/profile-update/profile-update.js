@@ -89,23 +89,27 @@ form.addEventListener("submit", async (event) => {
 
 const deleteModal = document.querySelector("[data-delete-modal]");
 
-document.querySelector("[data-delete-account]").addEventListener("click", () => {
-  deleteModal.classList.add("is-open");
-});
+document
+  .querySelector("[data-delete-account]")
+  .addEventListener("click", () => {
+    deleteModal.classList.add("is-open");
+  });
 
 document.querySelector("[data-cancel-delete]").addEventListener("click", () => {
   deleteModal.classList.remove("is-open");
 });
 
-document.querySelector("[data-confirm-delete]").addEventListener("click", async () => {
-  try {
-    await apiRequest(`/api/users/${userId}`, { method: "DELETE" });
-    sessionStorage.clear();
-    window.location.href = "../login/login.html";
-  } catch (error) {
-    deleteModal.classList.remove("is-open");
-    showToast(error.message);
-  }
-});
+document
+  .querySelector("[data-confirm-delete]")
+  .addEventListener("click", async () => {
+    try {
+      await apiRequest(`/api/users/${userId}`, { method: "DELETE" });
+      sessionStorage.clear();
+      window.location.href = "../login/login.html";
+    } catch (error) {
+      deleteModal.classList.remove("is-open");
+      showToast(error.message);
+    }
+  });
 
 loadProfile();

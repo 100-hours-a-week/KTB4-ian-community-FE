@@ -1,1 +1,201 @@
-<!doctype html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="PULSE 커뮤니티 피드와 댓글을 확인하세요."><link rel="stylesheet" href="../../styles/tailwind-output.css"><link rel="stylesheet" href="./post-detail.css"><script src="../../assets/vendor/dayjs/dayjs.min.js"></script><script type="module" src="./post-detail.js"></script><title>피드 상세보기 | PULSE</title></head><body><aside data-app-lnb></aside><main class="page page-card"><header class="page-header"><button class="page-header__back" type="button" aria-label="피드 목록으로 돌아가기" data-back><img src="../../assets/icons/direction_left.svg" alt=""></button><h1 class="page-title typography-title3-bold">피드 상세보기</h1></header><article class="post-detail" data-post-detail aria-live="polite"></article><section class="comments" aria-labelledby="comments-title"><h2 class="sr-only" id="comments-title">댓글</h2><form class="comment-form" data-comment-form><label class="sr-only" for="comment">댓글 작성</label><textarea id="comment" name="comment" placeholder="지금 댓글을 작성해보세요." aria-describedby="comment-error"></textarea><button class="comment-submit submit-icon" type="submit" disabled aria-label="댓글 등록"><span></span></button></form><p class="helper-text" id="comment-error" data-comment-error></p><div class="comment-list" data-comment-list></div></section></main><div class="modal modal--editor" data-edit-post hidden aria-labelledby="edit-post-title"><section class="modal__dialog" tabindex="-1"><header class="modal__header"><button data-close-modal>취소</button><h2 id="edit-post-title">피드 편집</h2><button class="submit-icon" form="edit-post-form" disabled data-edit-post-submit><span></span></button></header><form class="modal__body form" id="edit-post-form"><textarea class="form-textarea" name="content" aria-label="피드 본문"></textarea><p class="helper-text" data-edit-post-error></p></form></section></div><div class="modal modal--editor" data-edit-comment-modal hidden aria-labelledby="edit-comment-title"><section class="modal__dialog" tabindex="-1"><header class="modal__header"><button data-close-modal>취소</button><h2 id="edit-comment-title">댓글 수정</h2><button class="submit-icon" form="edit-comment-form" disabled data-edit-comment-submit><span></span></button></header><form class="modal__body form" id="edit-comment-form"><textarea class="form-textarea" name="comment" aria-label="댓글 내용"></textarea><p class="helper-text" data-edit-comment-error></p></form></section></div><div class="modal" data-confirm-modal hidden aria-labelledby="confirm-title"><section class="modal__dialog" tabindex="-1"><h2 class="modal__title" id="confirm-title" data-confirm-title></h2><p class="modal__description" data-confirm-description></p><div class="modal__actions"><button class="button button--outline" data-confirm-cancel>취소</button><button class="button button--dark" data-confirm-action>삭제하기</button></div></section></div><div class="modal-menu" data-option-menu role="menu" hidden><button role="menuitem" data-menu-edit>수정하기</button><button role="menuitem" data-menu-delete>삭제하기</button></div><div class="toast" data-toast role="status"></div><noscript>피드 상세와 댓글을 보려면 JavaScript를 활성화해주세요.</noscript></body></html>
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="PULSE 커뮤니티 피드와 댓글을 확인하세요."
+    />
+    <link rel="stylesheet" href="../../styles/tailwind-output.css" />
+    <link rel="stylesheet" href="./post-detail.css" />
+    <script src="../../assets/vendor/dayjs/dayjs.min.js"></script>
+    <script type="module" src="./post-detail.js"></script>
+    <title>피드 상세보기 | PULSE</title>
+  </head>
+  <body>
+    <aside data-app-lnb></aside>
+    <main class="page page-card">
+      <header class="page-header">
+        <button
+          class="page-header__back"
+          type="button"
+          aria-label="피드 목록으로 돌아가기"
+          data-back
+        >
+          <img src="../../assets/icons/direction_left.svg" alt="" />
+        </button>
+        <h1 class="page-title typography-title3-bold">피드 상세보기</h1>
+        <button
+          class="page-header__more icon-button"
+          type="button"
+          data-post-more
+          aria-label="피드 옵션"
+          aria-expanded="false"
+          hidden
+        >
+          <img src="../../assets/icons/more.svg" alt="" />
+        </button>
+      </header>
+      <article
+        class="post-detail"
+        data-post-detail
+        aria-live="polite"
+      ></article>
+      <section class="comments" aria-labelledby="comments-title">
+        <h2 class="sr-only" id="comments-title">댓글</h2>
+        <form class="comment-form" data-comment-form>
+          <label class="sr-only" for="comment">댓글 작성</label>
+          <textarea
+            id="comment"
+            name="comment"
+            placeholder="지금 댓글을 작성해보세요."
+            aria-describedby="comment-error"
+          ></textarea>
+          <button
+            class="comment-submit submit-icon"
+            type="submit"
+            disabled
+            aria-label="댓글 등록"
+          >
+            <span></span>
+          </button>
+        </form>
+        <p class="helper-text" id="comment-error" data-comment-error></p>
+        <div class="comment-list" data-comment-list></div>
+      </section>
+    </main>
+
+    <div
+      class="modal modal--editor"
+      data-edit-post
+      hidden
+      aria-labelledby="edit-post-title"
+    >
+      <section class="modal__dialog" tabindex="-1">
+        <header class="modal__header">
+          <button data-close-modal>취소</button>
+          <h2 class="typography-body1-normal-bold" id="edit-post-title">
+            피드 편집
+          </h2>
+        </header>
+        <form class="feed-editor form" id="edit-post-form">
+          <div class="feed-editor__body">
+            <div class="feed-editor__identity">
+              <img class="avatar--small" data-edit-post-avatar alt="" />
+              <strong data-edit-post-author></strong>
+            </div>
+            <img
+              class="feed-editor__preview"
+              data-edit-image-preview
+              hidden
+              alt="첨부 이미지 미리보기"
+            />
+            <textarea
+              class="form-textarea"
+              name="content"
+              aria-label="피드 본문"
+            ></textarea>
+            <p class="helper-text" data-edit-post-error></p>
+          </div>
+          <div class="feed-editor__footer">
+            <div class="feed-editor__actions">
+              <label class="feed-editor__camera" for="edit-feed-image">
+                <img src="../../assets/icons/Camera.svg" alt="" />
+                <span class="sr-only">이미지 선택</span>
+              </label>
+              <input
+                class="file-input"
+                id="edit-feed-image"
+                name="image"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+              />
+              <button
+                class="feed-editor__submit submit-icon"
+                type="submit"
+                disabled
+                data-edit-post-submit
+                aria-label="피드 수정 완료"
+              >
+                <span></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div
+      class="modal modal--editor comment-edit-modal"
+      data-edit-comment-modal
+      hidden
+      aria-labelledby="edit-comment-title"
+    >
+      <section class="modal__dialog" tabindex="-1">
+        <header class="comment-edit__header">
+          <h2 class="typography-body1-normal-bold" id="edit-comment-title">
+            댓글
+          </h2>
+          <button class="typography-body3-normal-medium" data-close-modal>
+            취소
+          </button>
+        </header>
+        <form id="edit-comment-form">
+          <div class="comment-edit__body">
+            <div class="comment-edit__author">
+              <img data-edit-comment-avatar alt="" /><strong
+                class="typography-label1-normal-semibold"
+                data-edit-comment-author
+              ></strong>
+            </div>
+            <textarea
+              class="form-textarea typography-label2-reading-regular"
+              name="comment"
+              aria-label="댓글 내용"
+            ></textarea>
+            <p class="helper-text" data-edit-comment-error></p>
+          </div>
+          <div class="comment-edit__footer">
+            <div class="comment-edit__submit-row">
+              <button
+                class="comment-edit__submit submit-icon"
+                type="submit"
+                disabled
+                data-edit-comment-submit
+                aria-label="댓글 수정 완료"
+              >
+                <span></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div
+      class="modal"
+      data-confirm-modal
+      hidden
+      aria-labelledby="confirm-title"
+    >
+      <section class="modal__dialog" tabindex="-1">
+        <h2 class="modal__title" id="confirm-title" data-confirm-title></h2>
+        <p class="modal__description" data-confirm-description></p>
+        <div class="modal__actions">
+          <button class="button button--outline" data-confirm-cancel>
+            취소</button
+          ><button class="button button--dark" data-confirm-action>
+            삭제하기
+          </button>
+        </div>
+      </section>
+    </div>
+    <div class="modal-menu" data-option-menu role="menu" hidden>
+      <button role="menuitem" data-menu-edit>수정하기</button
+      ><button role="menuitem" data-menu-delete>삭제하기</button>
+    </div>
+    <div class="toast" data-toast role="status"></div>
+    <noscript>피드 상세와 댓글을 보려면 JavaScript를 활성화해주세요.</noscript>
+  </body>
+</html>

@@ -88,8 +88,7 @@ form.addEventListener("submit", async (event) => {
 
     showToast("게시글이 수정되었습니다.");
     window.setTimeout(() => {
-      window.location.href =
-        `../post-detail/post-detail.html?postId=${postId}`;
+      window.location.href = `../post-detail/post-detail.html?postId=${postId}`;
     }, 1000);
   } catch (error) {
     setError(contentInput, contentError, `*${error.message}`);

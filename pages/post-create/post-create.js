@@ -60,9 +60,10 @@ form.addEventListener("submit", async (event) => {
       body: JSON.stringify(request),
     });
 
-    const postId = typeof response === "number"
-      ? response
-      : response?.postId ?? response?.id;
+    const postId =
+      typeof response === "number"
+        ? response
+        : (response?.postId ?? response?.id);
     window.location.href = postId
       ? `../post-detail/post-detail.html?postId=${postId}`
       : "../posts/posts.html";

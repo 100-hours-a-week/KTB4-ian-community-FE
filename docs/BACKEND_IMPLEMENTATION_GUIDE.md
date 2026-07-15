@@ -40,6 +40,8 @@ Principal과 중복되는 사용자 경로를 제거한다.
 
 현재 로그인 응답은 사용자 ID 본문을 제공하지 않고 별도의 `GET /api/users/me`도 없다. 새 세션에서 프로필·댓글 등 사용자 ID 경로를 안정적으로 조립하려면 `GET /api/users/me`를 추가해 `userId`, `email`, `nickname`, `profileImage`를 반환하거나, 아래처럼 사용자 ID 경로 자체를 제거해야 한다.
 
+`PostDetailResponse`에도 작성자 `user_id`를 추가해야 프론트가 닉네임 중복 가능성 없이 수정·삭제 옵션을 표시할 수 있다. 댓글 응답은 이미 `user_id`를 제공하므로 같은 계약으로 맞추는 것이 좋다.
+
 ```text
 POST   /api/posts
 POST   /api/posts/{postId}/comments
@@ -49,13 +51,13 @@ DELETE /api/posts/{postId}/comments/{commentId}
 
 게시글 생성/수정 DTO도 필수 필드가 서로 다르지 않게 정리한다. 모든 시간은 UTC `Z` 또는 offset이 있는 ISO-8601로 반환한다. 오류는 `{ "code": "POST_NOT_FOUND", "message": "피드를 찾을 수 없습니다." }`처럼 일관되게 반환한다.
 
-| 상황 | 권장 상태 | 코드 |
-|---|---:|---|
-| 북마크 중복/충돌 | 409 | `BOOKMARK_CONFLICT` |
-| 게시글·댓글 없음 | 404 | `POST_NOT_FOUND`, `COMMENT_NOT_FOUND` |
-| 작성자 권한 없음 | 403 | `FORBIDDEN` |
-| 이미지 형식/크기 오류 | 400/413 | `INVALID_IMAGE_TYPE`, `IMAGE_TOO_LARGE` |
-| 현재 비밀번호 불일치 | 400 | `CURRENT_PASSWORD_MISMATCH` |
+| 상황                  | 권장 상태 | 코드                                    |
+| --------------------- | --------: | --------------------------------------- |
+| 북마크 중복/충돌      |       409 | `BOOKMARK_CONFLICT`                     |
+| 게시글·댓글 없음      |       404 | `POST_NOT_FOUND`, `COMMENT_NOT_FOUND`   |
+| 작성자 권한 없음      |       403 | `FORBIDDEN`                             |
+| 이미지 형식/크기 오류 |   400/413 | `INVALID_IMAGE_TYPE`, `IMAGE_TOO_LARGE` |
+| 현재 비밀번호 불일치  |       400 | `CURRENT_PASSWORD_MISMATCH`             |
 
 ## JWT·CORS 점검
 
@@ -64,6 +66,7 @@ DELETE /api/posts/{postId}/comments/{commentId}
 - CORS는 정확한 프론트 Origin과 `allowCredentials(true)`를 사용한다.
 - `expired_access_token`과 `invalid_refresh_token`, `expired_refresh_token`, `refresh_token_reused`, family/user mismatch 응답을 일관되게 유지한다.
 - 프론트에 토큰 문자열을 JSON으로 노출하지 않는다.
+- 현재 Access Cookie의 `Max-Age`와 JWT 만료가 모두 600초라 브라우저가 쿠키를 먼저 제거하면 서버는 `expired_access_token` 대신 일반 `unauthorized`를 반환할 수 있다. 서버가 만료 사유를 일관되게 판별해야 한다면 Access Cookie 수명을 JWT보다 조금 길게 두거나, 만료 직전 Refresh를 공식 클라이언트 계약으로 명시한다. 프론트는 현재 로그인/갱신 후 9분이 지난 첫 보호 요청 전에 선제 Refresh한다.
 
 ## 백엔드 테스트 요구사항
 

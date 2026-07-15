@@ -1,8 +1,5 @@
-import {
-  apiRequest,
-  initBackButton,
-  setError,
-} from "../../scripts/common.js";
+import { apiRequest, initBackButton, setError } from "../../scripts/common.js";
+import { rememberRegistrationProfile } from "../../scripts/auth/session.js";
 
 initBackButton("../login/login.html");
 
@@ -114,15 +111,24 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
-    const submit = form.querySelector("button[type=submit]"); submit.disabled = true; submit.setAttribute("aria-busy", "true");
+    const submit = form.querySelector("button[type=submit]");
+    submit.disabled = true;
+    submit.setAttribute("aria-busy", "true");
     await apiRequest("/api/users/signup", {
       method: "POST",
       body: formData,
     });
 
+    rememberRegistrationProfile({
+      email: request.email,
+      nickname: request.nickname,
+    });
+
     window.location.href = "../login/login.html";
   } catch (error) {
     setError(emailInput, emailError, `*${error.message}`);
-    const submit = form.querySelector("button[type=submit]"); submit.disabled = false; submit.removeAttribute("aria-busy");
+    const submit = form.querySelector("button[type=submit]");
+    submit.disabled = false;
+    submit.removeAttribute("aria-busy");
   }
 });

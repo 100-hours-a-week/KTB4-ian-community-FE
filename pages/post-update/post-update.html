@@ -1,36 +1,129 @@
 <!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="PULSE 피드 편집 페이지입니다.">
-  <link rel="stylesheet" href="../../styles/tailwind-output.css">
-  <link rel="stylesheet" href="../post-create/post-create.css">
-  <link rel="stylesheet" href="./post-update.css">
-  <script type="module" src="./post-update.js"></script>
-  <title>피드 편집 | PULSE</title>
-</head>
-<body>
-  <div class="feed-backdrop" aria-hidden="true">
-    <aside class="app-lnb"><img class="app-lnb__logo" src="../../assets/images/logo.png" alt=""><nav class="app-lnb__group typography-label1-normal-medium"><span class="app-lnb__item" aria-current="page"><img class="app-lnb__icon" src="../../assets/icons/home-fill.svg" alt="">피드</span><span class="app-lnb__item"><span class="app-lnb__icon">＋</span>새로운 피드 작성</span><span class="app-lnb__item"><img class="app-lnb__icon" src="../../assets/icons/receipt-stroke.svg" alt="">북마크</span></nav></aside>
-    <div class="page page-card backdrop-card"><h1 class="typography-title3-bold">피드</h1><div class="backdrop-line"></div><div class="backdrop-media"></div><div class="backdrop-line"></div></div>
-  </div>
-  <main class="modal-page">
-    <section class="modal-page__dialog composer" role="dialog" aria-modal="true" aria-labelledby="update-title">
-      <header class="composer__header"><h1 class="typography-title3-bold" id="update-title">피드 편집</h1><button class="typography-body3-normal-regular" type="button" data-back-button>취소</button></header>
-      <form class="form composer__form" data-post-form novalidate>
-        <div class="composer__author typography-label1-normal-semibold"><img class="avatar--small" src="../../assets/images/profile-default.svg" alt="">dlkfjls</div>
-        <div class="form-field"><label class="sr-only" for="title">제목</label><input class="composer__title typography-body3-normal-medium" id="title" name="title" type="text" maxlength="26" aria-describedby="title-error"><p class="helper-text typography-label2-normal-regular" id="title-error" data-title-error></p></div>
-        <div class="post-editor__image"><img src="../../assets/images/loginAndSignup_image.png" alt="현재 게시글 이미지" data-current-image></div>
-        <div class="form-field"><label class="sr-only" for="content">내용</label><textarea class="form-textarea typography-label2-reading-regular" id="content" name="content" aria-describedby="content-error"></textarea><p class="helper-text typography-label2-normal-regular" id="content-error" data-content-error></p></div>
-        <footer class="composer__footer">
-          <label class="composer__camera" for="image" aria-label="사진 변경"><img src="../../assets/icons/edit_profile_image.svg" alt=""></label>
-          <input class="file-input" id="image" name="image" type="file" accept="image/png,image/jpeg,image/webp" data-image-input>
-          <button class="composer__submit" type="submit" aria-label="피드 저장"><img src="../../assets/icons/direction_top.svg" alt=""></button>
-        </footer>
-      </form>
-    </section>
-  </main>
-  <div class="toast" role="status" data-toast></div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PULSE 피드 편집 페이지입니다." />
+    <link rel="stylesheet" href="../../styles/tailwind-output.css" />
+    <link rel="stylesheet" href="../post-create/post-create.css" />
+    <link rel="stylesheet" href="./post-update.css" />
+    <script type="module" src="./post-update.js"></script>
+    <title>피드 편집 | PULSE</title>
+  </head>
+  <body>
+    <div class="feed-backdrop" aria-hidden="true">
+      <aside class="app-lnb">
+        <img class="app-lnb__logo" src="../../assets/images/logo.png" alt="" />
+        <nav class="app-lnb__group typography-label1-normal-medium">
+          <span class="app-lnb__item" aria-current="page"
+            ><img
+              class="app-lnb__icon"
+              src="../../assets/icons/home-fill.svg"
+              alt=""
+            />피드</span
+          ><span class="app-lnb__item"
+            ><span class="app-lnb__icon">＋</span>새로운 피드 작성</span
+          ><span class="app-lnb__item"
+            ><img
+              class="app-lnb__icon"
+              src="../../assets/icons/receipt-stroke.svg"
+              alt=""
+            />북마크</span
+          >
+        </nav>
+      </aside>
+      <div class="page page-card backdrop-card">
+        <h1 class="typography-title3-bold">피드</h1>
+        <div class="backdrop-line"></div>
+        <div class="backdrop-media"></div>
+        <div class="backdrop-line"></div>
+      </div>
+    </div>
+    <main class="modal-page">
+      <section
+        class="modal-page__dialog composer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="update-title"
+      >
+        <header class="composer__header">
+          <h1 class="typography-title3-bold" id="update-title">피드 편집</h1>
+          <button
+            class="typography-body3-normal-regular"
+            type="button"
+            data-back-button
+          >
+            취소
+          </button>
+        </header>
+        <form class="form composer__form" data-post-form novalidate>
+          <div class="composer__author typography-label1-normal-semibold">
+            <img
+              class="avatar--small"
+              src="../../assets/images/profile-default.svg"
+              alt=""
+            />dlkfjls
+          </div>
+          <div class="form-field">
+            <label class="sr-only" for="title">제목</label
+            ><input
+              class="composer__title typography-body3-normal-medium"
+              id="title"
+              name="title"
+              type="text"
+              maxlength="26"
+              aria-describedby="title-error"
+            />
+            <p
+              class="helper-text typography-label2-normal-regular"
+              id="title-error"
+              data-title-error
+            ></p>
+          </div>
+          <div class="post-editor__image">
+            <img
+              src="../../assets/images/loginAndSignup_image.png"
+              alt="현재 게시글 이미지"
+              data-current-image
+            />
+          </div>
+          <div class="form-field">
+            <label class="sr-only" for="content">내용</label
+            ><textarea
+              class="form-textarea typography-label2-reading-regular"
+              id="content"
+              name="content"
+              aria-describedby="content-error"
+            ></textarea>
+            <p
+              class="helper-text typography-label2-normal-regular"
+              id="content-error"
+              data-content-error
+            ></p>
+          </div>
+          <footer class="composer__footer">
+            <label class="composer__camera" for="image" aria-label="사진 변경"
+              ><img src="../../assets/icons/edit_profile_image.svg" alt=""
+            /></label>
+            <input
+              class="file-input"
+              id="image"
+              name="image"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              data-image-input
+            />
+            <button
+              class="composer__submit"
+              type="submit"
+              aria-label="피드 저장"
+            >
+              <img src="../../assets/icons/direction_top.svg" alt="" />
+            </button>
+          </footer>
+        </form>
+      </section>
+    </main>
+    <div class="toast" role="status" data-toast></div>
+  </body>
 </html>

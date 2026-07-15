@@ -1,42 +1,31 @@
 export { apiRequest, issueCsrfToken } from "./api/http-client.js";
 /* Legacy helpers below remain for existing pages during the module migration. */
 const API_PORT = "8080";
-const API_HOST =
-  window.location.hostname || "localhost";
-const API_BASE_URL =
-  `http://${API_HOST}:${API_PORT}`;
+const API_HOST = window.location.hostname || "localhost";
+const API_BASE_URL = `http://${API_HOST}:${API_PORT}`;
 
 function getCookie(name) {
   const target = `${name}=`;
 
   const cookie = document.cookie
     .split("; ")
-    .find((item) =>
-      item.startsWith(target),
-    );
+    .find((item) => item.startsWith(target));
 
   if (!cookie) {
     return null;
   }
 
-  return decodeURIComponent(
-    cookie.substring(target.length),
-  );
+  return decodeURIComponent(cookie.substring(target.length));
 }
 
 async function legacyIssueCsrfToken() {
-  const response = await fetch(
-    `${API_BASE_URL}/api/csrf`,
-    {
-      method: "GET",
-      credentials: "include",
-    },
-  );
+  const response = await fetch(`${API_BASE_URL}/api/csrf`, {
+    method: "GET",
+    credentials: "include",
+  });
 
   if (!response.ok) {
-    throw new Error(
-      "CSRF 토큰을 발급받지 못했습니다.",
-    );
+    throw new Error("CSRF 토큰을 발급받지 못했습니다.");
   }
 }
 
@@ -52,21 +41,16 @@ async function getCsrfToken() {
   token = getCookie("XSRF-TOKEN");
 
   if (!token) {
-    throw new Error(
-      "XSRF-TOKEN 쿠키를 확인할 수 없습니다.",
-    );
+    throw new Error("XSRF-TOKEN 쿠키를 확인할 수 없습니다.");
   }
 
   return token;
 }
 
-
 async function legacyApiRequest(path, options = {}) {
   let response;
 
-  const method = (
-    options.method ?? "GET"
-  ).toUpperCase();
+  const method = (options.method ?? "GET").toUpperCase();
 
   const headers = {
     ...(!(options.body instanceof FormData)
@@ -75,12 +59,7 @@ async function legacyApiRequest(path, options = {}) {
     ...options.headers,
   };
 
-  const unsafeMethods = new Set([
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-  ]);
+  const unsafeMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
   if (unsafeMethods.has(method)) {
     const csrfToken = await getCsrfToken();
@@ -89,15 +68,12 @@ async function legacyApiRequest(path, options = {}) {
   }
 
   try {
-    response = await fetch(
-      `${API_BASE_URL}${path}`,
-      {
-        ...options,
-        method,
-        credentials: "include",
-        headers,
-      },
-    );
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      method,
+      credentials: "include",
+      headers,
+    });
   } catch (error) {
     if (error instanceof TypeError) {
       throw new Error(
@@ -112,29 +88,23 @@ async function legacyApiRequest(path, options = {}) {
     return null;
   }
 
-  const contentType =
-    response.headers.get("content-type") ?? "";
+  const contentType = response.headers.get("content-type") ?? "";
 
-  const body = contentType.includes(
-    "application/json",
-  )
+  const body = contentType.includes("application/json")
     ? await response.json()
     : await response.text();
 
   if (!response.ok) {
     const message =
       typeof body === "object" && body !== null
-        ? body.message ??
-          "요청 처리에 실패했습니다."
-        : body ||
-          "요청 처리에 실패했습니다.";
+        ? (body.message ?? "요청 처리에 실패했습니다.")
+        : body || "요청 처리에 실패했습니다.";
 
     throw new Error(message);
   }
 
   return body;
 }
-
 
 export function initProfileMenu() {
   const button = document.querySelector("[data-profile-button]");
@@ -156,7 +126,6 @@ export function initProfileMenu() {
   });
 }
 
-
 export function initBackButton(fallbackUrl) {
   const button = document.querySelector("[data-back-button]");
 
@@ -174,41 +143,29 @@ export function initBackButton(fallbackUrl) {
   });
 }
 
-
 export function initLogout() {
-  const button =
-    document.querySelector(
-      "[data-logout-button]",
-    );
+  const button = document.querySelector("[data-logout-button]");
 
   if (!button) {
     return;
   }
 
-  button.addEventListener(
-    "click",
-    async () => {
-      try {
-        await legacyApiRequest(
-          "/api/users/logout",
-          {
-            method: "POST",
-          },
-        );
+  button.addEventListener("click", async () => {
+    try {
+      await legacyApiRequest("/api/users/logout", {
+        method: "POST",
+      });
 
-        await legacyIssueCsrfToken();
-      } catch (error) {
-        console.warn(error.message);
-      } finally {
-        sessionStorage.clear();
+      await legacyIssueCsrfToken();
+    } catch (error) {
+      console.warn(error.message);
+    } finally {
+      sessionStorage.clear();
 
-        window.location.href =
-          "../login/login.html";
-      }
-    },
-  );
+      window.location.href = "../login/login.html";
+    }
+  });
 }
-
 
 export function setError(input, errorElement, message) {
   input.setAttribute("aria-invalid", String(Boolean(message)));
@@ -230,11 +187,9 @@ export function showToast(message) {
   }, 1800);
 }
 
-
 export function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
-
 
 export function formatCount(value) {
   const number = Number(value) || 0;

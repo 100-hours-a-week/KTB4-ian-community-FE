@@ -1,4 +1,5 @@
-const FOCUSABLE = "button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
+const FOCUSABLE =
+  "button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
 export class ModalManager {
   constructor(root = document) {
@@ -7,7 +8,9 @@ export class ModalManager {
     this.handleKeydown = this.handleKeydown.bind(this);
   }
 
-  get activeModal() { return this.stack.at(-1)?.modal || null; }
+  get activeModal() {
+    return this.stack.at(-1)?.modal || null;
+  }
 
   open(modal, trigger = this.root.activeElement) {
     if (!modal) return;
@@ -22,9 +25,14 @@ export class ModalManager {
     this.root.addEventListener("keydown", this.handleKeydown);
     modal.addEventListener("click", this.handleBackdrop);
     (modal.querySelector(FOCUSABLE) || modal).focus();
+    this.root.dispatchEvent(
+      new CustomEvent("community:modal-opened", { detail: { modal } }),
+    );
   }
 
-  handleBackdrop = (event) => { if (event.target === event.currentTarget) this.close("backdrop"); };
+  handleBackdrop = (event) => {
+    if (event.target === event.currentTarget) this.close("backdrop");
+  };
 
   close(reason = "programmatic") {
     const entry = this.stack.pop();
@@ -33,21 +41,39 @@ export class ModalManager {
     entry.modal.hidden = true;
     entry.modal.removeEventListener("click", this.handleBackdrop);
     const previous = this.activeModal;
-    if (previous) { previous.hidden = false; previous.classList.add("is-open"); }
-    else { this.root.body?.classList.remove("is-modal-open"); this.root.removeEventListener("keydown", this.handleKeydown); }
+    if (previous) {
+      previous.hidden = false;
+      previous.classList.add("is-open");
+    } else {
+      this.root.body?.classList.remove("is-modal-open");
+      this.root.removeEventListener("keydown", this.handleKeydown);
+    }
     entry.trigger?.focus?.();
+    this.root.dispatchEvent(
+      new CustomEvent("community:modal-closed", {
+        detail: { modal: entry.modal, reason },
+      }),
+    );
     return reason;
   }
 
-  closeAll() { while (this.stack.length) this.close("all"); }
+  closeAll() {
+    while (this.stack.length) this.close("all");
+  }
 
   handleKeydown(event) {
     if (event.key === "Escape") return this.close("escape");
     if (event.key !== "Tab" || !this.activeModal) return;
     const focusable = [...this.activeModal.querySelectorAll(FOCUSABLE)];
     if (!focusable.length) return event.preventDefault();
-    const first = focusable[0]; const last = focusable.at(-1);
-    if (event.shiftKey && this.root.activeElement === first) { event.preventDefault(); last.focus(); }
-    else if (!event.shiftKey && this.root.activeElement === last) { event.preventDefault(); first.focus(); }
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (event.shiftKey && this.root.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && this.root.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 }
