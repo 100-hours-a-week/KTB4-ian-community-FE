@@ -1,4 +1,9 @@
-import { apiRequest, issueCsrfToken, setError } from "../../scripts/common.js";
+import {
+  apiAssetUrl,
+  apiRequest,
+  issueCsrfToken,
+  setError,
+} from "../../scripts/common.js";
 import {
   consumeReturnUrl,
   getRegistrationProfile,
@@ -64,15 +69,26 @@ form.addEventListener("submit", async (event) => {
 
     const email = emailInput.value.trim();
     const registrationProfile = getRegistrationProfile(email);
+    const userId = response?.userId ?? response?.user_id;
+    const authenticatedUser = userId
+      ? await apiRequest(`/api/users/${userId}`)
+      : null;
     setSessionUser({
       ...registrationProfile,
+      ...authenticatedUser,
       email,
-      userId: response?.userId ?? response?.user_id,
-      nickname: response?.nickname ?? registrationProfile?.nickname,
+      userId,
+      nickname:
+        authenticatedUser?.nickname ??
+        response?.nickname ??
+        registrationProfile?.nickname,
       profileImage:
-        response?.profileImage ??
-        response?.profile_image ??
-        registrationProfile?.profileImage,
+        apiAssetUrl(
+          authenticatedUser?.profileImage ??
+            response?.profileImage ??
+            response?.profile_image ??
+            registrationProfile?.profileImage,
+        ),
     });
 
     window.location.href = consumeReturnUrl("../posts/posts.html");

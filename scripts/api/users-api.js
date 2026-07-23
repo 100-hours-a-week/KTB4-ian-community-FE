@@ -20,10 +20,13 @@ export const usersApi = {
       method: "PATCH",
       body: json(payload),
     }),
-  profile: (userId, profileImage) =>
-    apiRequest(`/api/users/${userId}/profile`, {
+  profile: (userId, image) => {
+    const body = new FormData();
+    body.append("image", image);
+    return apiRequest(`/api/users/${userId}/profile`, {
       method: "PATCH",
-      body: json({ profile_image: profileImage }),
-    }),
+      body,
+    });
+  },
   remove: (userId) => apiRequest(`/api/users/${userId}`, { method: "DELETE" }),
 };

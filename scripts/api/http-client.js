@@ -27,6 +27,12 @@ const baseUrl = () =>
   globalThis.__API_BASE_URL__ ??
   `http://${location.hostname || "localhost"}:8080`;
 
+export function apiAssetUrl(value) {
+  if (!value) return value;
+  if (/^(?:https?:|blob:|data:)/i.test(value)) return value;
+  return `${baseUrl()}${value.startsWith("/") ? value : `/${value}`}`;
+}
+
 function cookie(name) {
   return (
     document.cookie

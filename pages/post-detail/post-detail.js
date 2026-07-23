@@ -39,7 +39,15 @@ function renderPost() {
   const image = post.imageUrl ?? post.image_url;
   const liked = Boolean(post.liked);
   const saved = bookmarks.has(postId);
-  detail.innerHTML = `<header class="post-detail__header"><div class="post-detail__meta-row"><div class="post-author"><img src="${post.profileImage ?? post.profile_image ?? "../../assets/images/profile-default.svg"}" alt=""><strong>${author}</strong></div><div class="post-detail__header-tools"><p class="post-author__date typography-label2-normal-regular">조회 ${post.viewCount ?? post.view_count ?? 0} · ${formatRelativeTime(post.createdAt ?? post.created_at)}</p></div></div></header>${image ? `<img class="post-detail__media" src="${image}" alt="피드 첨부 이미지">` : ""}<p class="post-detail__content">${post.content || post.title || ""}</p><footer class="post-stats"><button class="post-stat" data-like aria-label="좋아요" aria-pressed="${liked}"><img src="${liked ? ICONS.like.active : ICONS.like.inactive}" alt=""><span>${post.likeCount ?? post.like_count ?? 0}</span></button><span class="post-stat"><img src="${ICONS.comment}" alt=""><span data-comment-count>${(post.comment ?? post.comments ?? []).length}</span></span><button class="post-stat post-stat--bookmark" data-bookmark aria-label="북마크" aria-pressed="${saved}"><img src="${saved ? ICONS.bookmark.active : ICONS.bookmark.inactive}" alt=""></button></footer>`;
+  detail.innerHTML = 
+    `<header class="post-detail__header">
+      <div class="post-detail__meta-row">
+        <div class="post-author">
+          <img src="${post.profileImage ?? post.profile_image ?? "../../assets/images/profile-default.svg"}" alt="">
+          <strong>${author}</strong>
+        </div>
+          <div class="post-detail__header-tools">
+            <p class="post-author__date typography-label2-normal-regular">조회 ${post.viewCount ?? post.view_count ?? 0} · ${formatRelativeTime(post.createdAt ?? post.created_at)}</p></div></div></header>${image ? `<img class="post-detail__media" src="${image}" alt="피드 첨부 이미지">` : ""}<p class="post-detail__content">${post.content || post.title || ""}</p><footer class="post-stats"><button class="post-stat" data-like aria-label="좋아요" aria-pressed="${liked}"><img src="${liked ? ICONS.like.active : ICONS.like.inactive}" alt=""><span>${post.likeCount ?? post.like_count ?? 0}</span></button><span class="post-stat"><img src="${ICONS.comment}" alt=""><span data-comment-count>${(post.comment ?? post.comments ?? []).length}</span></span><button class="post-stat post-stat--bookmark" data-bookmark aria-label="북마크" aria-pressed="${saved}"><img src="${saved ? ICONS.bookmark.active : ICONS.bookmark.inactive}" alt=""></button></footer>`;
   postMoreButton.hidden = !isOwnedByUser(post, user);
   document.title = `${String(post.content || post.title || "피드").slice(0, 24)} | PULSE`;
   detail

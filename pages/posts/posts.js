@@ -10,6 +10,7 @@ import { BookmarkStore } from "../../scripts/stores/bookmark-store.js";
 import { LikeStore } from "../../scripts/stores/like-store.js";
 import { clearSession } from "../../scripts/auth/session.js";
 import { mountSettingsModals } from "../../scripts/components/settings-modals.js";
+import { apiAssetUrl } from "../../scripts/api/http-client.js";
 
 const list = document.querySelector("[data-post-list]");
 const store = new BookmarkStore();
@@ -22,7 +23,7 @@ const submit = document.querySelector("[data-submit-create]");
 function openCreate() {
   const user = getSessionUser();
   document.querySelector("[data-editor-avatar]").src =
-    user.profileImage || "../../assets/images/profile-default.svg";
+    apiAssetUrl(user.profileImage) || apiAssetUrl("/images/profile-default.svg");
   document.querySelector("[data-editor-name]").textContent =
     user.nickname || "알 수 없음";
   modals.open(createModal);
@@ -73,7 +74,7 @@ form.addEventListener("submit", async (event) => {
   try {
     await postsApi.create(user.userId || 0, {
       content: form.elements.content.value.trim(),
-      imageUrl: null,
+      image: form.elements.image.files[0] ?? null,
     });
     modals.close("success");
     form.elements.image.disabled = false;
@@ -104,6 +105,7 @@ function render(posts) {
           const likeCount =
             result?.likeCount ?? result?.like_count ?? item.likeCount;
           likes.set(item.postId, liked, likeCount);
+          
           return { ...result, liked, likeCount };
         },
         onBookmark: (item) => store.toggle(item),
@@ -117,7 +119,13 @@ async function load() {
     const result = await postsApi.list();
     render(Array.isArray(result) ? result : result?.content || []);
   } catch (error) {
-    list.innerHTML = `<div class="empty-state"><div><p>${error.message}</p><button class="button button--outline" data-retry>다시 시도</button></div></div>`;
+    list.innerHTML = 
+      `<div class="empty-state">
+        <div>
+          <p>${error.message}</p>
+          <button class="button button--outline" data-retry>다시 시도</button>
+        </div>
+      </div>`;
     list.querySelector("[data-retry]")?.addEventListener("click", load);
   }
 }

@@ -1,5 +1,6 @@
 import {
   apiRequest,
+  apiAssetUrl,
   initLogout,
   initProfileMenu,
   setError,
@@ -28,8 +29,9 @@ async function loadProfile() {
     const profileImage = user.profileImageUrl ?? user.profileImage;
 
     if (profileImage) {
-      profilePreview.src = profileImage;
-      sessionStorage.setItem("profileImage", profileImage);
+      const imageUrl = apiAssetUrl(profileImage);
+      profilePreview.src = imageUrl;
+      sessionStorage.setItem("profileImage", imageUrl);
     }
   } catch (error) {
     console.warn(error.message);
@@ -43,15 +45,20 @@ profileInput.addEventListener("change", async () => {
     return;
   }
 
-  const profileImage = URL.createObjectURL(file);
-  profilePreview.src = profileImage;
+  const previewUrl = URL.createObjectURL(file);
+  profilePreview.src = previewUrl;
 
   try {
-    await apiRequest(`/api/users/${userId}/profile`, {
+    const body = new FormData();
+    body.append("image", file);
+    const result = await apiRequest(`/api/users/${userId}/profile`, {
       method: "PATCH",
-      body: JSON.stringify({ profile_image: profileImage }),
+      body,
     });
-    sessionStorage.setItem("profileImage", profileImage);
+    const imageUrl = apiAssetUrl(result.profileImage);
+    profilePreview.src = imageUrl;
+    sessionStorage.setItem("profileImage", imageUrl);
+    URL.revokeObjectURL(previewUrl);
     showToast("프로필 사진이 수정되었습니다.");
   } catch (error) {
     setError(nicknameInput, nicknameError, `*${error.message}`);

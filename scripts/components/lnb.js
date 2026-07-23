@@ -1,10 +1,8 @@
 import { ICONS } from "../utils/icons.js";
+import { apiAssetUrl } from "../api/http-client.js";
 
 const logo = new URL("../../assets/images/logo.png", import.meta.url).href;
-const fallbackAvatar = new URL(
-  "../../assets/images/profile-default.svg",
-  import.meta.url,
-).href;
+const fallbackAvatar = apiAssetUrl("/images/profile-default.svg");
 let sessionHandlerMounted = false;
 
 export function getSessionUser() {
@@ -81,7 +79,7 @@ export function mountLnb({
   const renderUser = () => {
     const user = getSessionUser();
     root.querySelector("[data-user-avatar]").src =
-      user.profileImage || fallbackAvatar;
+      apiAssetUrl(user.profileImage) || fallbackAvatar;
     root.querySelector("[data-user-name]").textContent =
       user.nickname || "알 수 없음";
   };

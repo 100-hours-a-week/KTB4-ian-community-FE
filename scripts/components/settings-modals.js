@@ -3,11 +3,9 @@ import { clearSession } from "../auth/session.js";
 import { getSessionUser, setSessionUser } from "./lnb.js";
 import { ModalManager } from "./modal-manager.js";
 import { ICONS } from "../utils/icons.js";
+import { apiAssetUrl } from "../api/http-client.js";
 
-const fallbackAvatar = new URL(
-  "../../assets/images/profile-default.svg",
-  import.meta.url,
-).href;
+const fallbackAvatar = apiAssetUrl("/images/profile-default.svg");
 const passwordPattern =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=])[A-Za-z\d!@#$%^&*()_+\-=]{8,20}$/;
 
@@ -28,7 +26,7 @@ export function mountSettingsModals(manager = new ModalManager()) {
       user.email || "이메일 정보 없음";
     profileForm.elements.nickname.value = originalNickname;
     profileForm.querySelector("[data-profile-preview]").src =
-      user.profileImage || fallbackAvatar;
+      apiAssetUrl(user.profileImage) || fallbackAvatar;
     profileForm.querySelector("button[type=submit]").disabled = true;
   }
   async function openProfile() {
@@ -38,7 +36,12 @@ export function mountSettingsModals(manager = new ModalManager()) {
     if (!user.userId) return;
     try {
       const currentUser = await usersApi.me(user.userId);
-      renderProfileUser(setSessionUser(currentUser));
+      renderProfileUser(
+        setSessionUser({
+          ...currentUser,
+          profileImage: apiAssetUrl(currentUser.profileImage),
+        }),
+      );
     } catch (error) {
       profileForm.querySelector("[data-profile-error]").textContent =
         error.message;
@@ -69,15 +72,26 @@ export function mountSettingsModals(manager = new ModalManager()) {
     if (profilePreviewUrl) URL.revokeObjectURL(profilePreviewUrl);
     profilePreviewUrl = URL.createObjectURL(file);
     profileForm.querySelector("[data-profile-preview]").src = profilePreviewUrl;
-    setSessionUser({ profileImage: profilePreviewUrl });
+    profileForm.querySelector("button[type=submit]").disabled = false;
   });
   profileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const nickname = profileForm.elements.nickname.value.trim();
     try {
-      await usersApi.nickname(getSessionUser().userId || 0, nickname);
-      setSessionUser({ nickname });
+      const userId = getSessionUser().userId || 0;
+      const image = profileForm.elements.image.files[0];
+      if (nickname !== originalNickname) {
+        await usersApi.nickname(userId, nickname);
+        setSessionUser({ nickname });
+      }
+      if (image) {
+        const result = await usersApi.profile(userId, image);
+        setSessionUser({ profileImage: apiAssetUrl(result.profileImage) });
+      }
       originalNickname = nickname;
+      profileForm.elements.image.value = "";
+      if (profilePreviewUrl) URL.revokeObjectURL(profilePreviewUrl);
+      profilePreviewUrl = null;
       manager.close("success");
     } catch (error) {
       profileForm.querySelector("[data-profile-error]").textContent =

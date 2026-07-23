@@ -4,8 +4,6 @@ import { rememberRegistrationProfile } from "../../scripts/auth/session.js";
 initBackButton("../login/login.html");
 
 const form = document.querySelector("[data-signup-form]");
-const profileInput = document.querySelector("[data-profile-input]");
-const profilePreview = document.querySelector("[data-profile-preview]");
 
 const emailInput = form.elements.email;
 const passwordInput = form.elements.password;
@@ -21,16 +19,6 @@ const nicknameError = document.querySelector("[data-nickname-error]");
 
 const passwordPattern =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=])[A-Za-z\d!@#$%^&*()_+\-=]{8,20}$/;
-const defaultProfileImage = "../../assets/images/profile-default.svg";
-
-profileInput.addEventListener("change", () => {
-  const [file] = profileInput.files;
-
-  if (file) {
-    profilePreview.src = URL.createObjectURL(file);
-  }
-});
-
 function validate() {
   let isValid = true;
 
@@ -89,26 +77,12 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
-  const formData = new FormData();
-
   const request = {
     email: emailInput.value.trim(),
     password: passwordInput.value,
     password_confirm: passwordConfirmInput.value,
     nickname: nicknameInput.value.trim(),
-    profile_image: defaultProfileImage,
   };
-
-  formData.append(
-    "request",
-    new Blob([JSON.stringify(request)], {
-      type: "application/json",
-    }),
-  );
-
-  if (profileInput.files[0]) {
-    formData.append("image", profileInput.files[0]);
-  }
 
   try {
     const submit = form.querySelector("button[type=submit]");
@@ -116,7 +90,7 @@ form.addEventListener("submit", async (event) => {
     submit.setAttribute("aria-busy", "true");
     await apiRequest("/api/users/signup", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify(request),
     });
 
     rememberRegistrationProfile({

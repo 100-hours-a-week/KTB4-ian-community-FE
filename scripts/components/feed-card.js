@@ -1,11 +1,9 @@
 import { formatCount } from "../common.js";
 import { formatRelativeTime } from "../utils/date.js";
 import { ICONS, setToggleIcon } from "../utils/icons.js";
+import { apiAssetUrl } from "../api/http-client.js";
 
-const fallbackAvatar = new URL(
-  "../../assets/images/profile-default.svg",
-  import.meta.url,
-).href;
+const fallbackAvatar = apiAssetUrl("/images/profile-default.svg");
 const value = (post, camel, snake) => post[camel] ?? post[snake];
 
 export function normalizePost(post) {
@@ -19,8 +17,8 @@ export function normalizePost(post) {
       value(post, "authorName", "author_name") ?? post.nickname ?? "알 수 없음",
     createdAt: value(post, "createdAt", "created_at"),
     profileImage:
-      value(post, "profileImage", "profile_image") || fallbackAvatar,
-    imageUrl: value(post, "imageUrl", "image_url"),
+      apiAssetUrl(value(post, "profileImage", "profile_image")) || fallbackAvatar,
+    imageUrl: apiAssetUrl(value(post, "imageUrl", "image_url")),
     liked: Boolean(post.liked),
   };
 }

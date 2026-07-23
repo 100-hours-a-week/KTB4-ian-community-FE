@@ -5,8 +5,12 @@ export const postsApi = {
   list: (params = {}) =>
     apiRequest(`/api/posts?${new URLSearchParams(params)}`),
   detail: (postId) => apiRequest(`/api/posts/${postId}`),
-  create: (userId, payload) =>
-    apiRequest(`/api/posts/${userId}`, { method: "POST", body: json(payload) }),
+  create: (userId, payload) => {
+    const body = new FormData();
+    body.append("content", payload.content);
+    if (payload.image) body.append("image", payload.image);
+    return apiRequest(`/api/posts/${userId}`, { method: "POST", body });
+  },
   update: (postId, payload) =>
     apiRequest(`/api/posts/${postId}`, {
       method: "PATCH",

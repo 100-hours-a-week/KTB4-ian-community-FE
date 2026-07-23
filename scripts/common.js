@@ -1,4 +1,4 @@
-export { apiRequest, issueCsrfToken } from "./api/http-client.js";
+export { apiAssetUrl, apiRequest, issueCsrfToken } from "./api/http-client.js";
 /* Legacy helpers below remain for existing pages during the module migration. */
 const API_PORT = "8080";
 const API_HOST = window.location.hostname || "localhost";
