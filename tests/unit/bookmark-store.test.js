@@ -1,11 +1,19 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { BookmarkStore } from "../../scripts/stores/bookmark-store.js";
+import { normalizePost } from "../../src/entities/post/model/normalizePost.js";
+import { PostCard } from "../../src/entities/post/ui/PostCard.jsx";
 
-describe("BookmarkStore", () => {
-  it("피드를 토글하고 브라우저 저장소에서 복원한다", () => {
-    const store = new BookmarkStore();
-    expect(store.toggle({ postId: 7, content: "hello" })).toBe(true);
-    expect(new BookmarkStore().has(7)).toBe(true);
-    expect(store.toggle({ postId: 7 })).toBe(false);
+describe("북마크 범위", () => {
+  it("피드의 북마크는 저장 기능 없이 disabled 상태다", () => {
+    localStorage.clear();
+    const html = renderToStaticMarkup(
+      createElement(PostCard, {
+        post: normalizePost({ post_id: 7, content: "hello" }),
+      }),
+    );
+    expect(html).toContain('aria-label="북마크"');
+    expect(html).toContain("disabled");
+    expect(localStorage.length).toBe(0);
   });
 });

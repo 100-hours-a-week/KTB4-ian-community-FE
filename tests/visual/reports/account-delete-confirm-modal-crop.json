@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/account-delete-confirm-modal-crop.png",
+  "actual": "tests/visual/actual/account-delete-confirm-modal-crop.png",
+  "width": 480,
+  "height": 180,
+  "threshold": 16,
+  "changedPixels": 12066,
+  "totalPixels": 86400,
+  "changedPercent": 13.965278,
+  "meanAbsoluteChannelDifference": 12.546782,
+  "differenceBoundingBox": [
+    0,
+    0,
+    480,
+    180
+  ]
+}

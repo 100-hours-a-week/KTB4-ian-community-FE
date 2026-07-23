@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/comment-edit-modal-crop.png",
+  "actual": "tests/visual/actual/comment-edit-modal-crop.png",
+  "width": 480,
+  "height": 346,
+  "threshold": 16,
+  "changedPixels": 7829,
+  "totalPixels": 166080,
+  "changedPercent": 4.713993,
+  "meanAbsoluteChannelDifference": 5.622116,
+  "differenceBoundingBox": [
+    0,
+    0,
+    480,
+    346
+  ]
+}

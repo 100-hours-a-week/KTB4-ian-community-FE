@@ -1,64 +1,43 @@
 {
-  "devDependencies": {
-    "@playwright/test": "^1.61.1",
-    "@tailwindcss/cli": "^4.3.2",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/user-event": "^14.6.1",
-    "http-server": "^14.1.1",
-    "jsdom": "^29.1.1",
-    "prettier": "^3.9.5",
-    "tailwindcss": "^4.3.2",
-    "vitest": "^4.1.10"
-  },
   "name": "community-fe",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "PULSE React SPA",
+  "type": "module",
   "dependencies": {
-    "braces": "^3.0.3",
-    "dayjs": "^1.11.21",
-    "detect-libc": "^1.0.3",
-    "enhanced-resolve": "^5.21.6",
-    "fill-range": "^7.1.1",
-    "graceful-fs": "^4.2.11",
-    "is-extglob": "^2.1.1",
-    "is-glob": "^4.0.3",
-    "is-number": "^7.0.0",
-    "jiti": "^2.7.0",
-    "lightningcss": "^1.32.0",
-    "lightningcss-darwin-arm64": "^1.32.0",
-    "magic-string": "^0.30.21",
-    "micromatch": "^4.0.8",
-    "mri": "^1.2.0",
-    "node-addon-api": "^7.1.1",
-    "picocolors": "^1.1.1",
-    "picomatch": "^2.3.2",
-    "source-map-js": "^1.2.1",
-    "tapable": "^2.3.3",
-    "to-regex-range": "^5.0.1"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/preset-react": "^8.0.1",
+    "@playwright/test": "^1.61.1",
+    "@testing-library/dom": "^10.4.1",
+    "babel-loader": "^10.1.1",
+    "css-loader": "^7.1.2",
+    "jsdom": "^29.1.1",
+    "mini-css-extract-plugin": "^2.9.4",
+    "prettier": "^3.9.5",
+    "vitest": "^4.1.10",
+    "webpack": "^5.108.4",
+    "webpack-cli": "^7.2.1",
+    "webpack-dev-server": "^6.0.0"
   },
   "scripts": {
-    "dev:css": "tailwindcss -i ./styles/tailwind.css -o ./styles/tailwind-output.css --watch",
-    "build:css": "tailwindcss -i ./styles/tailwind.css -o ./styles/tailwind-output.css --minify",
-    "build:vendor": "mkdir -p assets/vendor/dayjs && cp node_modules/dayjs/dayjs.min.js assets/vendor/dayjs/dayjs.min.js",
-    "format:check": "prettier --check index.html 'pages/**/*.{html,css,js}' 'scripts/**/*.js' 'tests/**/*.js' 'docs/**/*.md' styles/common.css package.json playwright.config.js vitest.config.js",
+    "build:react": "webpack --mode production",
+    "build:watch": "webpack --mode development --watch",
+    "format:check": "prettier --check index.html 'src/**/*.{js,jsx,css}' 'tests/**/*.js' 'docs/**/*.md' package.json playwright.config.js vitest.config.js webpack.config.js",
     "test": "npm run test:unit",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:ui": "playwright test",
-    "test:all": "npm run format:check && npm run build:vendor && npm run build:css && npm run test:unit && npm run test:integration && npm run test:ui",
-    "serve:test": "http-server . -p 4173 -c-1"
+    "test:e2e:backend": "playwright test --config playwright.backend.config.js",
+    "test:all": "npm run format:check && npm run build:react && npm run test:unit && npm run test:integration && npm run test:ui",
+    "serve:test": "webpack serve --mode development"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/100-hours-a-week/KTB4-ian-community-FE.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/100-hours-a-week/KTB4-ian-community-FE/issues"
-  },
-  "homepage": "https://github.com/100-hours-a-week/KTB4-ian-community-FE#readme"
+  "license": "ISC"
 }

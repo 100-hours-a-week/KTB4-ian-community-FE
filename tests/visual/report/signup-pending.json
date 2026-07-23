@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/signup-pending.png",
+  "actual": "tests/visual/actual/signup-pending.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 39846,
+  "totalPixels": 2073600,
+  "changedPercent": 1.921586,
+  "meanAbsoluteChannelDifference": 2.803427,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1591,
+    1080
+  ]
+}

@@ -1,33 +1,23 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { LikeStore } from "../../scripts/stores/like-store.js";
-import { isOwnedByUser } from "../../scripts/utils/ownership.js";
+import { describe, expect, it } from "vitest";
+import { normalizePost } from "../../src/entities/post/model/normalizePost.js";
+import { optimisticLike } from "../../src/features/post/like/togglePostLike.js";
 
-describe("LikeStore", () => {
-  beforeEach(() => localStorage.clear());
-
-  it("목록에서 저장한 좋아요 상태를 상세 응답에 병합한다", () => {
-    const store = new LikeStore();
-    store.set(12, true, 4);
-
-    expect(
-      store.merge({ post_id: 12, liked: false, like_count: 3 }),
-    ).toMatchObject({ liked: true, likeCount: 4, like_count: 4 });
+describe("좋아요 Feature", () => {
+  it("낙관 상태에서 선택과 수를 함께 갱신한다", () => {
+    expect(optimisticLike({ liked: false, likeCount: 3 })).toMatchObject({
+      liked: true,
+      likeCount: 4,
+    });
   });
 
-  it("손상된 저장 데이터는 서버 상태를 유지한다", () => {
-    localStorage.setItem("community.likes", "broken");
-    expect(new LikeStore().merge({ postId: 1, liked: false })).toMatchObject({
-      liked: false,
-    });
+  it("좋아요 수는 0 아래로 내려가지 않는다", () => {
+    expect(optimisticLike({ liked: true, likeCount: 0 }).likeCount).toBe(0);
   });
 });
 
-describe("소유권 판정", () => {
-  it("사용자 ID를 우선하고 게시글 계약에 ID가 없으면 닉네임을 사용한다", () => {
-    expect(isOwnedByUser({ user_id: 7 }, { userId: "7" })).toBe(true);
-    expect(isOwnedByUser({ user_id: 8 }, { userId: "7" })).toBe(false);
-    expect(
-      isOwnedByUser({ nickname: "PULSE 사용자" }, { nickname: "PULSE 사용자" }),
-    ).toBe(true);
+describe("소유권 모델", () => {
+  it("Backend mine 필드를 Normalize한다", () => {
+    expect(normalizePost({ mine: true }).mine).toBe(true);
+    expect(normalizePost({ mine: false }).mine).toBe(false);
   });
 });

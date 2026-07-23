@@ -4,6 +4,7 @@
 @layer theme, base, components, utilities;
 @layer theme {
   :root, :host {
+    --font-sans: var(--font-family-font-family);
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-red-50: #ffe8e8;
@@ -66,6 +67,8 @@
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-family-font-family);
     --default-mono-font-family: var(--font-mono);
     --color-brand-50: #efeffd;
@@ -229,6 +232,9 @@
   }
 }
 @layer utilities {
+  .visible {
+    visibility: visible;
+  }
   .sr-only {
     position: absolute;
     width: 1px;
@@ -246,11 +252,35 @@
   .relative {
     position: relative;
   }
+  .static {
+    position: static;
+  }
+  .container {
+    width: 100%;
+    @media (width >= 40rem) {
+      max-width: 40rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 48rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 80rem;
+    }
+    @media (width >= 96rem) {
+      max-width: 96rem;
+    }
+  }
   .flex {
     display: flex;
   }
   .hidden {
     display: none;
+  }
+  .inline {
+    display: inline;
   }
   .table {
     display: table;
@@ -263,6 +293,9 @@
   }
   .resize {
     resize: both;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
   }
   .border {
     border-style: var(--tw-border-style);
@@ -281,6 +314,11 @@
   }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
 }
 :root {

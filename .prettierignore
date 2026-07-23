@@ -2,7 +2,4 @@ node_modules/
 test-results/
 playwright-report/
 assets/vendor/
-styles/tokens/colors.css
-styles/tokens/typography.css
-styles/tailwind-output.css
 tests/ui/baselines/

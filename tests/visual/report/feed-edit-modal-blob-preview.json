@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-edit-modal-blob-preview.png",
+  "actual": "tests/visual/actual/feed-edit-modal-blob-preview.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 98544,
+  "totalPixels": 2073600,
+  "changedPercent": 4.752315,
+  "meanAbsoluteChannelDifference": 3.645974,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1320,
+    1080
+  ]
+}

@@ -6,11 +6,14 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:4173",
     viewport: { width: 1920, height: 1080 },
+    deviceScaleFactor: 1,
+    colorScheme: "light",
+    locale: "ko-KR",
     trace: "retain-on-failure",
   },
   webServer: {
     command: "npm run serve:test",
-    url: "http://127.0.0.1:4173/pages/login/login.html",
+    url: "http://127.0.0.1:4173/dist/app.js",
     reuseExistingServer: true,
   },
 });

@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/signup-submit-hover.png",
+  "actual": "tests/visual/actual/signup-submit-hover.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 39899,
+  "totalPixels": 2073600,
+  "changedPercent": 1.924142,
+  "meanAbsoluteChannelDifference": 2.332532,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1594,
+    1080
+  ]
+}

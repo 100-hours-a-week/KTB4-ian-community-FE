@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/lnb-bookmarks.png",
+  "actual": "tests/visual/after/lnb-bookmarks.png",
+  "width": 180,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 3197,
+  "totalPixels": 194400,
+  "changedPercent": 1.644547,
+  "meanAbsoluteChannelDifference": 1.488507,
+  "differenceBoundingBox": [
+    0,
+    48,
+    180,
+    1060
+  ]
+}

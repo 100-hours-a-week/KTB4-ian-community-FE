@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/signup-nickname_already_exists.png",
+  "actual": "tests/visual/actual/signup-nickname_already_exists.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 52610,
+  "totalPixels": 2073600,
+  "changedPercent": 2.537133,
+  "meanAbsoluteChannelDifference": 3.019995,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1591,
+    1080
+  ]
+}

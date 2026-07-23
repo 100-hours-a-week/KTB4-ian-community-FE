@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-edit-modal-failure.png",
+  "actual": "tests/visual/actual/feed-edit-modal-failure.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 205506,
+  "totalPixels": 2073600,
+  "changedPercent": 9.91059,
+  "meanAbsoluteChannelDifference": 8.028376,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1320,
+    1080
+  ]
+}

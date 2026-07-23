@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-create-modal-validation.png",
+  "actual": "tests/visual/actual/feed-create-modal-validation.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 245840,
+  "totalPixels": 2073600,
+  "changedPercent": 11.85571,
+  "meanAbsoluteChannelDifference": 13.701219,
+  "differenceBoundingBox": [
+    605,
+    0,
+    1920,
+    1080
+  ]
+}

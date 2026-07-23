@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/profile-edit-modal-failure.png",
+  "actual": "tests/visual/actual/profile-edit-modal-failure.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 35866,
+  "totalPixels": 2073600,
+  "changedPercent": 1.729649,
+  "meanAbsoluteChannelDifference": 1.774894,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1320,
+    1080
+  ]
+}

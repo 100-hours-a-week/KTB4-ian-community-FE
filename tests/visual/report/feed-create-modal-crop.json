@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-create-modal-crop.png",
+  "actual": "tests/visual/actual/feed-create-modal-crop.png",
+  "width": 480,
+  "height": 518,
+  "threshold": 16,
+  "changedPixels": 22287,
+  "totalPixels": 248640,
+  "changedPercent": 8.963562,
+  "meanAbsoluteChannelDifference": 6.31851,
+  "differenceBoundingBox": [
+    0,
+    0,
+    480,
+    518
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-delete-confirm-modal-crop.png",
+  "actual": "tests/visual/actual/feed-delete-confirm-modal-crop.png",
+  "width": 480,
+  "height": 212,
+  "threshold": 16,
+  "changedPixels": 22614,
+  "totalPixels": 101760,
+  "changedPercent": 22.222877,
+  "meanAbsoluteChannelDifference": 17.917613,
+  "differenceBoundingBox": [
+    0,
+    0,
+    480,
+    212
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/signup-submit-focus.png",
+  "actual": "tests/visual/actual/signup-submit-focus.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 42220,
+  "totalPixels": 2073600,
+  "changedPercent": 2.036073,
+  "meanAbsoluteChannelDifference": 2.385691,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1596,
+    1080
+  ]
+}

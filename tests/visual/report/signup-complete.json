@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/signup-complete.png",
+  "actual": "tests/visual/actual/signup-complete.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 24378,
+  "totalPixels": 2073600,
+  "changedPercent": 1.175637,
+  "meanAbsoluteChannelDifference": 2.050136,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1594,
+    1080
+  ]
+}

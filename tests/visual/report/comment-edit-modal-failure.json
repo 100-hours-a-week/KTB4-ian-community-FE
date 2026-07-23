@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/comment-edit-modal-failure.png",
+  "actual": "tests/visual/actual/comment-edit-modal-failure.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 20182,
+  "totalPixels": 2073600,
+  "changedPercent": 0.973283,
+  "meanAbsoluteChannelDifference": 0.971961,
+  "differenceBoundingBox": [
+    605,
+    0,
+    1920,
+    1080
+  ]
+}

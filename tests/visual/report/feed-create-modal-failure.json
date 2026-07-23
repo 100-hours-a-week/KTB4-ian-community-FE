@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-create-modal-failure.png",
+  "actual": "tests/visual/actual/feed-create-modal-failure.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 145413,
+  "totalPixels": 2073600,
+  "changedPercent": 7.012587,
+  "meanAbsoluteChannelDifference": 5.813045,
+  "differenceBoundingBox": [
+    605,
+    0,
+    1920,
+    1080
+  ]
+}

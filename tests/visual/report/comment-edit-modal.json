@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/comment-edit-modal.png",
+  "actual": "tests/visual/actual/comment-edit-modal.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 8909,
+  "totalPixels": 2073600,
+  "changedPercent": 0.429639,
+  "meanAbsoluteChannelDifference": 0.50338,
+  "differenceBoundingBox": [
+    720,
+    0,
+    1920,
+    1080
+  ]
+}

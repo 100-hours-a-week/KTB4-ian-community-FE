@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-edit-modal.png",
+  "actual": "tests/visual/actual/feed-edit-modal.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 23365,
+  "totalPixels": 2073600,
+  "changedPercent": 1.126784,
+  "meanAbsoluteChannelDifference": 0.81713,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1200,
+    1080
+  ]
+}

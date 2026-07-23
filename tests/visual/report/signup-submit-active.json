@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/signup-submit-active.png",
+  "actual": "tests/visual/actual/signup-submit-active.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 42239,
+  "totalPixels": 2073600,
+  "changedPercent": 2.036989,
+  "meanAbsoluteChannelDifference": 2.412304,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1596,
+    1080
+  ]
+}

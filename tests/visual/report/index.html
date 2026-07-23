@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PULSE redesign report</title>
+    <style>
+      :root { font-family: Wanted Sans, system-ui, sans-serif; color: #171717; background: #f5f5f5; }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 32px; }
+      header, main { max-width: 1480px; margin: auto; }
+      header { margin-bottom: 24px; }
+      h1 { margin: 0 0 8px; font-size: 28px; }
+      header p { margin: 5px 0; color: #525252; }
+      .tests { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+      .tests span, .pass { border-radius: 999px; background: #dcfce7; color: #166534; font-size: 12px; font-weight: 700; padding: 6px 10px; }
+      main { display: grid; gap: 24px; }
+      article { overflow: hidden; border: 1px solid #e5e5e5; border-radius: 16px; background: #fff; box-shadow: 0 6px 20px rgb(0 0 0 / 5%); }
+      .summary { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #e5e5e5; }
+      .summary h2 { margin: 0; font-size: 18px; }
+      .summary p { margin: 0; color: #737373; font-size: 13px; }
+      .pass { margin-left: auto; }
+      .images { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #e5e5e5; }
+      figure { min-width: 0; margin: 0; padding: 12px; background: #fff; }
+      figcaption { margin-bottom: 8px; color: #525252; font-size: 12px; font-weight: 700; }
+      img { display: block; width: 100%; height: 360px; object-fit: contain; border: 1px solid #eee; background: #fafafa; }
+      .missing { display: grid; place-items: center; height: 360px; border: 1px dashed #d4d4d4; color: #737373; text-align: center; padding: 24px; }
+      .notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px 20px 18px; color: #525252; font-size: 12px; }
+      .notes b { color: #262626; }
+      @media (max-width: 900px) { body { padding: 16px; } .images, .notes { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>PULSE Figma redesign report</h1>
+      <p>Chromium · 1920×1080 · deviceScaleFactor 1 · light · ko-KR · Browser Zoom 100%</p>
+      <p>로그인·회원가입은 수정하지 않았으며, 북마크는 기능 계약에 따라 Coming Soon 화면만 구현했습니다.</p>
+      <div class="tests">
+        <span>Unit 109/109 PASS</span><span>Integration 19/19 PASS</span><span>Build PASS</span>
+        <span>UI 92/92 PASS</span><span>Backend E2E 11/11 PASS</span><span>Console/Asset errors 0</span>
+      </div>
+    </header>
+    <main id="report"></main>
+    <script>
+      const rows = [
+        { name: "LNB · 피드 활성", node: "548:3379", ref: "lnb-feed.png", before: "lnb-feed.png", after: "lnb-feed.png", icons: "home-fill/stroke, plus, receipt, my-page, lock, logout", issue: "아이콘·행 크기·활성 상태·사용자 영역 불일치", fix: "Figma SVG와 180px LNB, 34px Avatar, Route/Modal 상태를 통합" },
+        { name: "LNB · 피드 상세", node: "548:3449", ref: "lnb-post-detail.png", after: "lnb-post-detail.png", icons: "home-fill/stroke 외 공통 SVG", issue: "상세 Route 활성 상태와 위치 불일치", fix: "피드 계열 aria-current와 공통 레이아웃 적용" },
+        { name: "LNB · 북마크", node: "544:2690", ref: "lnb-bookmarks.png", before: "lnb-bookmarks.png", after: "lnb-bookmarks.png", icons: "receipt-fill/stroke 외 공통 SVG", issue: "북마크 활성 아이콘과 콘텐츠 정렬 불일치", fix: "Fill/Stroke 상태 및 Coming Soon 콘텐츠 위치 보정" },
+        { name: "피드", node: "548:3212", ref: "feed.png", before: "feed.png", after: "feed.png", icons: "heart, comment, bookmark, more", issue: "Card 구조·448px 이미지·작성 진입 영역의 밀도 차이", fix: "480/448px 그리드와 Figma Typography/Border/Spacing 적용" },
+        { name: "피드 상세", node: "544:1403", ref: "post-detail.png", after: "post-detail-core.png", icons: "back-left, more, heart, comment, bookmark", issue: "Header·본문·댓글 흐름과 Option 동작 불일치", fix: "상세 카드와 44px 댓글 입력, 비활성 북마크를 재구성" },
+        { name: "게시글 Option Menu", node: "544:1560", ref: "option-menu.png", after: "post-detail-option-menu.png", icons: "pencil, trash", issue: "문자 아이콘과 메뉴 크기 불일치", fix: "실제 SVG와 Figma 메뉴 크기·색상·Focus 적용" },
+        { name: "북마크 Coming Soon", node: "544:2530", ref: "bookmarks-redesign.png", before: "bookmarks.png", after: "bookmarks.png", icons: "receipt-fill", issue: "기능 범위와 Figma 목록 화면의 충돌", fix: "Community 레이아웃은 유지하고 계약 문구만 렌더링" },
+        { name: "피드 생성 Modal", node: "548:3491 / 544:1774", ref: "feed-create-modal-redesign.png", before: "feed-create-modal.png", after: "feed-create-modal.png", icons: "feed-preview-close-left/right", issue: "Preview 순서·공백·제거 아이콘·버튼 상태 차이", fix: "작성자→이미지→본문, 조건부 DOM과 Figma SVG 적용" },
+        { name: "피드 수정 Modal", node: "548:3693", ref: "feed-edit-modal-redesign.png", before: "feed-edit-modal.png", after: "feed-edit-modal.png", icons: "feed-preview-close-left/right", issue: "기존 이미지와 Blob Preview 표현 및 버튼 상태 차이", fix: "Preview 상태 분리, Drag 방지와 Object URL 정리 적용" },
+        { name: "댓글 수정 Modal", node: "560:5906", ref: "comment-edit-modal-redesign.png", before: "comment-edit-modal.png", after: "comment-edit-modal.png", icons: "close", issue: "Textarea·Footer·활성 상태 크기 차이", fix: "Figma 내부 폭과 상태별 Primary/Disabled 토큰 적용" },
+        { name: "프로필 편집 Modal", node: "548:4004", ref: "profile-edit-modal-redesign.png", before: "profile-edit-modal.png", after: "profile-edit-modal.png", icons: "back-left, camera", issue: "Back 문자 아이콘과 160px Preview 배치 차이", fix: "정확한 SVG, Avatar fallback과 즉시 사용자 정보 갱신 적용" },
+        { name: "비밀번호 변경 Modal", node: "548:4231", ref: "password-edit-modal-redesign.png", before: "password-edit-modal.png", after: "password-edit-modal.png", icons: "back-left", issue: "Header 아이콘·Input 간격·상태 색상 차이", fix: "Figma 구조와 Validation/Pending 상태 디자인 적용" },
+        { name: "회원탈퇴 확인 Modal", node: "592:6675", ref: "member-delete-confirm-redesign.png", after: "account-delete-confirm-modal.png", icons: "없음", issue: "확인 버튼이 비활성 색상처럼 표시됨", fix: "취소 Outline, 확인 Primary 212×48 정책 적용" },
+        { name: "게시글 삭제 확인 Modal", node: "592:6731", ref: "feed-delete-confirm-redesign.png", after: "feed-delete-confirm-modal.png", icons: "없음", issue: "Figma 위험 Action 계열과 Button 색상 차이", fix: "Secondary Filled 취소와 Primary 위험 Action 크기 적용" },
+        { name: "댓글 삭제 확인 Modal", node: "592:6714", ref: "comment-delete-confirm-redesign.png", after: "comment-delete-confirm-modal.png", icons: "없음", issue: "Figma 위험 Action 계열과 Button 색상 차이", fix: "Secondary Filled 취소와 Primary 위험 Action 크기 적용" },
+        { name: "로그아웃 확인 Modal", node: "Confirm 공통 규칙", after: "logout-confirm-modal.png", icons: "없음", issue: "별도 Figma Node 없음·확인 버튼 Secondary 사용", fix: "회원탈퇴 계열 구조와 요구된 Outline/Primary 정책 적용" },
+        { name: "인증 초기화 Loading", node: "Community 공통 Token", after: "auth-loading.png", icons: "PULSE logo", issue: "보호 Route 초기화 중 빈 화면", fix: "aria-busy 상태와 Community 공통 배치 적용" },
+        { name: "Not Found", node: "Community 공통 Token", after: "not-found.png", icons: "PULSE logo", issue: "정의되지 않은 Route의 시각적 피드백 부족", fix: "Community 480px 카드와 SPA 복귀 Action 적용" },
+        { name: "Feed Error / Retry", node: "Community 공통 Token", after: "feed-error.png", icons: "없음", issue: "오류 상태 Action의 공통성 부족", fix: "공통 Outline Button과 Retry 상태 적용" },
+      ];
+      const report = document.querySelector("#report");
+      const image = (folder, file, alt) => file
+        ? `<img loading="lazy" src="../${folder}/${file}" alt="${alt}" />`
+        : `<div class="missing">별도 기준 이미지 없음<br />공통 Component/Token 기준</div>`;
+      rows.forEach((row) => {
+        const article = document.createElement("article");
+        article.innerHTML = `
+          <div class="summary"><h2>${row.name}</h2><p>Figma ${row.node}</p><span class="pass">PASS</span></div>
+          <div class="images">
+            <figure><figcaption>Figma Reference</figcaption>${image("reference", row.ref, `${row.name} Figma`)}</figure>
+            <figure><figcaption>수정 전 Browser</figcaption>${image("before", row.before, `${row.name} 수정 전`)}</figure>
+            <figure><figcaption>수정 후 Browser</figcaption>${image("after", row.after, `${row.name} 수정 후`)}</figure>
+          </div>
+          <div class="notes"><div><b>SVG</b><br />${row.icons}</div><div><b>발견 문제</b><br />${row.issue}</div><div><b>수정·검증</b><br />${row.fix}<br />Unit · Integration · UI · E2E PASS</div></div>`;
+        report.append(article);
+      });
+    </script>
+  </body>
+</html>

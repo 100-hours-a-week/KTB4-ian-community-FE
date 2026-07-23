@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-edit-modal-crop.png",
+  "actual": "tests/visual/actual/feed-edit-modal-crop.png",
+  "width": 480,
+  "height": 518,
+  "threshold": 16,
+  "changedPixels": 22285,
+  "totalPixels": 248640,
+  "changedPercent": 8.962757,
+  "meanAbsoluteChannelDifference": 6.371624,
+  "differenceBoundingBox": [
+    0,
+    0,
+    480,
+    518
+  ]
+}

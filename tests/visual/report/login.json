@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/login.png",
+  "actual": "tests/visual/after/login.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 19309,
+  "totalPixels": 2073600,
+  "changedPercent": 0.931182,
+  "meanAbsoluteChannelDifference": 1.8712,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1591,
+    1080
+  ]
+}

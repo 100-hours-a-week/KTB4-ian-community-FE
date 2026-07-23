@@ -1,0 +1,106 @@
+{
+  "figmaNode": "544:2271",
+  "figma": {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "panel": {
+      "x": 1248,
+      "width": 343
+    },
+    "artwork": {
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 1080
+    },
+    "logo": {
+      "width": 239.329,
+      "height": 37.5
+    },
+    "input": {
+      "width": 343,
+      "height": 44
+    },
+    "submit": {
+      "width": 343,
+      "height": 48
+    }
+  },
+  "actual": {
+    "panel": {
+      "x": 1248,
+      "y": 324.25,
+      "width": 343,
+      "height": 431.5
+    },
+    "logo": {
+      "x": 1299.828125,
+      "y": 324.25,
+      "width": 239.328125,
+      "height": 37.5
+    },
+    "artwork": {
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 1080
+    },
+    "divider": {
+      "x": 1248,
+      "y": 413.75,
+      "width": 343,
+      "height": 18
+    },
+    "input": {
+      "x": 1248,
+      "y": 443.75,
+      "width": 343,
+      "height": 44
+    },
+    "inputStyle": {
+      "color": "rgb(23, 23, 23)",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "borderColor": "rgb(212, 212, 212)",
+      "borderRadius": "8px",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "lineHeight": "20px",
+      "fontFamily": "\"Wanted Sans\", \"Wanted Sans Variable\", -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif"
+    },
+    "submit": {
+      "x": 1248,
+      "y": 651.75,
+      "width": 343,
+      "height": 48
+    },
+    "switchButton": {
+      "x": 1248,
+      "y": 711.75,
+      "width": 343,
+      "height": 44
+    },
+    "submitStyle": {
+      "color": "rgb(212, 212, 212)",
+      "backgroundColor": "rgb(245, 245, 245)",
+      "borderColor": "rgb(212, 212, 212)",
+      "borderRadius": "8px",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "lineHeight": "24px",
+      "fontFamily": "\"Wanted Sans\", \"Wanted Sans Variable\", -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif"
+    },
+    "fieldsGap": "8px"
+  },
+  "deltas": {
+    "panelX": 0,
+    "panelWidth": 0,
+    "logoWidth": -0.0008750000000077307,
+    "logoHeight": 0,
+    "inputWidth": 0,
+    "inputHeight": 0,
+    "submitWidth": 0,
+    "submitHeight": 0
+  }
+}

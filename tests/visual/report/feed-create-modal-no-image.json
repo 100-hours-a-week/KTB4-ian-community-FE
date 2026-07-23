@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-create-modal-no-image.png",
+  "actual": "tests/visual/actual/feed-create-modal-no-image.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 245808,
+  "totalPixels": 2073600,
+  "changedPercent": 11.854167,
+  "meanAbsoluteChannelDifference": 13.677622,
+  "differenceBoundingBox": [
+    605,
+    0,
+    1920,
+    1080
+  ]
+}

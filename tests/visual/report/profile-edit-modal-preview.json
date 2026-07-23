@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/profile-edit-modal-preview.png",
+  "actual": "tests/visual/actual/profile-edit-modal-preview.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 35844,
+  "totalPixels": 2073600,
+  "changedPercent": 1.728588,
+  "meanAbsoluteChannelDifference": 1.853575,
+  "differenceBoundingBox": [
+    0,
+    0,
+    1320,
+    1080
+  ]
+}

@@ -1,7 +1,0 @@
-.signup-panel {
-  gap: 52px;
-}
-
-.signup-panel .helper-text:empty {
-  display: none;
-}

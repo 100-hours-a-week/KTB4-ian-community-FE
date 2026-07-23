@@ -1,0 +1,17 @@
+{
+  "reference": "tests/visual/reference/feed-create-modal-pending.png",
+  "actual": "tests/visual/actual/feed-create-modal-pending.png",
+  "width": 1920,
+  "height": 1080,
+  "threshold": 16,
+  "changedPixels": 245772,
+  "totalPixels": 2073600,
+  "changedPercent": 11.852431,
+  "meanAbsoluteChannelDifference": 13.653196,
+  "differenceBoundingBox": [
+    605,
+    0,
+    1920,
+    1080
+  ]
+}
