@@ -1,0 +1,135 @@
+.feed-page {
+  min-height: calc(100vh - 40px);
+}
+
+.feed-page > .content-layer {
+  min-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+}
+
+.feed-page .feed-state {
+  flex: 1;
+  min-height: 240px;
+}
+
+.post-card {
+  position: relative;
+  transition: background-color 120ms ease;
+}
+
+.post-card--interactive:hover {
+  background: color-mix(
+    in srgb,
+    var(--color-bg-tertiary) 35%,
+    var(--color-bg-primary)
+  );
+}
+
+.post-card__surface {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.post-card__surface:focus-visible {
+  outline: 2px solid var(--color-border-interactive-primary-hover);
+  outline-offset: -2px;
+}
+
+.post-card__body,
+.post-actions {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+}
+
+.post-card__body:hover {
+  background: transparent;
+}
+
+.post-actions button,
+.post-card a {
+  pointer-events: auto;
+}
+
+.post-actions__more,
+.post-actions__bookmark {
+  margin-left: auto;
+}
+
+.more-button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  flex: 0 0 36px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 99999px;
+  background: transparent;
+}
+
+.more-button > span {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.more-button img {
+  position: absolute;
+  top: 8.75px;
+  left: 1.667px;
+  width: 16.667px;
+  height: 2.5px;
+  max-width: none;
+}
+
+.more-button:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.more-button:active {
+  background: var(--color-bg-forty);
+}
+
+.more-button:focus-visible {
+  outline: 2px solid var(--color-border-interactive-primary-hover);
+  outline-offset: 2px;
+}
+
+.comment-item__options,
+.post-card__options {
+  background: transparent;
+}
+
+.option-menu {
+  position: fixed;
+  z-index: 120;
+  height: auto;
+  min-height: 76px;
+}
+
+.comment-form {
+  border: 1px solid transparent;
+}
+
+.comment-form:focus-within {
+  border-color: var(--color-border-interactive-primary-hover);
+  box-shadow: 0 0 0 1px var(--color-border-interactive-primary-hover);
+}
+
+@media (max-width: 760px) {
+  .feed-page {
+    min-height: calc(100vh - 12px);
+  }
+
+  .feed-page > .content-layer {
+    min-height: calc(100vh - 12px);
+  }
+}
