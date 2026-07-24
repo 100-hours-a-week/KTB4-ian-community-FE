@@ -11,7 +11,7 @@ export function normalizePost(raw = {}) {
       raw.commentCount ?? raw.comment_count ?? raw.comment?.length ?? 0,
     viewCount: raw.viewCount ?? raw.view_count ?? 0,
     liked: Boolean(raw.liked),
-    mine: Boolean(raw.mine),
+    mine: typeof raw.mine === "boolean" ? raw.mine : null,
     comments: raw.comments ?? raw.comment ?? [],
     createdAt: raw.createdAt ?? raw.created_at ?? null,
   };
