@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { postApi } from "../../entities/post/api/postApi.js";
 import { normalizePost } from "../../entities/post/model/normalizePost.js";
+import { isPostOwnedByCurrentUser } from "../../entities/post/model/isPostOwnedByCurrentUser.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
 import { CommentForm } from "../../features/comment/create/CommentForm.jsx";
 import { EditCommentModal } from "../../features/comment/edit/EditCommentModal.jsx";
+import { EditPostModal } from "../../features/post/edit/EditPostModal.jsx";
 import { DeletePostModal } from "../../features/post/delete/DeletePostModal.jsx";
 import { DeleteCommentModal } from "../../features/comment/delete/DeleteCommentModal.jsx";
 import { PageHeader } from "../../shared/ui/PageHeader.jsx";
@@ -13,6 +15,7 @@ import { Button } from "../../shared/ui/Button.jsx";
 export function PostDetailPage({ postId, user, onNavigate }) {
   const [post, setPost] = useState(null);
   const [error, setError] = useState("");
+  const [editingPost, setEditingPost] = useState(null);
   const [editingComment, setEditingComment] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletingComment, setDeletingComment] = useState(null);
@@ -53,27 +56,30 @@ export function PostDetailPage({ postId, user, onNavigate }) {
         )}
       </main>
     );
+
+  const owned = isPostOwnedByCurrentUser(post, user);
+
   return (
     <main className="page post-detail-page" aria-labelledby="post-detail-title">
       <PageHeader title="피드 상세보기" onBack={() => onNavigate("/feed")} />
       <PostCard
         post={post}
-        onDelete={
-          post.author.nickname === user.nickname
-            ? () => setDeleteOpen(true)
-            : undefined
-        }
+        owned={owned}
+        onEdit={owned ? () => setEditingPost(post) : undefined}
+        onDelete={owned ? () => setDeleteOpen(true) : undefined}
       />
       <CommentForm postId={postId} userId={user.userId} onCreated={load} />
       <section className="comments">
         {post.comments.map((item) => {
           const commentId = item.commentId ?? item.comment_id;
-          const owned = (item.userId ?? item.user_id) === user.userId;
+          const commentOwned =
+            String(item.userId ?? item.user_id ?? "") ===
+            String(user.userId ?? "");
           return (
             <CommentItem
               key={commentId}
               comment={item}
-              owned={owned}
+              owned={commentOwned}
               optionsOpen={optionCommentId === commentId}
               onOpenOptions={() => setOptionCommentId(commentId)}
               onCloseOptions={() => setOptionCommentId(null)}
@@ -84,6 +90,12 @@ export function PostDetailPage({ postId, user, onNavigate }) {
         })}
       </section>
       {error && <p className="error">{error}</p>}
+      <EditPostModal
+        open={Boolean(editingPost)}
+        onClose={() => setEditingPost(null)}
+        post={editingPost}
+        onUpdated={load}
+      />
       <EditCommentModal
         open={Boolean(editingComment)}
         onClose={() => setEditingComment(null)}
