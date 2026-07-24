@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { normalizePost } from "../../entities/post/model/normalizePost.js";
+import { isPostOwnedByCurrentUser } from "../../entities/post/model/isPostOwnedByCurrentUser.js";
 import { postApi } from "../../entities/post/api/postApi.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
 import { UserAvatar } from "../../entities/user/ui/UserAvatar.jsx";
@@ -115,24 +116,20 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
             </Button>
           </div>
         ) : posts.length ? (
-          posts.map((post, index) => (
-            <PostCard
-              key={post.postId}
-              post={post}
-              onOpen={() => onNavigate(`/posts/${post.postId}`)}
-              onLike={() => like(index)}
-              onEdit={
-                post.author.nickname === user.nickname
-                  ? () => setEditingPost(post)
-                  : undefined
-              }
-              onDelete={
-                post.author.nickname === user.nickname
-                  ? () => setDeletingPost(post)
-                  : undefined
-              }
-            />
-          ))
+          posts.map((post, index) => {
+            const owned = isPostOwnedByCurrentUser(post, user);
+            return (
+              <PostCard
+                key={post.postId}
+                post={post}
+                owned={owned}
+                onOpen={() => onNavigate(`/posts/${post.postId}`)}
+                onLike={() => like(index)}
+                onEdit={owned ? () => setEditingPost(post) : undefined}
+                onDelete={owned ? () => setDeletingPost(post) : undefined}
+              />
+            );
+          })
         ) : (
           <p className="feed-state empty">아직 생성된 피드가 없어요.</p>
         )}
