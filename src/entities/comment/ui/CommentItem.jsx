@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { UserAvatar } from "../../user/ui/UserAvatar.jsx";
-import { moreDotsIcon } from "../../../shared/assets/index.js";
 import { OptionMenu } from "../../../shared/ui/OptionMenu.jsx";
+import { MoreButton } from "../../../shared/ui/MoreButton.jsx";
 
 export function CommentItem({
   comment,
@@ -13,6 +13,8 @@ export function CommentItem({
   onDelete,
 }) {
   const triggerRef = useRef(null);
+  const generatedMenuId = useId();
+  const menuId = `comment-option-menu-${generatedMenuId.replaceAll(":", "")}`;
   const nickname = comment.nickname ?? "알 수 없음";
   const profileImage = comment.profileImage ?? comment.profile_image;
   const content = comment.comment ?? comment.content ?? "";
@@ -25,22 +27,18 @@ export function CommentItem({
           <strong>{nickname}</strong>
         </span>
         {owned && (
-          <button
+          <MoreButton
             className="comment-item__options"
-            type="button"
-            aria-label="댓글 옵션"
-            aria-haspopup="menu"
-            aria-expanded={optionsOpen}
+            label="댓글 메뉴 열기"
+            expanded={optionsOpen}
+            controls={menuId}
             onClick={onOpenOptions}
             ref={triggerRef}
-          >
-            <span aria-hidden="true">
-              <img src={moreDotsIcon} alt="" />
-            </span>
-          </button>
+          />
         )}
         {optionsOpen && (
           <OptionMenu
+            id={menuId}
             onEdit={onEdit}
             onDelete={onDelete}
             onClose={onCloseOptions}
