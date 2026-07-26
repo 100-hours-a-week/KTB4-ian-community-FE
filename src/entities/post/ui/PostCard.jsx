@@ -7,12 +7,20 @@ import {
   commentIcon,
   heartFillIcon,
   heartStrokeIcon,
+  lnbReceiptFillVector,
   lnbReceiptStrokeVector,
   moreDotsIcon,
 } from "../../../shared/assets/index.js";
 import { OptionMenu } from "../../../shared/ui/OptionMenu.jsx";
 
-export function PostCard({ post, onOpen, onLike, onEdit, onDelete }) {
+export function PostCard({
+  post,
+  onOpen,
+  onLike,
+  onBookmark,
+  onEdit,
+  onDelete,
+}) {
   const [imageOrientation, setImageOrientation] = useState("landscape");
   const [optionsOpen, setOptionsOpen] = useState(false);
   const optionsTriggerRef = useRef(null);
@@ -102,6 +110,7 @@ export function PostCard({ post, onOpen, onLike, onEdit, onDelete }) {
           aria-label="좋아요"
           aria-pressed={post.liked}
           onClick={onLike}
+          disabled={!onLike}
         >
           <img src={post.liked ? heartFillIcon : heartStrokeIcon} alt="" />
           <span>{formatCount(post.likeCount)}</span>
@@ -113,11 +122,20 @@ export function PostCard({ post, onOpen, onLike, onEdit, onDelete }) {
         <button
           className="post-actions__bookmark"
           type="button"
-          aria-label="북마크"
-          disabled
+          aria-label={post.bookmarked ? "북마크 해제" : "북마크 저장"}
+          aria-pressed={post.bookmarked}
+          onClick={onBookmark}
+          disabled={!onBookmark}
         >
           <span className="post-actions__receipt" aria-hidden="true">
-            <img src={lnbReceiptStrokeVector} alt="" />
+            <img
+              src={
+                post.bookmarked
+                  ? lnbReceiptFillVector
+                  : lnbReceiptStrokeVector
+              }
+              alt=""
+            />
           </span>
         </button>
       </footer>
