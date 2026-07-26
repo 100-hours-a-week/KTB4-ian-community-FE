@@ -9,6 +9,10 @@ import {
   optimisticLike,
   togglePostLike,
 } from "../../features/post/like/togglePostLike.js";
+import {
+  optimisticBookmark,
+  togglePostBookmark,
+} from "../../features/post/bookmark/togglePostBookmark.js";
 import { useSkeletonReveal } from "../../shared/hooks/useSkeletonReveal.js";
 import { FeedPageSkeleton } from "./FeedPageSkeleton.jsx";
 import { Button } from "../../shared/ui/Button.jsx";
@@ -53,6 +57,25 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
     );
     try {
       const result = await togglePostLike(before);
+      setPosts((all) =>
+        all.map((post, current) => (current === index ? result : post)),
+      );
+    } catch {
+      setPosts((all) =>
+        all.map((post, current) => (current === index ? before : post)),
+      );
+    }
+  }
+
+  async function bookmark(index) {
+    const before = posts[index];
+    setPosts((all) =>
+      all.map((post, current) =>
+        current === index ? optimisticBookmark(post) : post,
+      ),
+    );
+    try {
+      const result = await togglePostBookmark(before);
       setPosts((all) =>
         all.map((post, current) => (current === index ? result : post)),
       );
@@ -121,6 +144,7 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
               post={post}
               onOpen={() => onNavigate(`/posts/${post.postId}`)}
               onLike={() => like(index)}
+              onBookmark={() => bookmark(index)}
               onEdit={
                 post.author.nickname === user.nickname
                   ? () => setEditingPost(post)
