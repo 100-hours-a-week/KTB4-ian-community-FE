@@ -97,7 +97,7 @@ function Shell() {
           onNavigate={navigate}
         />
       ) : route.name === "bookmarks" ? (
-        <BookmarksPage />
+        <BookmarksPage onNavigate={navigate} />
       ) : (
         <NotFoundPage onFeed={() => navigate("/feed")} />
       )}
