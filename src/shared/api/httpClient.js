@@ -9,6 +9,7 @@ const NO_REFRESH_PATHS = new Set([
   "/api/users/logout",
   "/api/users/refresh",
 ]);
+const ACCESS_TOKEN_REFRESH_BUFFER_MS = 60_000;
 let refreshPromise = null;
 
 function readCookie(name) {
@@ -18,6 +19,15 @@ function readCookie(name) {
       .find((item) => item.startsWith(`${name}=`))
       ?.slice(name.length + 1) ?? null
   );
+}
+
+function shouldRefreshProactively(pathname) {
+  if (NO_REFRESH_PATHS.has(pathname)) return false;
+
+  const expiresAt = Number(readCookie("accessTokenExpiresAt"));
+  if (!Number.isFinite(expiresAt)) return false;
+
+  return expiresAt - Date.now() <= ACCESS_TOKEN_REFRESH_BUFFER_MS;
 }
 
 async function parse(response) {
@@ -85,6 +95,18 @@ async function refresh(signal) {
 }
 
 export async function httpClient(path, options = {}) {
+  const pathname = path.split("?")[0];
+
+  try {
+    if (shouldRefreshProactively(pathname)) {
+      await refresh(options.signal);
+    }
+  } catch (cause) {
+    if (cause?.name === "AbortError") throw cause;
+    if (cause instanceof ApiError) throw cause;
+    throw new ApiError("세션을 갱신하지 못했습니다.", { cause });
+  }
+
   let response;
   try {
     response = await send(path, options);
@@ -94,7 +116,6 @@ export async function httpClient(path, options = {}) {
     throw new ApiError("백엔드 서버에 연결할 수 없습니다.", { cause });
   }
   let body = await parse(response);
-  const pathname = path.split("?")[0];
   const expired =
     response.status === 401 && body?.message === "expired_access_token";
   if (expired && !options.__retried && !NO_REFRESH_PATHS.has(pathname)) {
