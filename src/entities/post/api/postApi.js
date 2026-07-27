@@ -2,7 +2,8 @@ import { httpClient } from "../../../shared/api/httpClient.js";
 
 export const postApi = {
   list: (options) => httpClient("/api/posts", options),
-  bookmarks: (options) => httpClient("/api/posts/bookmarks", options),
+  bookmarks: ({ page = 0, size = 10, ...options } = {}) =>
+    httpClient(`/api/posts/bookmarks?page=${page}&size=${size}`, options),
   detail: (postId, options) => httpClient(`/api/posts/${postId}`, options),
   create: (userId, { content, image }) => {
     const body = new FormData();
