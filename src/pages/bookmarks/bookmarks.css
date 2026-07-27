@@ -37,6 +37,27 @@
   letter-spacing: 0.252px;
 }
 
+.bookmarks-page__more {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-top: 1px solid var(--color-border-secondary);
+}
+
+.bookmarks-page__more .button {
+  min-width: 152px;
+  height: 40px;
+}
+
+.bookmarks-page__load-error {
+  margin: 0;
+  padding: 12px 16px 0;
+  color: var(--color-text-error);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
 .post-actions__bookmark:not(:disabled) {
   border-radius: 6px;
 }
