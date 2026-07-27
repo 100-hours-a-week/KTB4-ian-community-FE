@@ -8,6 +8,7 @@ import {
 } from "../../features/post/like/togglePostLike.js";
 import { togglePostBookmark } from "../../features/post/bookmark/togglePostBookmark.js";
 import { Button } from "../../shared/ui/Button.jsx";
+import "./bookmarks.css";
 
 export function BookmarksPage({ onNavigate }) {
   const [posts, setPosts] = useState([]);
