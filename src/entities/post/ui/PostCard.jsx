@@ -122,15 +122,15 @@ export function PostCard({
         <button
           className="post-actions__bookmark"
           type="button"
-          aria-label={post.bookmarked ? "북마크 해제" : "북마크 저장"}
-          aria-pressed={post.bookmarked}
+          aria-label={post.bookmark ? "북마크 해제" : "북마크 저장"}
+          aria-pressed={post.bookmark}
           onClick={onBookmark}
           disabled={!onBookmark}
         >
           <span className="post-actions__receipt" aria-hidden="true">
             <img
               src={
-                post.bookmarked
+                post.bookmark
                   ? lnbReceiptFillVector
                   : lnbReceiptStrokeVector
               }
