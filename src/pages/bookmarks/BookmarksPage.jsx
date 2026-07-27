@@ -60,7 +60,7 @@ export function BookmarksPage({ onNavigate }) {
     setPosts((all) => all.filter((_, current) => current !== index));
     try {
       const result = await togglePostBookmark(before);
-      if (result.bookmarked) {
+      if (result.bookmark) {
         setPosts((all) => {
           const restored = [...all];
           restored.splice(index, 0, result);
