@@ -10,20 +10,26 @@ import { togglePostBookmark } from "../../features/post/bookmark/togglePostBookm
 import { Button } from "../../shared/ui/Button.jsx";
 import "./bookmarks.css";
 
+const BOOKMARK_PAGE_SIZE = 10;
+
 export function BookmarksPage({ onNavigate }) {
   const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await postApi.bookmarks();
-      setPosts(
-        (Array.isArray(result) ? result : result?.content || []).map(
-          normalizePost,
-        ),
-      );
+      const result = await postApi.bookmarks({
+        page: 0,
+        size: BOOKMARK_PAGE_SIZE,
+      });
+      setPosts((result?.content || []).map(normalizePost));
+      setPage(0);
+      setHasNext(!result?.last);
       setError("");
     } catch (cause) {
       setError(cause.message);
@@ -35,6 +41,28 @@ export function BookmarksPage({ onNavigate }) {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function loadMore() {
+    if (!hasNext || loadingMore) return;
+
+    const nextPage = page + 1;
+    setLoadingMore(true);
+    try {
+      const result = await postApi.bookmarks({
+        page: nextPage,
+        size: BOOKMARK_PAGE_SIZE,
+      });
+      const nextPosts = (result?.content || []).map(normalizePost);
+      setPosts((current) => [...current, ...nextPosts]);
+      setPage(nextPage);
+      setHasNext(!result?.last);
+      setError("");
+    } catch (cause) {
+      setError(cause.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   async function like(index) {
     const before = posts[index];
@@ -80,7 +108,7 @@ export function BookmarksPage({ onNavigate }) {
     <main
       className="page bookmarks-page"
       data-testid="bookmarks-page-ready"
-      aria-busy={loading}
+      aria-busy={loading || loadingMore}
       aria-labelledby="bookmarks-page-title"
     >
       <header className="bookmarks-page__header">
@@ -89,7 +117,7 @@ export function BookmarksPage({ onNavigate }) {
       <section className="bookmarks-page__content">
         {loading ? (
           <p className="feed-state loading">북마크를 불러오는 중입니다.</p>
-        ) : error ? (
+        ) : error && !posts.length ? (
           <div className="feed-state error">
             <p>{error}</p>
             <Button
@@ -101,15 +129,29 @@ export function BookmarksPage({ onNavigate }) {
             </Button>
           </div>
         ) : posts.length ? (
-          posts.map((post, index) => (
-            <PostCard
-              key={post.postId}
-              post={post}
-              onOpen={() => onNavigate(`/posts/${post.postId}`)}
-              onLike={() => like(index)}
-              onBookmark={() => removeBookmark(index)}
-            />
-          ))
+          <>
+            {posts.map((post, index) => (
+              <PostCard
+                key={post.postId}
+                post={post}
+                onOpen={() => onNavigate(`/posts/${post.postId}`)}
+                onLike={() => like(index)}
+                onBookmark={() => removeBookmark(index)}
+              />
+            ))}
+            {error && <p className="bookmarks-page__load-error">{error}</p>}
+            {hasNext && (
+              <div className="bookmarks-page__more">
+                <Button
+                  variant="outline"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? "불러오는 중입니다." : "피드 10개 더 보기"}
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="bookmarks-empty">
             <h2>저장한 피드가 없어요.</h2>
