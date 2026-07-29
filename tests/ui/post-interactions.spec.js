@@ -19,6 +19,7 @@ async function prepare(page) {
   const responsePost = () => ({
     post_id: 1,
     user_id: 7,
+    owner: true,
     content: "상호작용 피드",
     nickname: "현재 사용자",
     profile_image: "/images/profile.svg",
