@@ -12,7 +12,8 @@ export function normalizePost(raw = {}) {
     viewCount: raw.viewCount ?? raw.view_count ?? 0,
     liked: Boolean(raw.liked),
     bookmarked: Boolean(raw.bookmarked ?? raw.bookmark),
-    mine: Boolean(raw.mine),
+    owner: Boolean(raw.owner ?? raw.mine),
+    mine: Boolean(raw.owner ?? raw.mine),
     comments: raw.comments ?? raw.comment ?? [],
     createdAt: raw.createdAt ?? raw.created_at ?? null,
   };
