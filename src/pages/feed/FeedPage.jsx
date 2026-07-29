@@ -257,16 +257,10 @@ export function FeedPage({
                 onBookmark={() => bookmark(post.postId)}
                 bookmarkPending={bookmarking.has(post.postId)}
                 onEdit={
-                  post.author.userId != null &&
-                  post.author.userId === user.userId
-                    ? () => setEditingPost(post)
-                    : undefined
+                  post.owner ? () => setEditingPost(post) : undefined
                 }
                 onDelete={
-                  post.author.userId != null &&
-                  post.author.userId === user.userId
-                    ? () => setDeletingPost(post)
-                    : undefined
+                  post.owner ? () => setDeletingPost(post) : undefined
                 }
               />
             ))}
