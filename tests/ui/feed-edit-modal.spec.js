@@ -9,7 +9,10 @@ const user = {
 const initialContent =
   "분위기 좋은 다로베에서 화덕피자 먹고, 도보 5분 거리 재즈바 '포지티브 제로'로 이동하세요. 조명이 예뻐서 서로 더 예뻐 보이는 마법의 코스입니다. (예약 필수!)";
 
-async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
+async function prepare(
+  page,
+  { updateFails = false, updateDelay = 0, owner = true } = {},
+) {
   let updateCount = 0;
   let content = initialContent;
   const consoleErrors = [];
@@ -60,6 +63,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
               {
                 post_id: 31,
                 user_id: 7,
+                owner,
                 content,
                 author_name: "dlkfjs",
                 profile_image: "/images/profile-default.svg",
@@ -122,6 +126,18 @@ async function openModal(page) {
   await expect(page.getByRole("dialog", { name: "피드 편집" })).toBeVisible();
   await page.evaluate(async () => document.fonts.ready);
 }
+
+test("작성자 ID가 같아도 서버가 owner false를 반환하면 수정·삭제 메뉴를 숨긴다", async ({
+  page,
+}) => {
+  await prepare(page, { owner: false });
+  await page.goto("/feed");
+  await expect(page.getByTestId("feed-content")).toHaveClass(/is-visible/);
+  await expect(page.getByRole("article")).toContainText(initialContent);
+  await expect(
+    page.getByRole("button", { name: "피드 옵션" }),
+  ).toHaveCount(0);
+});
 
 test("피드 수정 Modal은 Figma 구조와 수치로 렌더링된다", async ({ page }) => {
   const network = await prepare(page);
