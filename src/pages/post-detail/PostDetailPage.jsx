@@ -4,13 +4,20 @@ import { normalizePost } from "../../entities/post/model/normalizePost.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
 import { CommentForm } from "../../features/comment/create/CommentForm.jsx";
 import { EditCommentModal } from "../../features/comment/edit/EditCommentModal.jsx";
+import { EditPostModal } from "../../features/post/edit/EditPostModal.jsx";
+import { optimisticLike, togglePostLike } from "../../features/post/like/togglePostLike.js";
 import { DeletePostModal } from "../../features/post/delete/DeletePostModal.jsx";
 import { DeleteCommentModal } from "../../features/comment/delete/DeleteCommentModal.jsx";
 import { PageHeader } from "../../shared/ui/PageHeader.jsx";
 import { CommentItem } from "../../entities/comment/ui/CommentItem.jsx";
 import { Button } from "../../shared/ui/Button.jsx";
 
-export function PostDetailPage({ postId, user, onNavigate }) {
+export function PostDetailPage({
+  postId,
+  user,
+  onNavigate,
+  onBookmarksChanged = () => {},
+}) {
   const [post, setPost] = useState(null);
   const [error, setError] = useState("");
   const [editingComment, setEditingComment] = useState(null);
@@ -18,6 +25,8 @@ export function PostDetailPage({ postId, user, onNavigate }) {
   const [deletingComment, setDeletingComment] = useState(null);
   const [optionCommentId, setOptionCommentId] = useState(null);
   const [bookmarkPending, setBookmarkPending] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
+  const [likePending, setLikePending] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -32,15 +41,52 @@ export function PostDetailPage({ postId, user, onNavigate }) {
     load();
   }, [load]);
 
+  async function like() {
+    if (likePending || !post) {
+      return;
+    }
+
+    const before = post;
+
+    setLikePending(true);
+    setPost(optimisticLike(before));
+
+    try {
+      const updated = await togglePostLike(before);
+
+      setPost(updated);
+      setError("");
+    } catch (cause) {
+      setPost(before);
+      setError(cause.message);
+    } finally {
+      setLikePending(false);
+    }
+  }
+
   async function bookmark() {
-    if (bookmarkPending) return;
+    if (bookmarkPending || !post) {
+      return;
+    }
+
     const before = post;
     const bookmarked = !before.bookmarked;
+
     setBookmarkPending(true);
-    setPost({ ...before, bookmarked });
+    setPost({
+      ...before,
+      bookmarked,
+    });
+
     try {
-      if (bookmarked) await postApi.addBookmark(postId);
-      else await postApi.deleteBookmark(postId);
+      if (bookmarked) {
+        await postApi.addBookmark(postId);
+      } else {
+        await postApi.deleteBookmark(postId);
+      }
+
+      onBookmarksChanged();
+      setError("");
     } catch (cause) {
       setPost(before);
       setError(cause.message);
@@ -48,6 +94,12 @@ export function PostDetailPage({ postId, user, onNavigate }) {
       setBookmarkPending(false);
     }
   }
+
+  const isOwner =
+  post.author.userId !== undefined &&
+  user.userId !== undefined
+    ? post.author.userId === user.userId
+    : post.author.nickname === user.nickname;
 
   if (!post)
     return (
@@ -76,10 +128,16 @@ export function PostDetailPage({ postId, user, onNavigate }) {
       <PageHeader title="피드 상세보기" onBack={() => onNavigate("/feed")} />
       <PostCard
         post={post}
+        onLike={like}
         onBookmark={bookmark}
         bookmarkPending={bookmarkPending}
+        onEdit={
+          isOwner
+            ? () => setEditingPost(post)
+            : undefined
+        }
         onDelete={
-          post.author.nickname === user.nickname
+          isOwner
             ? () => setDeleteOpen(true)
             : undefined
         }
@@ -109,6 +167,12 @@ export function PostDetailPage({ postId, user, onNavigate }) {
         onClose={() => setEditingComment(null)}
         comment={editingComment}
         userId={user.userId}
+        onUpdated={load}
+      />
+      <EditPostModal
+        open={Boolean(editingPost)}
+        onClose={() => setEditingPost(null)}
+        post={editingPost}
         onUpdated={load}
       />
       <DeletePostModal

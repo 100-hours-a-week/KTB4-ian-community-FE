@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { postApi } from "../../entities/post/api/postApi.js";
 import { normalizePost } from "../../entities/post/model/normalizePost.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
@@ -6,41 +6,67 @@ import { Button } from "../../shared/ui/Button.jsx";
 
 const PAGE_SIZE = 10;
 
-export function BookmarksPage({ onNavigate = () => {} }) {
+export function BookmarksPage({
+  onNavigate = () => {},
+  refreshKey = 0,
+}) {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [pending, setPending] = useState(new Set());
   const [error, setError] = useState("");
+  const loadMoreRef = useRef(null);
 
-  const load = useCallback(async (targetPage = 0, replace = true) => {
-    if (replace) setLoading(true);
-    try {
-      const result = await postApi.bookmarks({
-        page: targetPage,
-        size: PAGE_SIZE,
-      });
-      const next = (result?.content || []).map(normalizePost);
-      setPosts((current) => {
-        const values = replace ? [] : current;
-        const unique = new Map(values.map((post) => [post.postId, post]));
-        next.forEach((post) => unique.set(post.postId, post));
-        return [...unique.values()];
-      });
-      setPage(targetPage);
-      setHasNext(Boolean(result?.hasNext ?? result?.has_next));
-      setError("");
-    } catch (cause) {
-      setError(cause.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const load = useCallback(
+    async (targetPage = 0, replace = true) => {
+      if (replace) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
 
-  useEffect(() => {
-    load();
-  }, [load]);
+      try {
+        const result = await postApi.bookmarks({
+          page: targetPage,
+          size: PAGE_SIZE,
+        });
+
+        const next = (result?.content || []).map(
+          normalizePost,
+        );
+
+        setPosts((current) => {
+          if (replace) {
+            return next;
+          }
+
+          const unique = new Map(
+            current.map((post) => [post.postId, post]),
+          );
+
+          next.forEach((post) => {
+            unique.set(post.postId, post);
+          });
+
+          return [...unique.values()];
+        });
+
+        setPage(targetPage);
+        setHasNext(
+          Boolean(result?.hasNext ?? result?.has_next),
+        );
+        setError("");
+      } catch (cause) {
+        setError(cause.message);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [],
+  );
 
   async function remove(post) {
     if (pending.has(post.postId)) return;
@@ -68,6 +94,56 @@ export function BookmarksPage({ onNavigate = () => {} }) {
       });
     }
   }
+
+  useEffect(() => {
+    load(0, true);
+  }, [load, refreshKey]);
+
+  useEffect(() => {
+    if (
+      !hasNext ||
+      loadingMore ||
+      !loadMoreRef.current ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        load(page + 1, false);
+      }
+    });
+
+    observer.observe(loadMoreRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasNext, load, loadingMore, page]);
+
+  useEffect(() => {
+    function refreshExhaustedBookmarks() {
+      if (
+        document.visibilityState === "visible" &&
+        !hasNext
+      ) {
+        load(0, true);
+      }
+    }
+
+    document.addEventListener(
+      "visibilitychange",
+      refreshExhaustedBookmarks,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        refreshExhaustedBookmarks,
+      );
+    };
+  }, [hasNext, load]);
 
   return (
     <main className="page bookmarks-page" data-testid="bookmarks-page-ready">
@@ -98,11 +174,15 @@ export function BookmarksPage({ onNavigate = () => {} }) {
           ))}
           {hasNext && (
             <button
+              ref={loadMoreRef}
               className="feed-state loading"
               type="button"
+              disabled={loadingMore}
               onClick={() => load(page + 1, false)}
             >
-              북마크 더 보기
+              {loadingMore
+                ? "북마크를 불러오는 중입니다."
+                : "북마크 더 보기"}
             </button>
           )}
         </>

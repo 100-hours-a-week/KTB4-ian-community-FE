@@ -22,6 +22,8 @@ function Shell() {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [feedRefreshKey, setFeedRefreshKey] = useState(0);
+  const [bookmarkRefreshKey, setBookmarkRefreshKey] = useState(0);
+
   useEffect(() => {
     const update = () => setRoute(currentRoute());
     addEventListener("popstate", update);
@@ -88,6 +90,9 @@ function Shell() {
           user={auth.user}
           onNavigate={navigate}
           onCreatePost={() => setCreateOpen(true)}
+          onBookmarksChanged={() =>
+            setBookmarkRefreshKey((current) => current + 1)
+          }
           refreshKey={feedRefreshKey}
         />
       ) : route.name === "post" ? (
@@ -95,9 +100,16 @@ function Shell() {
           postId={route.postId}
           user={auth.user}
           onNavigate={navigate}
+          onBookmarksChanged={() =>
+            setBookmarkRefreshKey((current) => current + 1)
+          }
         />
       ) : route.name === "bookmarks" ? (
-        <BookmarksPage user={auth.user} onNavigate={navigate} />
+        <BookmarksPage
+          user={auth.user}
+          onNavigate={navigate}
+          refreshKey={bookmarkRefreshKey}
+        />
       ) : (
         <NotFoundPage onFeed={() => navigate("/feed")} />
       )}

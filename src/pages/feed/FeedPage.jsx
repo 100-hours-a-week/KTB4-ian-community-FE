@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { normalizePost } from "../../entities/post/model/normalizePost.js";
+import { sortPostsByLatest } from "../../entities/post/model/sortPostsByLatest.js";
 import { postApi } from "../../entities/post/api/postApi.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
 import { UserAvatar } from "../../entities/user/ui/UserAvatar.jsx";
 import { EditPostModal } from "../../features/post/edit/EditPostModal.jsx";
 import { DeletePostModal } from "../../features/post/delete/DeletePostModal.jsx";
-import {
-  optimisticLike,
-  togglePostLike,
-} from "../../features/post/like/togglePostLike.js";
+import {optimisticLike,togglePostLike,} from "../../features/post/like/togglePostLike.js";
 import { useSkeletonReveal } from "../../shared/hooks/useSkeletonReveal.js";
 import { FeedPageSkeleton } from "./FeedPageSkeleton.jsx";
 import { Button } from "../../shared/ui/Button.jsx";
@@ -16,12 +14,24 @@ import { Button } from "../../shared/ui/Button.jsx";
 const PAGE_SIZE = 10;
 
 function appendUnique(current, next) {
-  const posts = new Map(current.map((post) => [post.postId, post]));
-  next.forEach((post) => posts.set(post.postId, post));
-  return [...posts.values()];
+  const unique = new Map(
+    current.map((post) => [post.postId, post]),
+  );
+
+  next.forEach((post) => {
+    unique.set(post.postId, post);
+  });
+
+  return sortPostsByLatest([...unique.values()]);
 }
 
-export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
+export function FeedPage({
+  user,
+  onNavigate,
+  onCreatePost,
+  onBookmarksChanged = () => {},
+  refreshKey = 0,
+}) {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
@@ -37,30 +47,40 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
   const load = useCallback(
     async (targetPage = 0, replace = true) => {
       if (replace) {
-        reveal.startLoading();
         setLoading(true);
       } else {
         setLoadingMore(true);
       }
+
       try {
         const result = await postApi.list({
           page: targetPage,
           size: PAGE_SIZE,
         });
-        const next = (result?.content || []).map(normalizePost);
-        setPosts((current) => (replace ? next : appendUnique(current, next)));
+
+        const next = (result?.content || []).map(
+          normalizePost,
+        );
+
+        setPosts((current) =>
+          replace
+            ? sortPostsByLatest(next)
+            : appendUnique(current, next),
+        );
+
         setPage(targetPage);
-        setHasNext(Boolean(result?.hasNext ?? result?.has_next));
+        setHasNext(
+          Boolean(result?.hasNext ?? result?.has_next),
+        );
         setError("");
       } catch (cause) {
         setError(cause.message);
       } finally {
         setLoading(false);
         setLoadingMore(false);
-        if (replace) reveal.revealContent();
       }
     },
-    [reveal.startLoading, reveal.revealContent],
+    [],
   );
 
   useEffect(() => {
@@ -68,38 +88,50 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
   }, [load, refreshKey]);
 
   useEffect(() => {
+    function refreshExhaustedFeed() {
+      if (
+        document.visibilityState === "visible" &&
+        !hasNext
+      ) {
+        load(0, true);
+      }
+    }
+
+    document.addEventListener(
+      "visibilitychange",
+      refreshExhaustedFeed,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        refreshExhaustedFeed,
+      );
+    };
+  }, [hasNext, load]);
+
+  useEffect(() => {
     if (
       !hasNext ||
       loadingMore ||
       !loadMoreRef.current ||
       typeof IntersectionObserver === "undefined"
-    )
+    ) {
       return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) load(page + 1, false);
-    });
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, [hasNext, load, loadingMore, page]);
-
-  async function like(index) {
-    const before = posts[index];
-    setPosts((all) =>
-      all.map((post, current) =>
-        current === index ? optimisticLike(post) : post,
-      ),
-    );
-    try {
-      const result = await togglePostLike(before);
-      setPosts((all) =>
-        all.map((post, current) => (current === index ? result : post)),
-      );
-    } catch {
-      setPosts((all) =>
-        all.map((post, current) => (current === index ? before : post)),
-      );
     }
-  }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        load(page + 1, false);
+      }
+    });
+
+    observer.observe(loadMoreRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasNext, load, loadingMore, page]);
 
   async function bookmark(index) {
     const before = posts[index];
@@ -111,19 +143,21 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
       ),
     );
     try {
-      if (before.bookmarked) await postApi.deleteBookmark(before.postId);
-      else await postApi.addBookmark(before.postId);
+      if (before.bookmarked) {
+        await postApi.deleteBookmark(before.postId);
+      } else {
+        await postApi.addBookmark(before.postId);
+      }
+
+      onBookmarksChanged();
     } catch (cause) {
       setPosts((all) =>
-        all.map((post, current) => (current === index ? before : post)),
+        all.map((post, current) =>
+          current === index ? before : post,
+        ),
       );
+
       setError(cause.message);
-    } finally {
-      setBookmarking((current) => {
-        const next = new Set(current);
-        next.delete(before.postId);
-        return next;
-      });
     }
   }
 
