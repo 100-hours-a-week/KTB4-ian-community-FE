@@ -56,6 +56,7 @@ async function prepare(page) {
         json: {
           data: {
             post_id: 31,
+            owner: true,
             content:
               "분위기 좋은 다로베에서 화덕피자 먹고, 도보 5분 거리 재즈바 '포지티브 제로'로 이동하세요. 조명이 예뻐서 서로 더 예뻐 보이는 마법의 코스입니다. (예약 필수!)",
             nickname: "dlkfjls",
