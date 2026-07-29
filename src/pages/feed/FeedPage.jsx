@@ -256,12 +256,8 @@ export function FeedPage({
                 likePending={liking.has(post.postId)}
                 onBookmark={() => bookmark(post.postId)}
                 bookmarkPending={bookmarking.has(post.postId)}
-                onEdit={
-                  post.owner ? () => setEditingPost(post) : undefined
-                }
-                onDelete={
-                  post.owner ? () => setDeletingPost(post) : undefined
-                }
+                onEdit={post.owner ? () => setEditingPost(post) : undefined}
+                onDelete={post.owner ? () => setDeletingPost(post) : undefined}
               />
             ))}
             {error && <p className="feed-state error">{error}</p>}
