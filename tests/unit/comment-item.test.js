@@ -28,13 +28,27 @@ describe("Comment Item", () => {
     expect(html).toMatch(/more-dots|data:image\/svg\+xml/);
   });
 
-  it("열린 상태에서 공통 Option Menu를 조합한다", () => {
+  it("열린 상태에서 전달된 Action만 공통 Option Menu에 조합한다", () => {
     const html = renderToStaticMarkup(
-      createElement(CommentItem, { comment, owned: true, optionsOpen: true }),
+      createElement(CommentItem, {
+        comment,
+        owned: true,
+        optionsOpen: true,
+        onEdit() {},
+        onDelete() {},
+      }),
     );
     expect(html).toContain('aria-expanded="true"');
     expect(html).toContain('role="menu"');
     expect(html).toContain("수정하기");
     expect(html).toContain("삭제하기");
+  });
+
+  it("콜백이 없으면 수정·삭제 항목을 표시하지 않는다", () => {
+    const html = renderToStaticMarkup(
+      createElement(CommentItem, { comment, owned: true, optionsOpen: true }),
+    );
+    expect(html).not.toContain("수정하기");
+    expect(html).not.toContain("삭제하기");
   });
 });

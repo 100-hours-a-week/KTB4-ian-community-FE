@@ -87,7 +87,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
       if (updateFails)
         return route.fulfill({
           status: 500,
-          json: { message: "댓글 수정 실패" },
+          json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
           headers: cors,
         });
       comment = request.postDataJSON().comment;
@@ -248,7 +248,7 @@ test("실패하면 Modal과 입력을 유지한다", async ({ page }) => {
   const dialog = page.getByRole("dialog", { name: "댓글" });
   await dialog.getByLabel("댓글 내용").fill("실패 후 유지 댓글");
   await dialog.getByRole("button", { name: "댓글 수정" }).click();
-  await expect(dialog).toContainText("댓글 수정 실패");
+  await expect(dialog).toContainText("서버 오류가 발생했습니다.");
   await expect(dialog.getByLabel("댓글 내용")).toHaveValue("실패 후 유지 댓글");
   await page.screenshot({
     path: "tests/visual/actual/comment-edit-modal-failure.png",

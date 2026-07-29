@@ -17,13 +17,16 @@ const ERROR_MESSAGES = {
   NICKNAME_ALREADY_EXISTS: "이미 사용 중인 닉네임입니다.",
   USER_NOT_FOUND: "사용자를 찾을 수 없습니다.",
   BOOKMARK_OPERATION_FAILED: "북마크 처리에 실패했습니다.",
+  INVALID_POST_REQUEST: "게시글 정보를 확인해주세요.",
+  INVALID_COMMENT_REQUEST: "댓글 정보를 확인해주세요.",
+  NO_CHANGES_DETECTED: "변경된 내용이 없습니다.",
+  INTERNAL_SERVER_ERROR: "서버 오류가 발생했습니다.",
 };
 
 export const UNKNOWN_ERROR_MESSAGE =
   "요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.";
 
 export function errorMessageFor(code, serverMessage) {
-  if (!code && serverMessage) return serverMessage;
   if (code === "INVALID_REQUEST" && serverMessage) return serverMessage;
   return ERROR_MESSAGES[code] ?? UNKNOWN_ERROR_MESSAGE;
 }

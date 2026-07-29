@@ -6,7 +6,10 @@ import { PostCard } from "../../entities/post/ui/PostCard.jsx";
 import { UserAvatar } from "../../entities/user/ui/UserAvatar.jsx";
 import { EditPostModal } from "../../features/post/edit/EditPostModal.jsx";
 import { DeletePostModal } from "../../features/post/delete/DeletePostModal.jsx";
-import {optimisticLike,togglePostLike,} from "../../features/post/like/togglePostLike.js";
+import {
+  optimisticLike,
+  togglePostLike,
+} from "../../features/post/like/togglePostLike.js";
 import { useSkeletonReveal } from "../../shared/hooks/useSkeletonReveal.js";
 import { FeedPageSkeleton } from "./FeedPageSkeleton.jsx";
 import { Button } from "../../shared/ui/Button.jsx";
@@ -14,9 +17,7 @@ import { Button } from "../../shared/ui/Button.jsx";
 const PAGE_SIZE = 10;
 
 function appendUnique(current, next) {
-  const unique = new Map(
-    current.map((post) => [post.postId, post]),
-  );
+  const unique = new Map(current.map((post) => [post.postId, post]));
 
   next.forEach((post) => {
     unique.set(post.postId, post);
@@ -39,16 +40,25 @@ export function FeedPage({
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [bookmarking, setBookmarking] = useState(new Set());
+  const [liking, setLiking] = useState(new Set());
+  const [terminalMessage, setTerminalMessage] = useState("");
   const [editingPost, setEditingPost] = useState(null);
   const [deletingPost, setDeletingPost] = useState(null);
   const loadMoreRef = useRef(null);
+  const loadMorePendingRef = useRef(false);
   const reveal = useSkeletonReveal();
 
   const load = useCallback(
     async (targetPage = 0, replace = true) => {
+      if (!replace && loadMorePendingRef.current) {
+        return;
+      }
+
       if (replace) {
+        reveal.startLoading();
         setLoading(true);
       } else {
+        loadMorePendingRef.current = true;
         setLoadingMore(true);
       }
 
@@ -58,57 +68,35 @@ export function FeedPage({
           size: PAGE_SIZE,
         });
 
-        const next = (result?.content || []).map(
-          normalizePost,
-        );
+        const next = (result?.content || []).map(normalizePost);
 
         setPosts((current) =>
-          replace
-            ? sortPostsByLatest(next)
-            : appendUnique(current, next),
+          replace ? sortPostsByLatest(next) : appendUnique(current, next),
         );
 
         setPage(targetPage);
-        setHasNext(
-          Boolean(result?.hasNext ?? result?.has_next),
-        );
+        setHasNext(Boolean(result?.hasNext ?? result?.has_next));
+        setTerminalMessage(result?.message ?? "");
         setError("");
       } catch (cause) {
         setError(cause.message);
       } finally {
+        if (replace) {
+          reveal.revealContent();
+        }
         setLoading(false);
         setLoadingMore(false);
+        if (!replace) {
+          loadMorePendingRef.current = false;
+        }
       }
     },
-    [],
+    [reveal.revealContent, reveal.startLoading],
   );
 
   useEffect(() => {
     load(0, true);
   }, [load, refreshKey]);
-
-  useEffect(() => {
-    function refreshExhaustedFeed() {
-      if (
-        document.visibilityState === "visible" &&
-        !hasNext
-      ) {
-        load(0, true);
-      }
-    }
-
-    document.addEventListener(
-      "visibilitychange",
-      refreshExhaustedFeed,
-    );
-
-    return () => {
-      document.removeEventListener(
-        "visibilitychange",
-        refreshExhaustedFeed,
-      );
-    };
-  }, [hasNext, load]);
 
   useEffect(() => {
     if (
@@ -133,31 +121,76 @@ export function FeedPage({
     };
   }, [hasNext, load, loadingMore, page]);
 
-  async function bookmark(index) {
-    const before = posts[index];
+  async function like(postId) {
+    const before = posts.find((post) => post.postId === postId);
+    if (!before || liking.has(postId)) return;
+
+    setLiking((current) => new Set(current).add(postId));
+    setPosts((all) =>
+      all.map((post) => (post.postId === postId ? optimisticLike(post) : post)),
+    );
+
+    try {
+      const updated = await togglePostLike(before);
+      setPosts((all) =>
+        all.map((post) => (post.postId === postId ? updated : post)),
+      );
+      setError("");
+    } catch (cause) {
+      setPosts((all) =>
+        all.map((post) => (post.postId === postId ? before : post)),
+      );
+      setError(cause.message);
+    } finally {
+      setLiking((current) => {
+        const next = new Set(current);
+        next.delete(postId);
+        return next;
+      });
+    }
+  }
+
+  async function bookmark(postId) {
+    const before = posts.find((post) => post.postId === postId);
+    if (!before) return;
     if (bookmarking.has(before.postId)) return;
     setBookmarking((current) => new Set(current).add(before.postId));
     setPosts((all) =>
-      all.map((post, current) =>
-        current === index ? { ...post, bookmarked: !post.bookmarked } : post,
+      all.map((post) =>
+        post.postId === postId
+          ? { ...post, bookmarked: !post.bookmarked }
+          : post,
       ),
     );
     try {
+      let bookmarked;
       if (before.bookmarked) {
         await postApi.deleteBookmark(before.postId);
+        bookmarked = false;
       } else {
-        await postApi.addBookmark(before.postId);
+        const result = await postApi.addBookmark(before.postId);
+        bookmarked = result?.bookmarked ?? true;
       }
 
+      setPosts((all) =>
+        all.map((post) =>
+          post.postId === postId ? { ...post, bookmarked } : post,
+        ),
+      );
       onBookmarksChanged();
+      setError("");
     } catch (cause) {
       setPosts((all) =>
-        all.map((post, current) =>
-          current === index ? before : post,
-        ),
+        all.map((post) => (post.postId === postId ? before : post)),
       );
 
       setError(cause.message);
+    } finally {
+      setBookmarking((current) => {
+        const next = new Set(current);
+        next.delete(postId);
+        return next;
+      });
     }
   }
 
@@ -214,21 +247,24 @@ export function FeedPage({
           </div>
         ) : posts.length ? (
           <>
-            {posts.map((post, index) => (
+            {posts.map((post) => (
               <PostCard
                 key={post.postId}
                 post={post}
                 onOpen={() => onNavigate(`/posts/${post.postId}`)}
-                onLike={() => like(index)}
-                onBookmark={() => bookmark(index)}
+                onLike={() => like(post.postId)}
+                likePending={liking.has(post.postId)}
+                onBookmark={() => bookmark(post.postId)}
                 bookmarkPending={bookmarking.has(post.postId)}
                 onEdit={
-                  post.author.nickname === user.nickname
+                  post.author.userId != null &&
+                  post.author.userId === user.userId
                     ? () => setEditingPost(post)
                     : undefined
                 }
                 onDelete={
-                  post.author.nickname === user.nickname
+                  post.author.userId != null &&
+                  post.author.userId === user.userId
                     ? () => setDeletingPost(post)
                     : undefined
                 }
@@ -245,6 +281,11 @@ export function FeedPage({
               >
                 {loadingMore ? "피드를 불러오는 중입니다." : "피드 더 보기"}
               </button>
+            )}
+            {!hasNext && terminalMessage && (
+              <p className="feed-state end" aria-live="polite">
+                {terminalMessage}
+              </p>
             )}
           </>
         ) : (

@@ -39,7 +39,7 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
       return fails
         ? route.fulfill({
             status: 500,
-            json: { message: "로그아웃 실패" },
+            json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
             headers: cors,
           })
         : route.fulfill({ status: 204, headers: cors });
@@ -50,7 +50,7 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
       return fails
         ? route.fulfill({
             status: 500,
-            json: { message: "탈퇴 실패" },
+            json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
             headers: cors,
           })
         : route.fulfill({ status: 204, headers: cors });
@@ -168,9 +168,7 @@ for (const action of ["로그아웃", "회원탈퇴"]) {
     const network = await prepare(page, { fails: true });
     const dialog = await open(page, action);
     await dialog.getByRole("button", { name: "확인" }).click();
-    await expect(dialog).toContainText(
-      action === "로그아웃" ? "로그아웃 실패" : "탈퇴 실패",
-    );
+    await expect(dialog).toContainText("서버 오류가 발생했습니다.");
     await page.screenshot({
       path: `tests/visual/actual/${action === "로그아웃" ? "logout" : "account-delete"}-confirm-failure.png`,
       fullPage: true,

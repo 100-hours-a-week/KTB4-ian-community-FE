@@ -97,7 +97,7 @@ async function prepare(page, { createFails = false, feedDelay = 0 } = {}) {
     if (url.pathname === "/api/posts/7" && createFails)
       return route.fulfill({
         status: 500,
-        json: { message: "생성 실패" },
+        json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
         headers: cors,
       });
     return route.fulfill({ status: 204, headers: cors });
@@ -161,7 +161,7 @@ test("생성 실패 시 본문과 Preview를 유지", async ({ page }) => {
     buffer: Buffer.from("image"),
   });
   await page.getByRole("button", { name: "피드 게시", exact: true }).click();
-  await expect(page.getByText("생성 실패")).toBeVisible();
+  await expect(page.getByText("서버 오류가 발생했습니다.")).toBeVisible();
   await expect(page.getByLabel("피드 본문")).toHaveValue("재시도 본문");
   await expect(page.locator(".feed-editor__preview")).toBeVisible();
 });

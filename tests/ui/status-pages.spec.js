@@ -102,13 +102,13 @@ test("Feed 오류는 Retry 후 Content로 회복한다", async ({ page }) => {
     if (requestCount === 1)
       return route.fulfill({
         status: 500,
-        json: { message: "피드 조회 실패" },
+        json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
         headers: cors,
       });
     return route.fulfill({ json: { data: { content: [] } }, headers: cors });
   });
   await page.goto("/feed");
-  await expect(page.getByText("피드 조회 실패")).toBeVisible();
+  await expect(page.getByText("서버 오류가 발생했습니다.")).toBeVisible();
   await page.screenshot({
     path: "tests/visual/after/feed-error.png",
     fullPage: true,
@@ -129,7 +129,7 @@ test("Post Detail 오류는 Header를 유지하고 Retry 후 본문을 표시한
     if (requestCount === 1)
       return route.fulfill({
         status: 500,
-        json: { message: "상세 조회 실패" },
+        json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
         headers: cors,
       });
     return route.fulfill({
@@ -148,7 +148,7 @@ test("Post Detail 오류는 Header를 유지하고 Retry 후 본문을 표시한
   await expect(
     page.getByRole("heading", { name: "피드 상세보기" }),
   ).toBeVisible();
-  await expect(page.getByText("상세 조회 실패")).toBeVisible();
+  await expect(page.getByText("서버 오류가 발생했습니다.")).toBeVisible();
   await page.getByRole("button", { name: "다시 시도" }).click();
   await expect(page.getByText("재시도로 불러온 피드")).toBeVisible();
   expect(requestCount).toBe(2);

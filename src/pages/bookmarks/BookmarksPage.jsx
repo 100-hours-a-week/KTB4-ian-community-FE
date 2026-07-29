@@ -6,10 +6,7 @@ import { Button } from "../../shared/ui/Button.jsx";
 
 const PAGE_SIZE = 10;
 
-export function BookmarksPage({
-  onNavigate = () => {},
-  refreshKey = 0,
-}) {
+export function BookmarksPage({ onNavigate = () => {}, refreshKey = 0 }) {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
@@ -17,56 +14,58 @@ export function BookmarksPage({
   const [loadingMore, setLoadingMore] = useState(false);
   const [pending, setPending] = useState(new Set());
   const [error, setError] = useState("");
+  const [terminalMessage, setTerminalMessage] = useState("");
   const loadMoreRef = useRef(null);
+  const loadMorePendingRef = useRef(false);
 
-  const load = useCallback(
-    async (targetPage = 0, replace = true) => {
-      if (replace) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
+  const load = useCallback(async (targetPage = 0, replace = true) => {
+    if (!replace && loadMorePendingRef.current) {
+      return;
+    }
 
-      try {
-        const result = await postApi.bookmarks({
-          page: targetPage,
-          size: PAGE_SIZE,
+    if (replace) {
+      setLoading(true);
+    } else {
+      loadMorePendingRef.current = true;
+      setLoadingMore(true);
+    }
+
+    try {
+      const result = await postApi.bookmarks({
+        page: targetPage,
+        size: PAGE_SIZE,
+      });
+
+      const next = (result?.content || []).map(normalizePost);
+
+      setPosts((current) => {
+        if (replace) {
+          return next;
+        }
+
+        const unique = new Map(current.map((post) => [post.postId, post]));
+
+        next.forEach((post) => {
+          unique.set(post.postId, post);
         });
 
-        const next = (result?.content || []).map(
-          normalizePost,
-        );
+        return [...unique.values()];
+      });
 
-        setPosts((current) => {
-          if (replace) {
-            return next;
-          }
-
-          const unique = new Map(
-            current.map((post) => [post.postId, post]),
-          );
-
-          next.forEach((post) => {
-            unique.set(post.postId, post);
-          });
-
-          return [...unique.values()];
-        });
-
-        setPage(targetPage);
-        setHasNext(
-          Boolean(result?.hasNext ?? result?.has_next),
-        );
-        setError("");
-      } catch (cause) {
-        setError(cause.message);
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
+      setPage(targetPage);
+      setHasNext(Boolean(result?.hasNext ?? result?.has_next));
+      setTerminalMessage(result?.message ?? "");
+      setError("");
+    } catch (cause) {
+      setError(cause.message);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      if (!replace) {
+        loadMorePendingRef.current = false;
       }
-    },
-    [],
-  );
+    }
+  }, []);
 
   async function remove(post) {
     if (pending.has(post.postId)) return;
@@ -122,29 +121,6 @@ export function BookmarksPage({
     };
   }, [hasNext, load, loadingMore, page]);
 
-  useEffect(() => {
-    function refreshExhaustedBookmarks() {
-      if (
-        document.visibilityState === "visible" &&
-        !hasNext
-      ) {
-        load(0, true);
-      }
-    }
-
-    document.addEventListener(
-      "visibilitychange",
-      refreshExhaustedBookmarks,
-    );
-
-    return () => {
-      document.removeEventListener(
-        "visibilitychange",
-        refreshExhaustedBookmarks,
-      );
-    };
-  }, [hasNext, load]);
-
   return (
     <main className="page bookmarks-page" data-testid="bookmarks-page-ready">
       <header className="bookmarks-page__header">
@@ -180,10 +156,13 @@ export function BookmarksPage({
               disabled={loadingMore}
               onClick={() => load(page + 1, false)}
             >
-              {loadingMore
-                ? "북마크를 불러오는 중입니다."
-                : "북마크 더 보기"}
+              {loadingMore ? "북마크를 불러오는 중입니다." : "북마크 더 보기"}
             </button>
+          )}
+          {!hasNext && terminalMessage && (
+            <p className="feed-state end" aria-live="polite">
+              {terminalMessage}
+            </p>
           )}
         </>
       ) : (

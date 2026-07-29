@@ -20,12 +20,8 @@ describe("피드 최신순 정렬", () => {
 
     const result = sortPostsByLatest(posts);
 
-    expect(
-      result.map((post) => post.postId),
-    ).toEqual([3, 2, 1]);
+    expect(result.map((post) => post.postId)).toEqual([3, 2, 1]);
 
-    expect(
-      posts.map((post) => post.postId),
-    ).toEqual([1, 3, 2]);
+    expect(posts.map((post) => post.postId)).toEqual([1, 3, 2]);
   });
 });

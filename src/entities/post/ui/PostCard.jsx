@@ -17,6 +17,7 @@ export function PostCard({
   post,
   onOpen,
   onLike,
+  likePending = false,
   onBookmark,
   bookmarkPending = false,
   onEdit,
@@ -110,6 +111,7 @@ export function PostCard({
           type="button"
           aria-label="좋아요"
           aria-pressed={post.liked}
+          disabled={!onLike || likePending}
           onClick={onLike}
         >
           <img src={post.liked ? heartFillIcon : heartStrokeIcon} alt="" />

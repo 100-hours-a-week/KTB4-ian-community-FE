@@ -43,7 +43,10 @@ async function prepare(page, { loginFails = false, delay = 0 } = {}) {
       return loginFails
         ? route.fulfill({
             status: 401,
-            json: { message: "이메일 또는 비밀번호를 확인해주세요." },
+            json: {
+              code: "INVALID_LOGIN_REQUEST",
+              message: "이메일 또는 비밀번호를 확인해주세요.",
+            },
             headers: cors,
           })
         : route.fulfill({

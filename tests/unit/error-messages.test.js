@@ -25,6 +25,9 @@ describe("API 오류 표시 계약", () => {
     expect(errorMessageFor("UNKNOWN_CODE", "internal detail")).toBe(
       UNKNOWN_ERROR_MESSAGE,
     );
+    expect(errorMessageFor(undefined, "internal detail")).toBe(
+      UNKNOWN_ERROR_MESSAGE,
+    );
   });
 
   it("ApiError는 status, code, message, response와 cause를 보존한다", () => {

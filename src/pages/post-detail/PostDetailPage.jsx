@@ -5,7 +5,10 @@ import { PostCard } from "../../entities/post/ui/PostCard.jsx";
 import { CommentForm } from "../../features/comment/create/CommentForm.jsx";
 import { EditCommentModal } from "../../features/comment/edit/EditCommentModal.jsx";
 import { EditPostModal } from "../../features/post/edit/EditPostModal.jsx";
-import { optimisticLike, togglePostLike } from "../../features/post/like/togglePostLike.js";
+import {
+  optimisticLike,
+  togglePostLike,
+} from "../../features/post/like/togglePostLike.js";
 import { DeletePostModal } from "../../features/post/delete/DeletePostModal.jsx";
 import { DeleteCommentModal } from "../../features/comment/delete/DeleteCommentModal.jsx";
 import { PageHeader } from "../../shared/ui/PageHeader.jsx";
@@ -79,12 +82,16 @@ export function PostDetailPage({
     });
 
     try {
+      let confirmed;
       if (bookmarked) {
-        await postApi.addBookmark(postId);
+        const result = await postApi.addBookmark(postId);
+        confirmed = result?.bookmarked ?? true;
       } else {
         await postApi.deleteBookmark(postId);
+        confirmed = false;
       }
 
+      setPost((current) => ({ ...current, bookmarked: confirmed }));
       onBookmarksChanged();
       setError("");
     } catch (cause) {
@@ -94,12 +101,6 @@ export function PostDetailPage({
       setBookmarkPending(false);
     }
   }
-
-  const isOwner =
-  post.author.userId !== undefined &&
-  user.userId !== undefined
-    ? post.author.userId === user.userId
-    : post.author.nickname === user.nickname;
 
   if (!post)
     return (
@@ -123,24 +124,20 @@ export function PostDetailPage({
         )}
       </main>
     );
+  const isOwner =
+    post.author.userId != null && post.author.userId === user.userId;
+
   return (
     <main className="page post-detail-page" aria-labelledby="post-detail-title">
       <PageHeader title="피드 상세보기" onBack={() => onNavigate("/feed")} />
       <PostCard
         post={post}
         onLike={like}
+        likePending={likePending}
         onBookmark={bookmark}
         bookmarkPending={bookmarkPending}
-        onEdit={
-          isOwner
-            ? () => setEditingPost(post)
-            : undefined
-        }
-        onDelete={
-          isOwner
-            ? () => setDeleteOpen(true)
-            : undefined
-        }
+        onEdit={isOwner ? () => setEditingPost(post) : undefined}
+        onDelete={isOwner ? () => setDeleteOpen(true) : undefined}
       />
       <CommentForm postId={postId} userId={user.userId} onCreated={load} />
       <section className="comments">

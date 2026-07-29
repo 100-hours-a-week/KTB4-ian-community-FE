@@ -60,7 +60,14 @@ async function mockSignupApi(
       if (error)
         return route.fulfill({
           status: 409,
-          json: { message: error, data: null },
+          json: {
+            code:
+              error === "email_already_exists"
+                ? "EMAIL_ALREADY_EXISTS"
+                : "NICKNAME_ALREADY_EXISTS",
+            message: error,
+            data: null,
+          },
           headers: cors,
         });
       return route.fulfill({

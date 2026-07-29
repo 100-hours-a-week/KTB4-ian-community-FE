@@ -3,7 +3,12 @@ import { expect, test } from "@playwright/test";
 async function prepare(page, { fails = false, delay = 0 } = {}) {
   let deleteCount = 0;
   let posts = [
-    { post_id: 31, content: "삭제 검증 피드", author_name: "dlkfjs" },
+    {
+      post_id: 31,
+      user_id: 7,
+      content: "삭제 검증 피드",
+      author_name: "dlkfjs",
+    },
   ];
   await page.addInitScript(() => {
     sessionStorage.setItem("userId", "7");
@@ -44,7 +49,7 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
       if (fails)
         return route.fulfill({
           status: 500,
-          json: { message: "피드 삭제 실패" },
+          json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
           headers: cors,
         });
       posts = [];
@@ -134,7 +139,7 @@ test("피드 삭제 실패 시 Modal과 기존 피드를 유지한다", async ({
   const network = await prepare(page, { fails: true });
   const dialog = await open(page);
   await dialog.getByRole("button", { name: "확인" }).click();
-  await expect(dialog).toContainText("피드 삭제 실패");
+  await expect(dialog).toContainText("서버 오류가 발생했습니다.");
   await expect(page.getByText("삭제 검증 피드")).toBeVisible();
   expect(network.deleteCount()).toBe(1);
   await page.screenshot({

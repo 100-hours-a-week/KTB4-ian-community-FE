@@ -62,7 +62,7 @@ async function prepare(page, { saveFails = false, saveDelay = 0 } = {}) {
       if (saveFails)
         return route.fulfill({
           status: 500,
-          json: { message: "프로필 수정 실패" },
+          json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
           headers: cors,
         });
       return route.fulfill({ status: 204, headers: cors });
@@ -74,7 +74,7 @@ async function prepare(page, { saveFails = false, saveDelay = 0 } = {}) {
       if (saveFails)
         return route.fulfill({
           status: 500,
-          json: { message: "프로필 수정 실패" },
+          json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
           headers: cors,
         });
       return route.fulfill({
@@ -239,7 +239,7 @@ test("Pending 중 중복 요청을 막고 실패 시 입력과 Preview를 유지
     path: "tests/visual/actual/profile-edit-modal-pending.png",
     fullPage: true,
   });
-  await expect(dialog).toContainText("프로필 수정 실패");
+  await expect(dialog).toContainText("서버 오류가 발생했습니다.");
   await expect(dialog.getByLabel("닉네임")).toHaveValue("실패닉");
   await page.screenshot({
     path: "tests/visual/actual/profile-edit-modal-failure.png",

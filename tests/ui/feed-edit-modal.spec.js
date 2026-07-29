@@ -59,6 +59,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
             content: [
               {
                 post_id: 31,
+                user_id: 7,
                 content,
                 author_name: "dlkfjs",
                 profile_image: "/images/profile-default.svg",
@@ -76,7 +77,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
       if (updateFails)
         return route.fulfill({
           status: 500,
-          json: { message: "수정 실패" },
+          json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
           headers: cors,
         });
       content = request.postDataJSON().content;
@@ -285,7 +286,7 @@ test("API 실패 시 Modal과 입력값을 유지한다", async ({ page }) => {
   const dialog = page.getByRole("dialog", { name: "피드 편집" });
   await dialog.getByLabel("피드 본문").fill("실패 후 유지할 본문");
   await dialog.getByRole("button", { name: "피드 수정" }).click();
-  await expect(dialog).toContainText("수정 실패");
+  await expect(dialog).toContainText("서버 오류가 발생했습니다.");
   await expect(dialog.getByLabel("피드 본문")).toHaveValue(
     "실패 후 유지할 본문",
   );

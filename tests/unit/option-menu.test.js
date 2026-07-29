@@ -54,6 +54,15 @@ describe("Option Menu", () => {
     expect(callbacks.onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("제공된 콜백에 해당하는 항목만 표시한다", async () => {
+    await renderMenu({ onDelete: undefined });
+    expect(container.textContent).toContain("수정하기");
+    expect(container.textContent).not.toContain("삭제하기");
+
+    await renderMenu({ onEdit: undefined, onDelete: undefined });
+    expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(0);
+  });
+
   it("Escape는 닫고 Trigger Focus를 복원한다", async () => {
     const callbacks = await renderMenu();
     await act(() => fireEvent.keyDown(document, { key: "Escape" }));

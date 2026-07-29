@@ -49,17 +49,10 @@ export function OptionMenu({ onEdit, onDelete, onClose, triggerRef }) {
       onClick={(event) => event.stopPropagation()}
     >
       {onEdit && (
-        <button
-          type="button"
-          role="menuitem"
-          onClick={() => run(onEdit)}
-        >
+        <button type="button" role="menuitem" onClick={() => run(onEdit)}>
           <span>수정하기</span>
 
-          <span
-            className="option-menu__pencil"
-            aria-hidden="true"
-          >
+          <span className="option-menu__pencil" aria-hidden="true">
             <img
               className="option-menu__pencil-body"
               src={pencilBodyIcon}
@@ -82,11 +75,7 @@ export function OptionMenu({ onEdit, onDelete, onClose, triggerRef }) {
           onClick={() => run(onDelete)}
         >
           <span>삭제하기</span>
-          <img
-            src={trashIcon}
-            alt=""
-            aria-hidden="true"
-          />
+          <img src={trashIcon} alt="" aria-hidden="true" />
         </button>
       )}
     </div>

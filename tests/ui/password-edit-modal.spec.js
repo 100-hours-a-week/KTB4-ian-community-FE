@@ -43,7 +43,10 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
       if (fails)
         return route.fulfill({
           status: 400,
-          json: { message: "현재 비밀번호가 올바르지 않습니다." },
+          json: {
+            code: "CURRENT_PASSWORD_MISMATCH",
+            message: "현재 비밀번호가 일치하지 않습니다.",
+          },
           headers: cors,
         });
       return route.fulfill({ status: 204, headers: cors });
@@ -192,7 +195,7 @@ test("Pending 중 중복 요청을 막고 실패하면 입력을 유지한다", 
     path: "tests/visual/actual/password-edit-modal-pending.png",
     fullPage: true,
   });
-  await expect(dialog).toContainText("현재 비밀번호가 올바르지 않습니다.");
+  await expect(dialog).toContainText("현재 비밀번호가 일치하지 않습니다.");
   await expect(dialog.getByLabel("현재 비밀번호")).toHaveValue("Signup123!");
   await page.screenshot({
     path: "tests/visual/actual/password-edit-modal-failure.png",
