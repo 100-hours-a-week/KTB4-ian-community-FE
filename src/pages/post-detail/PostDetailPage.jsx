@@ -124,8 +124,7 @@ export function PostDetailPage({
         )}
       </main>
     );
-  const isOwner =
-    post.author.userId != null && post.author.userId === user.userId;
+  const isOwner = post.owner;
 
   return (
     <main className="page post-detail-page" aria-labelledby="post-detail-title">
