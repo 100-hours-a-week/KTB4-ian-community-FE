@@ -134,9 +134,7 @@ test("작성자 ID가 같아도 서버가 owner false를 반환하면 수정·�
   await page.goto("/feed");
   await expect(page.getByTestId("feed-content")).toHaveClass(/is-visible/);
   await expect(page.getByRole("article")).toContainText(initialContent);
-  await expect(
-    page.getByRole("button", { name: "피드 옵션" }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "피드 옵션" })).toHaveCount(0);
 });
 
 test("피드 수정 Modal은 Figma 구조와 수치로 렌더링된다", async ({ page }) => {
