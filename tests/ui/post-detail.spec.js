@@ -40,7 +40,7 @@ async function prepare(page) {
         status: 200,
         headers: { ...headers, "Set-Cookie": "XSRF-TOKEN=test; Path=/" },
       });
-    if (url.pathname === "/api/users/7")
+    if (url.pathname === "/api/users/me")
       return route.fulfill({
         json: {
           data: {

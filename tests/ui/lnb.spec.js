@@ -60,7 +60,7 @@ async function prepare(page) {
         body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><circle cx="17" cy="17" r="16.25" fill="white" stroke="#e5e5e5" stroke-width="1.5"/><circle cx="17" cy="12" r="4" fill="#a1a1a1"/><path d="M9 26v-3c0-4 3-7 8-7s8 3 8 7v3" fill="#a1a1a1"/></svg>',
         headers,
       });
-    if (url.pathname === "/api/users/7" && method === "GET")
+    if (url.pathname === "/api/users/me" && method === "GET")
       return requestRoute.fulfill({
         json: { data: { ...user, nickname: state.nickname } },
         headers,

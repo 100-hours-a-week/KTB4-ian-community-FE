@@ -26,7 +26,7 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
         status: 204,
         headers: { ...cors, "Set-Cookie": "XSRF-TOKEN=confirm-test; Path=/" },
       });
-    if (url.pathname === "/api/users/7" && request.method() === "GET")
+    if (url.pathname === "/api/users/me" && request.method() === "GET")
       return route.fulfill({
         json: { data: { user_id: 7, nickname: "dlkfjs" } },
         headers: cors,

@@ -22,13 +22,13 @@ function serverErrors(error) {
     passwordConfirm: fields.passwordConfirm ?? fields.password_confirm,
   };
   const code = error.code ?? error.message;
-  if (code === "email_already_exists")
+  if (code === "EMAIL_ALREADY_EXISTS" || code === "email_already_exists")
     normalized.email = "이미 사용 중인 이메일입니다.";
-  if (code === "nickname_already_exists")
+  if (code === "NICKNAME_ALREADY_EXISTS" || code === "nickname_already_exists")
     normalized.nickname = "이미 사용 중인 닉네임입니다.";
   if (!normalized.email && !normalized.nickname && !error.fieldErrors)
     normalized.form =
-      code === "invalid_signup_request"
+      code === "INVALID_SIGNUP_REQUEST" || code === "invalid_signup_request"
         ? "입력한 회원가입 정보를 다시 확인해주세요."
         : error.message;
   return normalized;

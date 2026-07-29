@@ -72,7 +72,7 @@ async function mockSignupApi(
         },
       });
     }
-    if (url.pathname === "/api/users/7")
+    if (url.pathname === "/api/users/me")
       return route.fulfill({
         status: 200,
         json: {

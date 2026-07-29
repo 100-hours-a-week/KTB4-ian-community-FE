@@ -3,7 +3,12 @@ import { httpClient } from "../../../shared/api/httpClient.js";
 const json = (value) => JSON.stringify(value);
 
 export const userApi = {
-  me: (userId, options) => httpClient(`/api/users/${userId}`, options),
+  me: (userIdOrOptions, options) =>
+    httpClient(
+      "/api/users/me",
+      options ??
+        (typeof userIdOrOptions === "object" ? userIdOrOptions : undefined),
+    ),
   login: (payload) =>
     httpClient("/api/users/login", { method: "POST", body: json(payload) }),
   signup: (payload) =>

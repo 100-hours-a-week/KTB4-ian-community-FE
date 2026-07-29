@@ -50,7 +50,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
           "Set-Cookie": "XSRF-TOKEN=feed-edit-test; Path=/; SameSite=Lax",
         },
       });
-    if (url.pathname === "/api/users/7")
+    if (url.pathname === "/api/users/me")
       return route.fulfill({ json: { data: user }, headers: cors });
     if (url.pathname === "/api/posts" && request.method() === "GET")
       return route.fulfill({
@@ -108,7 +108,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
 async function openModal(page) {
   await page.goto("/feed");
   await expect(page.getByTestId("feed-content")).toHaveClass(/is-visible/);
-  await expect(page.locator(".post-card")).toContainText(initialContent);
+  await expect(page.getByRole("article")).toContainText(initialContent);
   await page.screenshot({
     path: "tests/visual/actual/feed-edit-modal-closed-page.png",
     fullPage: true,

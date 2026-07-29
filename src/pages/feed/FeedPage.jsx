@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { normalizePost } from "../../entities/post/model/normalizePost.js";
 import { postApi } from "../../entities/post/api/postApi.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
@@ -13,36 +13,74 @@ import { useSkeletonReveal } from "../../shared/hooks/useSkeletonReveal.js";
 import { FeedPageSkeleton } from "./FeedPageSkeleton.jsx";
 import { Button } from "../../shared/ui/Button.jsx";
 
+const PAGE_SIZE = 10;
+
+function appendUnique(current, next) {
+  const posts = new Map(current.map((post) => [post.postId, post]));
+  next.forEach((post) => posts.set(post.postId, post));
+  return [...posts.values()];
+}
+
 export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
   const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
+  const [bookmarking, setBookmarking] = useState(new Set());
   const [editingPost, setEditingPost] = useState(null);
   const [deletingPost, setDeletingPost] = useState(null);
+  const loadMoreRef = useRef(null);
   const reveal = useSkeletonReveal();
 
-  const load = useCallback(async () => {
-    reveal.startLoading();
-    setLoading(true);
-    try {
-      const result = await postApi.list();
-      setPosts(
-        (Array.isArray(result) ? result : result?.content || []).map(
-          normalizePost,
-        ),
-      );
-      setError("");
-    } catch (cause) {
-      setError(cause.message);
-    } finally {
-      setLoading(false);
-      reveal.revealContent();
-    }
-  }, [reveal.startLoading, reveal.revealContent]);
+  const load = useCallback(
+    async (targetPage = 0, replace = true) => {
+      if (replace) {
+        reveal.startLoading();
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      try {
+        const result = await postApi.list({
+          page: targetPage,
+          size: PAGE_SIZE,
+        });
+        const next = (result?.content || []).map(normalizePost);
+        setPosts((current) => (replace ? next : appendUnique(current, next)));
+        setPage(targetPage);
+        setHasNext(Boolean(result?.hasNext ?? result?.has_next));
+        setError("");
+      } catch (cause) {
+        setError(cause.message);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+        if (replace) reveal.revealContent();
+      }
+    },
+    [reveal.startLoading, reveal.revealContent],
+  );
 
   useEffect(() => {
-    load();
+    load(0, true);
   }, [load, refreshKey]);
+
+  useEffect(() => {
+    if (
+      !hasNext ||
+      loadingMore ||
+      !loadMoreRef.current ||
+      typeof IntersectionObserver === "undefined"
+    )
+      return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) load(page + 1, false);
+    });
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNext, load, loadingMore, page]);
 
   async function like(index) {
     const before = posts[index];
@@ -60,6 +98,32 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
       setPosts((all) =>
         all.map((post, current) => (current === index ? before : post)),
       );
+    }
+  }
+
+  async function bookmark(index) {
+    const before = posts[index];
+    if (bookmarking.has(before.postId)) return;
+    setBookmarking((current) => new Set(current).add(before.postId));
+    setPosts((all) =>
+      all.map((post, current) =>
+        current === index ? { ...post, bookmarked: !post.bookmarked } : post,
+      ),
+    );
+    try {
+      if (before.bookmarked) await postApi.deleteBookmark(before.postId);
+      else await postApi.addBookmark(before.postId);
+    } catch (cause) {
+      setPosts((all) =>
+        all.map((post, current) => (current === index ? before : post)),
+      );
+      setError(cause.message);
+    } finally {
+      setBookmarking((current) => {
+        const next = new Set(current);
+        next.delete(before.postId);
+        return next;
+      });
     }
   }
 
@@ -103,36 +167,52 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
           <div className="feed-state loading" aria-busy="true">
             피드를 불러오는 중입니다.
           </div>
-        ) : error ? (
+        ) : error && !posts.length ? (
           <div className="feed-state error">
             <p>{error}</p>
             <Button
               variant="outline"
               className="feed-state__action"
-              onClick={load}
+              onClick={() => load(0, true)}
             >
               다시 시도
             </Button>
           </div>
         ) : posts.length ? (
-          posts.map((post, index) => (
-            <PostCard
-              key={post.postId}
-              post={post}
-              onOpen={() => onNavigate(`/posts/${post.postId}`)}
-              onLike={() => like(index)}
-              onEdit={
-                post.author.nickname === user.nickname
-                  ? () => setEditingPost(post)
-                  : undefined
-              }
-              onDelete={
-                post.author.nickname === user.nickname
-                  ? () => setDeletingPost(post)
-                  : undefined
-              }
-            />
-          ))
+          <>
+            {posts.map((post, index) => (
+              <PostCard
+                key={post.postId}
+                post={post}
+                onOpen={() => onNavigate(`/posts/${post.postId}`)}
+                onLike={() => like(index)}
+                onBookmark={() => bookmark(index)}
+                bookmarkPending={bookmarking.has(post.postId)}
+                onEdit={
+                  post.author.nickname === user.nickname
+                    ? () => setEditingPost(post)
+                    : undefined
+                }
+                onDelete={
+                  post.author.nickname === user.nickname
+                    ? () => setDeletingPost(post)
+                    : undefined
+                }
+              />
+            ))}
+            {error && <p className="feed-state error">{error}</p>}
+            {hasNext && (
+              <button
+                ref={loadMoreRef}
+                className="feed-state loading"
+                type="button"
+                disabled={loadingMore}
+                onClick={() => load(page + 1, false)}
+              >
+                {loadingMore ? "피드를 불러오는 중입니다." : "피드 더 보기"}
+              </button>
+            )}
+          </>
         ) : (
           <p className="feed-state empty">아직 생성된 피드가 없어요.</p>
         )}
@@ -140,7 +220,7 @@ export function FeedPage({ user, onNavigate, onCreatePost, refreshKey = 0 }) {
           open={Boolean(editingPost)}
           onClose={() => setEditingPost(null)}
           post={editingPost}
-          onUpdated={load}
+          onUpdated={() => load(0, true)}
         />
         <DeletePostModal
           open={Boolean(deletingPost)}

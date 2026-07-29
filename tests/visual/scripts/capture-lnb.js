@@ -49,7 +49,7 @@ await page.route("http://127.0.0.1:8080/**", async (requestRoute) => {
       headers,
     });
   }
-  if (url.pathname === "/api/users/7") {
+  if (url.pathname === "/api/users/me") {
     return requestRoute.fulfill({ json: { data: user }, headers });
   }
   if (url.pathname === "/api/posts") {

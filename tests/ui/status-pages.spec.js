@@ -16,7 +16,7 @@ async function seedSession(page) {
 }
 
 async function routeUser(page) {
-  await page.route("http://127.0.0.1:8080/api/users/7", (route) =>
+  await page.route("http://127.0.0.1:8080/api/users/me", (route) =>
     route.fulfill({
       json: {
         data: {
@@ -43,7 +43,7 @@ test("인증 초기화 Loading은 응답 전 표시되고 완료 후 보호 Page
 }) => {
   await seedSession(page);
   let releaseUser;
-  await page.route("http://127.0.0.1:8080/api/users/7", async (route) => {
+  await page.route("http://127.0.0.1:8080/api/users/me", async (route) => {
     await new Promise((resolve) => {
       releaseUser = resolve;
     });
@@ -73,7 +73,7 @@ test("Not Found는 Community Layout과 SPA 피드 복귀를 제공한다", async
 }) => {
   await seedSession(page);
   await routeUser(page);
-  await page.route("http://127.0.0.1:8080/api/posts", (route) =>
+  await page.route("http://127.0.0.1:8080/api/posts?*", (route) =>
     route.fulfill({ json: { data: { content: [] } }, headers: cors }),
   );
   await page.goto("/없는-주소");
@@ -97,7 +97,7 @@ test("Feed 오류는 Retry 후 Content로 회복한다", async ({ page }) => {
   await seedSession(page);
   await routeUser(page);
   let requestCount = 0;
-  await page.route("http://127.0.0.1:8080/api/posts", (route) => {
+  await page.route("http://127.0.0.1:8080/api/posts?*", (route) => {
     requestCount += 1;
     if (requestCount === 1)
       return route.fulfill({

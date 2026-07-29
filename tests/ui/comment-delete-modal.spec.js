@@ -34,7 +34,7 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
         status: 204,
         headers: { ...cors, "Set-Cookie": "XSRF-TOKEN=comment-delete; Path=/" },
       });
-    if (path === "/api/users/7")
+    if (path === "/api/users/me")
       return route.fulfill({
         json: { data: { user_id: 7, nickname: "dlkfjs" } },
         headers: cors,

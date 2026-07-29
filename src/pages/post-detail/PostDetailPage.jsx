@@ -17,6 +17,7 @@ export function PostDetailPage({ postId, user, onNavigate }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletingComment, setDeletingComment] = useState(null);
   const [optionCommentId, setOptionCommentId] = useState(null);
+  const [bookmarkPending, setBookmarkPending] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -30,6 +31,23 @@ export function PostDetailPage({ postId, user, onNavigate }) {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function bookmark() {
+    if (bookmarkPending) return;
+    const before = post;
+    const bookmarked = !before.bookmarked;
+    setBookmarkPending(true);
+    setPost({ ...before, bookmarked });
+    try {
+      if (bookmarked) await postApi.addBookmark(postId);
+      else await postApi.deleteBookmark(postId);
+    } catch (cause) {
+      setPost(before);
+      setError(cause.message);
+    } finally {
+      setBookmarkPending(false);
+    }
+  }
 
   if (!post)
     return (
@@ -58,6 +76,8 @@ export function PostDetailPage({ postId, user, onNavigate }) {
       <PageHeader title="피드 상세보기" onBack={() => onNavigate("/feed")} />
       <PostCard
         post={post}
+        onBookmark={bookmark}
+        bookmarkPending={bookmarkPending}
         onDelete={
           post.author.nickname === user.nickname
             ? () => setDeleteOpen(true)

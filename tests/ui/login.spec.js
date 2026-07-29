@@ -51,7 +51,7 @@ async function prepare(page, { loginFails = false, delay = 0 } = {}) {
             headers: cors,
           });
     }
-    if (path === "/api/users/7")
+    if (path === "/api/users/me")
       return route.fulfill({
         json: { data: { user_id: 7, nickname: "pulse" } },
         headers: cors,

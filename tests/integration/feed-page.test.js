@@ -22,17 +22,22 @@ describe("React 피드 화면 통합", () => {
     expect(html).toContain("3");
   });
 
-  it("북마크 Action은 disabled이고 저장 상태를 갖지 않는다", () => {
-    const html = renderToStaticMarkup(createElement(PostCard, { post }));
+  it("북마크 Action은 서버 저장 상태와 Toggle Handler를 갖는다", () => {
+    const html = renderToStaticMarkup(
+      createElement(PostCard, {
+        post: { ...post, bookmarked: true },
+        onBookmark() {},
+      }),
+    );
     const bookmark = html.match(/<button[^>]*aria-label="북마크"[^>]*>/)?.[0];
-    expect(bookmark).toContain("disabled");
-    expect(bookmark).not.toContain("aria-pressed");
+    expect(bookmark).not.toContain("disabled");
+    expect(bookmark).toContain('aria-pressed="true"');
   });
 
-  it("북마크 Page는 Coming Soon 문구만 제공한다", () => {
+  it("북마크 Page는 실제 목록 API Loading 상태를 제공한다", () => {
     const html = renderToStaticMarkup(createElement(BookmarksPage));
-    expect(html).toContain("북마크 기능을 준비하고 있어요.");
-    expect(html).toContain("곧 원하는 피드를 저장하고 다시 확인할 수 있어요.");
+    expect(html).toContain("북마크를 불러오는 중입니다.");
+    expect(html).toContain('aria-busy="true"');
   });
 
   it("Feed Skeleton은 실제 Avatar 34px 구조와 대응한다", () => {

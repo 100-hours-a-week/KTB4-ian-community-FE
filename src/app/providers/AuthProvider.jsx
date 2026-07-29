@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { userApi } from "../../entities/user/api/userApi.js";
 import { normalizeUser } from "../../entities/user/model/normalizeUser.js";
+import { clearAccessTokenRefresh } from "../../shared/api/httpClient.js";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -18,7 +19,7 @@ export function AuthProvider({ children }) {
     }
     const controller = new AbortController();
     userApi
-      .me(userId, { signal: controller.signal })
+      .me({ signal: controller.signal })
       .then((raw) => {
         const next = normalizeUser({ ...cached, ...raw, userId });
         setUser(next);
@@ -28,6 +29,14 @@ export function AuthProvider({ children }) {
         if (error.name !== "AbortError") setStatus("unauthenticated");
       });
     return () => controller.abort();
+  }, []);
+  useEffect(() => {
+    const expire = () => {
+      setUser(null);
+      setStatus("unauthenticated");
+    };
+    addEventListener("auth:expired", expire);
+    return () => removeEventListener("auth:expired", expire);
   }, []);
   const value = useMemo(
     () => ({
@@ -41,6 +50,7 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem("userId", String(next.userId));
       },
       clear() {
+        clearAccessTokenRefresh();
         setUser(null);
         setStatus("unauthenticated");
         sessionStorage.removeItem("community.user");

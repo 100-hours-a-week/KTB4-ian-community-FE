@@ -1,7 +1,10 @@
 import { httpClient } from "../../../shared/api/httpClient.js";
 
 export const postApi = {
-  list: (options) => httpClient("/api/posts", options),
+  list: ({ page = 0, size = 10, ...options } = {}) =>
+    httpClient(`/api/posts?page=${page}&size=${size}`, options),
+  bookmarks: ({ page = 0, size = 10, ...options } = {}) =>
+    httpClient(`/api/posts/bookmarks?page=${page}&size=${size}`, options),
   detail: (postId, options) => httpClient(`/api/posts/${postId}`, options),
   create: (userId, { content, image }) => {
     const body = new FormData();
@@ -21,6 +24,10 @@ export const postApi = {
   remove: (postId) => httpClient(`/api/posts/${postId}`, { method: "DELETE" }),
   like: (postId) =>
     httpClient(`/api/posts/${postId}/likes`, { method: "POST" }),
+  addBookmark: (postId) =>
+    httpClient(`/api/posts/${postId}/bookmarks`, { method: "POST" }),
+  deleteBookmark: (postId) =>
+    httpClient(`/api/posts/${postId}/bookmarks`, { method: "DELETE" }),
   comment: (postId, userId, comment) =>
     httpClient(`/api/posts/${postId}/comments/users/${userId}`, {
       method: "POST",

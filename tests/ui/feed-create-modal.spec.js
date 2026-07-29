@@ -50,7 +50,7 @@ async function prepare(page, { createFails = false, createDelay = 0 } = {}) {
           "Set-Cookie": "XSRF-TOKEN=feed-create-test; Path=/; SameSite=Lax",
         },
       });
-    if (url.pathname === "/api/users/7")
+    if (url.pathname === "/api/users/me")
       return route.fulfill({ json: { data: user }, headers: cors });
     if (url.pathname === "/api/posts" && request.method() === "GET")
       return route.fulfill({

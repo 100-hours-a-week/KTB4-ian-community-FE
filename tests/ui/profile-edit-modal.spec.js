@@ -41,7 +41,7 @@ async function prepare(page, { saveFails = false, saveDelay = 0 } = {}) {
           "Set-Cookie": "XSRF-TOKEN=profile-edit-test; Path=/; SameSite=Lax",
         },
       });
-    if (url.pathname === "/api/users/7" && request.method() === "GET")
+    if (url.pathname === "/api/users/me" && request.method() === "GET")
       return route.fulfill({
         json: {
           data: {

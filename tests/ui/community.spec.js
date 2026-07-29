@@ -17,6 +17,7 @@ const feed = {
 };
 
 async function prepare(page, { createFails = false, feedDelay = 0 } = {}) {
+  let bookmarked = false;
   const cors = {
     "Access-Control-Allow-Origin": "http://127.0.0.1:4173",
     "Access-Control-Allow-Credentials": "true",
@@ -46,14 +47,49 @@ async function prepare(page, { createFails = false, feedDelay = 0 } = {}) {
         status: 200,
         headers: { ...cors, "Set-Cookie": "XSRF-TOKEN=test; Path=/" },
       });
-    if (url.pathname === "/api/users/7")
+    if (url.pathname === "/api/users/me")
       return route.fulfill({ json: { data: user }, headers: cors });
+    if (
+      url.pathname === "/api/posts/1/bookmarks" &&
+      route.request().method() === "POST"
+    ) {
+      bookmarked = true;
+      return route.fulfill({
+        json: { data: { postId: 1, bookmarked: true } },
+        headers: cors,
+      });
+    }
+    if (
+      url.pathname === "/api/posts/1/bookmarks" &&
+      route.request().method() === "DELETE"
+    ) {
+      bookmarked = false;
+      return route.fulfill({ status: 204, headers: cors });
+    }
+    if (
+      url.pathname === "/api/posts/bookmarks" &&
+      route.request().method() === "GET"
+    )
+      return route.fulfill({
+        json: {
+          data: {
+            content: bookmarked ? [{ ...feed, bookmarked: true }] : [],
+            hasNext: false,
+          },
+        },
+        headers: cors,
+      });
     if (url.pathname === "/api/posts" && route.request().method() === "GET")
       if (feedDelay)
         await new Promise((resolve) => setTimeout(resolve, feedDelay));
     if (url.pathname === "/api/posts" && route.request().method() === "GET")
       return route.fulfill({
-        json: { data: { content: [feed] } },
+        json: {
+          data: {
+            content: [{ ...feed, bookmarked }],
+            hasNext: false,
+          },
+        },
         headers: cors,
       });
     if (url.pathname === "/api/posts/1" && route.request().method() === "GET")
@@ -148,16 +184,18 @@ test("댓글 버튼은 trim과 pending 상태를 반영하고 색상이 다르�
   await input.fill("   ");
   await expect(button).toBeDisabled();
 });
-test("북마크는 화면만 제공하고 버튼과 Storage를 변경하지 않는다", async ({
-  page,
-}) => {
+test("북마크는 Feed에서 저장하고 목록에서 삭제할 수 있다", async ({ page }) => {
   await prepare(page);
   await page.goto("/feed");
-  await expect(
-    page.locator(".post-actions").getByRole("button", { name: "북마크" }),
-  ).toBeDisabled();
+  const feedBookmark = page
+    .locator(".post-actions")
+    .getByRole("button", { name: "북마크" });
+  await expect(feedBookmark).toBeEnabled();
+  await expect(feedBookmark).toHaveAttribute("aria-pressed", "false");
+  await feedBookmark.click();
+  await expect(feedBookmark).toHaveAttribute("aria-pressed", "true");
   await page.getByText("북마크", { exact: true }).click();
-  await expect(page.getByText("북마크 기능을 준비하고 있어요.")).toBeVisible();
+  await expect(page.getByText("Figma 기준 커뮤니티 피드")).toBeVisible();
   await expect(page).toHaveURL(/\/bookmarks$/);
   const layout = await page.evaluate(() => {
     const pageRect = document
@@ -181,6 +219,11 @@ test("북마크는 화면만 제공하고 버튼과 Storage를 변경하지 않�
     path: "tests/visual/after/bookmarks.png",
     fullPage: true,
   });
+  await page
+    .locator(".post-actions")
+    .getByRole("button", { name: "북마크" })
+    .click();
+  await expect(page.getByText("저장한 북마크가 없어요.")).toBeVisible();
   expect(await page.evaluate(() => localStorage.length)).toBe(0);
 });
 test("로그아웃과 회원탈퇴 확인만 Primary, 취소는 Outline", async ({ page }) => {
