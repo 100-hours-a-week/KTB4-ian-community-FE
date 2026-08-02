@@ -53,7 +53,7 @@ export function CreatePostModal({ open, onClose, user, onCreated }) {
     setPending(true);
     setError("");
     try {
-      await postApi.create(user.userId, {
+      await postApi.create({
         content: content.trim(),
         image: file,
       });

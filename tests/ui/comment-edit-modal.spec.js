@@ -78,7 +78,7 @@ async function prepare(page, { updateFails = false, updateDelay = 0 } = {}) {
         headers: cors,
       });
     if (
-      url.pathname === "/api/posts/31/comments/41/users/7" &&
+      url.pathname === "/api/posts/31/comments/41/users/me" &&
       request.method() === "PATCH"
     ) {
       updateCount += 1;

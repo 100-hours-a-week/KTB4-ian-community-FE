@@ -107,7 +107,7 @@ describe("피드 생성 Modal", () => {
       fireEvent.click(submit);
     });
     expect(postApi.create).toHaveBeenCalledTimes(1);
-    expect(postApi.create).toHaveBeenCalledWith(7, {
+    expect(postApi.create).toHaveBeenCalledWith({
       content: "본문",
       image: file,
     });

@@ -139,7 +139,7 @@ export function PostDetailPage({
         onEdit={isOwner ? () => setEditingPost(post) : undefined}
         onDelete={isOwner ? () => setDeleteOpen(true) : undefined}
       />
-      <CommentForm postId={postId} userId={user.userId} onCreated={load} />
+      <CommentForm postId={postId} onCreated={load} />
       <section className="comments">
         {post.comments.map((item) => {
           const commentId = item.commentId ?? item.comment_id;
@@ -163,7 +163,6 @@ export function PostDetailPage({
         open={Boolean(editingComment)}
         onClose={() => setEditingComment(null)}
         comment={editingComment}
-        userId={user.userId}
         onUpdated={load}
       />
       <EditPostModal
@@ -183,7 +182,6 @@ export function PostDetailPage({
         onClose={() => setDeletingComment(null)}
         postId={post.postId}
         comment={deletingComment}
-        userId={user.userId}
         onDeleted={(commentId) =>
           setPost((current) => ({
             ...current,

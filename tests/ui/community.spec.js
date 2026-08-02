@@ -94,7 +94,7 @@ async function prepare(page, { createFails = false, feedDelay = 0 } = {}) {
       });
     if (url.pathname === "/api/posts/1" && route.request().method() === "GET")
       return route.fulfill({ json: { data: feed }, headers: cors });
-    if (url.pathname === "/api/posts/7" && createFails)
+    if (url.pathname === "/api/posts/me" && createFails)
       return route.fulfill({
         status: 500,
         json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
@@ -209,12 +209,35 @@ test("북마크는 Feed에서 저장하고 목록에서 삭제할 수 있다", a
         x: pageRect.x,
         y: pageRect.y,
         width: pageRect.width,
+        height: pageRect.height,
       },
       headerHeight: headerRect.height,
+      radius: getComputedStyle(document.querySelector(".bookmarks-page"))
+        .borderRadius,
+      stroke: (() => {
+        const style = getComputedStyle(
+          document.querySelector(".bookmarks-page"),
+          "::after",
+        );
+        return {
+          width: style.borderLeftWidth,
+          style: style.borderLeftStyle,
+          color: style.borderLeftColor,
+          radius: style.borderRadius,
+        };
+      })(),
     };
   });
-  expect(layout.page).toEqual({ x: 720, y: 40, width: 480 });
+  expect(layout.page).toMatchObject({ x: 720, y: 40, width: 480 });
+  expect(layout.page.height).toBeGreaterThanOrEqual(1040);
   expect(layout.headerHeight).toBe(64);
+  expect(layout.radius).toBe("30px");
+  expect(layout.stroke).toEqual({
+    width: "1px",
+    style: "solid",
+    color: "rgb(229, 229, 229)",
+    radius: "30px",
+  });
   await page.screenshot({
     path: "tests/visual/after/bookmarks.png",
     fullPage: true,
