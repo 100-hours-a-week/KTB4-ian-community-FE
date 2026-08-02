@@ -1,8 +1,15 @@
+export function defaultApiBaseUrl(location = globalThis.location) {
+  const hostname = location?.hostname || "localhost";
+  const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+
+  if (isLocal) return `http://${hostname}:8080`;
+  if (location?.origin && location.origin !== "null") return location.origin;
+
+  return `http://${hostname}:8080`;
+}
+
 export function apiBaseUrl() {
-  return (
-    globalThis.__API_BASE_URL__ ??
-    `http://${globalThis.location?.hostname || "localhost"}:8080`
-  );
+  return globalThis.__API_BASE_URL__ ?? defaultApiBaseUrl();
 }
 
 export const DEFAULT_PROFILE_PATH = "/images/profile-default.svg";
