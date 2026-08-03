@@ -1,12 +1,47 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
+  lnbReceiptFillVector,
+  lnbReceiptStrokeVector,
   pencilBodyIcon,
   pencilDetailIcon,
   trashIcon,
 } from "../assets/index.js";
 
-export function OptionMenu({ onEdit, onDelete, onClose, triggerRef }) {
+export function OptionMenu({
+  onBookmark,
+  bookmarked = false,
+  bookmarkPending = false,
+  onEdit,
+  onDelete,
+  onClose,
+  triggerRef,
+  placement = "header",
+}) {
   const menuRef = useRef(null);
+  const [openAbove, setOpenAbove] = useState(false);
+
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const trigger = triggerRef?.current;
+    if (!menu || !trigger) return undefined;
+
+    function updatePosition() {
+      const triggerRect = trigger.getBoundingClientRect();
+      const menuHeight = menu.getBoundingClientRect().height;
+      const viewportPadding = 8;
+      const availableBelow =
+        window.innerHeight - triggerRect.bottom - viewportPadding;
+      setOpenAbove(availableBelow < menuHeight);
+    }
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [triggerRef]);
 
   useEffect(() => {
     const menu = menuRef.current;
@@ -36,18 +71,41 @@ export function OptionMenu({ onEdit, onDelete, onClose, triggerRef }) {
     };
   }, [onClose, triggerRef]);
 
-  function run(action) {
+  function run(action, restoreTriggerFocus = false) {
     action?.();
     onClose?.();
+    if (restoreTriggerFocus) {
+      triggerRef?.current?.focus();
+    }
   }
 
   return (
     <div
-      className="option-menu"
+      className={`option-menu option-menu--${placement}${
+        openAbove ? " option-menu--above" : ""
+      }`}
       role="menu"
       ref={menuRef}
       onClick={(event) => event.stopPropagation()}
     >
+      {onBookmark && (
+        <button
+          type="button"
+          role="menuitem"
+          aria-pressed={bookmarked}
+          disabled={bookmarkPending}
+          onClick={() => run(onBookmark, true)}
+        >
+          <span>{bookmarked ? "저장 취소" : "저장하기"}</span>
+          <span className="option-menu__receipt" aria-hidden="true">
+            <img
+              src={bookmarked ? lnbReceiptFillVector : lnbReceiptStrokeVector}
+              alt=""
+            />
+          </span>
+        </button>
+      )}
+
       {onEdit && (
         <button type="button" role="menuitem" onClick={() => run(onEdit)}>
           <span>수정하기</span>

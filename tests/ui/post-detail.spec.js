@@ -133,6 +133,8 @@ test("Post Detail Header와 본문은 Figma 위치·크기를 사용한다", asy
       };
     };
     const title = document.querySelector(".page-header h1");
+    const pageElement = document.querySelector(".post-detail-page");
+    const stroke = getComputedStyle(pageElement, "::after");
     return {
       page: measure(".post-detail-page"),
       header: measure(".page-header"),
@@ -142,6 +144,29 @@ test("Post Detail Header와 본문은 Figma 위치·크기를 사용한다", asy
       composer: measure(".comment-composer"),
       commentForm: measure(".comment-form"),
       commentSubmit: measure(".comment-form .submit-icon"),
+      commentSubmitIcon: measure(".comment-form .submit-icon > img"),
+      commentFormStyle: {
+        backgroundColor: getComputedStyle(
+          document.querySelector(".comment-form"),
+        ).backgroundColor,
+        borderRadius: getComputedStyle(document.querySelector(".comment-form"))
+          .borderRadius,
+        padding: getComputedStyle(document.querySelector(".comment-form"))
+          .padding,
+      },
+      commentPlaceholder: getComputedStyle(
+        document.querySelector(".comment-form textarea"),
+        "::placeholder",
+      ).color,
+      commentSubmitBackground: getComputedStyle(
+        document.querySelector(".comment-form .submit-icon"),
+      ).backgroundColor,
+      stroke: {
+        borderLeft: stroke.borderLeft,
+        pointerEvents: stroke.pointerEvents,
+        position: stroke.position,
+        zIndex: stroke.zIndex,
+      },
       pageRadius: getComputedStyle(document.querySelector(".post-detail-page"))
         .borderRadius,
       titleTypography: {
@@ -162,6 +187,20 @@ test("Post Detail Header와 본문은 Figma 위치·크기를 사용한다", asy
     height: 44,
   });
   expect(metrics.commentSubmit).toMatchObject({ width: 32, height: 32 });
+  expect(metrics.commentSubmitIcon).toMatchObject({ width: 16, height: 16 });
+  expect(metrics.commentFormStyle).toEqual({
+    backgroundColor: "rgb(245, 245, 245)",
+    borderRadius: "99999px",
+    padding: "6px 6px 6px 16px",
+  });
+  expect(metrics.commentPlaceholder).toBe("rgb(115, 115, 115)");
+  expect(metrics.commentSubmitBackground).toBe("rgb(161, 161, 161)");
+  expect(metrics.stroke).toEqual({
+    borderLeft: "1px solid rgb(229, 229, 229)",
+    pointerEvents: "none",
+    position: "absolute",
+    zIndex: "30",
+  });
   expect(metrics.pageRadius).toBe("30px 30px 0px 0px");
   expect(metrics.titleTypography).toEqual({
     fontSize: "20px",

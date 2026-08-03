@@ -29,7 +29,7 @@ test("실제 Backend에서 피드를 생성하고 새로고침 후 다시 조회
     .setInputFiles("tests/fixtures/feed-create-reference.jpg");
   const responsePromise = page.waitForResponse(
     (response) =>
-      /\/api\/posts\/\d+$/.test(new URL(response.url()).pathname) &&
+      new URL(response.url()).pathname === "/api/posts/me" &&
       response.request().method() === "POST",
   );
   await page.getByRole("button", { name: "피드 게시", exact: true }).click();

@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { postApi } from "../../../entities/post/api/postApi.js";
 import { directionTopIcon } from "../../../shared/assets/index.js";
 
-export function CommentForm({ postId, userId, onCreated }) {
+export function CommentForm({ postId, onCreated }) {
   const [comment, setComment] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -16,7 +16,7 @@ export function CommentForm({ postId, userId, onCreated }) {
     setPending(true);
     setError("");
     try {
-      await postApi.comment(postId, userId, comment.trim());
+      await postApi.comment(postId, comment.trim());
       setComment("");
       await onCreated();
     } catch (cause) {

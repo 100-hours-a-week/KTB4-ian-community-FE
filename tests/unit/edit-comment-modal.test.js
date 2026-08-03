@@ -78,7 +78,7 @@ describe("댓글 수정 Modal", () => {
       fireEvent.click(submit);
     });
     expect(postApi.updateComment).toHaveBeenCalledTimes(1);
-    expect(postApi.updateComment).toHaveBeenCalledWith(31, 41, 7, "수정 댓글");
+    expect(postApi.updateComment).toHaveBeenCalledWith(31, 41, "수정 댓글");
     expect(submit.disabled).toBe(true);
     await act(async () => finish());
     expect(onUpdated).toHaveBeenCalledTimes(1);

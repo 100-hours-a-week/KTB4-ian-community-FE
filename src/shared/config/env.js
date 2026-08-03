@@ -1,7 +1,14 @@
+export function defaultApiBaseUrl(hostname) {
+  const normalizedHostname = hostname || "localhost";
+  if (normalizedHostname === "localhost" || normalizedHostname === "127.0.0.1")
+    return `http://${normalizedHostname}:8080`;
+  return "";
+}
+
 export function apiBaseUrl() {
   return (
     globalThis.__API_BASE_URL__ ??
-    `http://${globalThis.location?.hostname || "localhost"}:8080`
+    defaultApiBaseUrl(globalThis.location?.hostname)
   );
 }
 

@@ -23,6 +23,7 @@ describe("Option Menu", () => {
     const triggerRef = createRef();
     triggerRef.current = document.querySelector("#trigger");
     const callbacks = {
+      onBookmark: vi.fn(),
       onEdit: vi.fn(),
       onDelete: vi.fn(),
       onClose: vi.fn(),
@@ -37,29 +38,36 @@ describe("Option Menu", () => {
     await renderMenu();
     const items = [...container.querySelectorAll('[role="menuitem"]')];
     expect(items.map((item) => item.textContent)).toEqual([
+      "저장하기",
       "수정하기",
       "삭제하기",
     ]);
-    expect(container.querySelectorAll("img")).toHaveLength(3);
+    expect(container.querySelectorAll("img")).toHaveLength(4);
     expect(items[0]).toBe(document.activeElement);
   });
 
   it("Action은 한 번 실행하고 Menu를 닫는다", async () => {
     const callbacks = await renderMenu();
     await act(() =>
-      fireEvent.click(getByRole(container, "menuitem", { name: "수정하기" })),
+      fireEvent.click(getByRole(container, "menuitem", { name: "저장하기" })),
     );
-    expect(callbacks.onEdit).toHaveBeenCalledTimes(1);
+    expect(callbacks.onBookmark).toHaveBeenCalledTimes(1);
+    expect(callbacks.onEdit).not.toHaveBeenCalled();
     expect(callbacks.onDelete).not.toHaveBeenCalled();
     expect(callbacks.onClose).toHaveBeenCalledTimes(1);
+    expect(callbacks.triggerRef.current).toBe(document.activeElement);
   });
 
   it("제공된 콜백에 해당하는 항목만 표시한다", async () => {
-    await renderMenu({ onDelete: undefined });
+    await renderMenu({ onBookmark: undefined, onDelete: undefined });
     expect(container.textContent).toContain("수정하기");
     expect(container.textContent).not.toContain("삭제하기");
 
-    await renderMenu({ onEdit: undefined, onDelete: undefined });
+    await renderMenu({
+      onBookmark: undefined,
+      onEdit: undefined,
+      onDelete: undefined,
+    });
     expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(0);
   });
 

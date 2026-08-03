@@ -8,7 +8,6 @@ export function DeleteCommentModal({
   onClose,
   postId,
   comment,
-  userId,
   onDeleted,
 }) {
   const [pending, setPending] = useState(false);
@@ -29,7 +28,7 @@ export function DeleteCommentModal({
     setPending(true);
     setError("");
     try {
-      await postApi.removeComment(postId, commentId, userId);
+      await postApi.removeComment(postId, commentId);
       onDeleted?.(commentId);
       onClose();
     } catch (cause) {

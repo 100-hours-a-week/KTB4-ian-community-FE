@@ -43,7 +43,7 @@ test("실제 Backend에서 댓글을 수정하고 새로고침 후 다시 조회
   await dialog.getByLabel("댓글 내용").fill(updatedComment);
   const responsePromise = page.waitForResponse(
     (response) =>
-      /\/api\/posts\/\d+\/comments\/\d+\/users\/\d+$/.test(
+      /\/api\/posts\/\d+\/comments\/\d+\/users\/me$/.test(
         new URL(response.url()).pathname,
       ) && response.request().method() === "PATCH",
   );

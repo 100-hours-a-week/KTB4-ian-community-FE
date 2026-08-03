@@ -52,7 +52,7 @@ async function prepare(page, { fails = false, delay = 0 } = {}) {
         headers: cors,
       });
     if (
-      path === "/api/posts/31/comments/41/users/7" &&
+      path === "/api/posts/31/comments/41/users/me" &&
       request.method() === "DELETE"
     ) {
       deleteCount += 1;

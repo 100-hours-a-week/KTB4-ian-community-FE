@@ -57,7 +57,7 @@ async function prepare(page, { createFails = false, createDelay = 0 } = {}) {
         json: { data: { content: [] } },
         headers: cors,
       });
-    if (url.pathname === "/api/posts/7" && request.method() === "POST") {
+    if (url.pathname === "/api/posts/me" && request.method() === "POST") {
       createCount += 1;
       if (createDelay)
         await new Promise((resolve) => setTimeout(resolve, createDelay));

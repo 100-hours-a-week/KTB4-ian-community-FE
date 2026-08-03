@@ -4,13 +4,7 @@ import { UserAvatar } from "../../../entities/user/ui/UserAvatar.jsx";
 import { directionTopIcon } from "../../../shared/assets/index.js";
 import { Modal } from "../../../shared/ui/Modal.jsx";
 
-export function EditCommentModal({
-  open,
-  onClose,
-  comment,
-  userId,
-  onUpdated,
-}) {
+export function EditCommentModal({ open, onClose, comment, onUpdated }) {
   const initialContent = comment?.comment ?? comment?.content ?? "";
   const [content, setContent] = useState("");
   const [pending, setPending] = useState(false);
@@ -37,7 +31,6 @@ export function EditCommentModal({
       await postApi.updateComment(
         comment.postId ?? comment.post_id,
         comment.commentId ?? comment.comment_id,
-        userId,
         content.trim(),
       );
       await onUpdated();

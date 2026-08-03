@@ -72,13 +72,44 @@ describe("Feed Card", () => {
     expect(container.querySelector(".post-card__image")).toBeNull();
   });
 
-  it("소유자 Action은 공통 Option Menu Trigger로 제공한다", async () => {
-    await renderCard({}, { onEdit: vi.fn(), onDelete: vi.fn() });
+  it("Feed 소유자 Action은 하단 북마크 위치의 Option Menu로 제공한다", async () => {
+    await renderCard(
+      {},
+      {
+        onBookmark: vi.fn(),
+        onEdit: vi.fn(),
+        onDelete: vi.fn(),
+        ownerOptionsInFooter: true,
+      },
+    );
     const trigger = getByRole(container, "button", { name: "피드 옵션" });
+    expect(trigger.closest(".post-actions")).toBeTruthy();
+    expect(container.querySelector(".post-actions__bookmark")).toBeNull();
     expect(trigger.getAttribute("aria-expanded")).toBe("false");
     await act(() => fireEvent.click(trigger));
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
     expect(getByRole(container, "menu")).toBeTruthy();
+    expect(container.textContent).toContain("저장하기");
+    expect(container.textContent).toContain("수정하기");
+    expect(container.textContent).toContain("삭제하기");
+    await act(() => fireEvent.click(trigger));
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(container.querySelector('[role="menu"]')).toBeNull();
+  });
+
+  it("타인 글은 기존 하단 북마크 위치를 유지한다", async () => {
+    await renderCard({}, { onBookmark: vi.fn() });
+    const bookmark = getByRole(container, "button", { name: "북마크" });
+    expect(bookmark.closest(".post-actions")).toBeTruthy();
+    expect(container.querySelector('[aria-label="피드 옵션"]')).toBeNull();
+  });
+
+  it("Footer Modifier가 없으면 기존 상단 소유자 메뉴를 유지한다", async () => {
+    await renderCard({}, { onEdit: vi.fn(), onDelete: vi.fn() });
+    const trigger = getByRole(container, "button", { name: "피드 옵션" });
+    expect(trigger.closest(".post-card__header")).toBeTruthy();
+    await act(() => fireEvent.click(trigger));
+    expect(container.textContent).not.toContain("저장하기");
     expect(container.textContent).toContain("수정하기");
     expect(container.textContent).toContain("삭제하기");
   });

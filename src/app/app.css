@@ -393,13 +393,28 @@
   align-content: start;
   gap: 16px;
 }
+.feed-page,
+.post-detail-page,
+.bookmarks-page {
+  position: relative;
+}
+.feed-page::after,
+.post-detail-page::after,
+.bookmarks-page::after {
+  content: "";
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: inherit;
+  pointer-events: none;
+}
 .feed-page {
   gap: 0;
   margin-top: 40px;
   overflow: hidden;
   border-radius: 30px 30px 0 0;
   background: var(--color-bg-primary);
-  box-shadow: inset 0 0 0 1px var(--color-border-secondary);
 }
 .post-detail-page {
   gap: 0;
@@ -407,7 +422,6 @@
   overflow: hidden;
   border-radius: 30px 30px 0 0;
   background: var(--color-bg-primary);
-  box-shadow: inset 0 0 0 1px var(--color-border-secondary);
 }
 .skeleton-shell {
   display: grid;
@@ -518,19 +532,21 @@
   border-top: 1px solid var(--color-border-secondary);
   background: var(--color-bg-primary);
 }
+.post-card--owner-options-open {
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+}
 .post-card__body {
   width: 100%;
   display: grid;
   gap: 12px;
   padding: 16px 16px 12px;
   border: 0;
-  background: transparent;
+  background: var(--color-bg-primary);
   color: var(--color-text-primary);
   font: inherit;
   text-align: left;
-}
-.post-card__body:hover {
-  background: var(--color-bg-secondary);
 }
 .post-card__body:focus-visible {
   position: relative;
@@ -562,7 +578,7 @@
   padding: 0;
   border: 0;
   border-radius: 99999px;
-  background: var(--color-bg-tertiary);
+  background: transparent;
 }
 .post-card__options > span {
   position: relative;
@@ -635,18 +651,19 @@
   aspect-ratio: auto;
 }
 .post-actions {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   height: 49px;
   padding: 8px 20px 20px;
 }
-.post-actions button {
+.post-actions > button {
   padding: 0;
   border: 0;
   background: transparent;
 }
-.post-actions button,
+.post-actions > button,
 .post-action-label {
   display: inline-flex;
   align-items: center;
@@ -657,12 +674,30 @@
   line-height: 18px;
   letter-spacing: 0.252px;
 }
-.post-actions img {
+.post-actions > button > img,
+.post-action-label > img {
   width: 20px;
   height: 20px;
 }
+.post-actions__like {
+  width: 60px;
+  flex: 0 0 60px;
+  justify-content: flex-start;
+}
 .post-actions__bookmark {
   margin-left: auto;
+}
+.post-actions__owner-menu {
+  position: relative;
+  display: inline-flex;
+  margin-left: auto;
+  transform: translateY(-4px);
+}
+.post-actions__owner-menu > .post-card__options {
+  background: transparent;
+}
+.post-actions__owner-menu > .post-card__options:hover {
+  background: var(--color-bg-tertiary);
 }
 .post-actions__bookmark:disabled {
   opacity: 1;
@@ -1112,7 +1147,17 @@
   gap: 8px;
   padding: 6px 6px 6px 16px;
   border-radius: 99999px;
-  background: var(--color-bg-teritray);
+  background: var(--color-bg-tertiary);
+}
+.comment-form .submit-icon {
+  display: grid;
+  flex: 0 0 32px;
+  place-items: center;
+}
+.comment-form .submit-icon > img {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 .comment-form textarea {
   min-width: 0;
@@ -1214,7 +1259,6 @@
   top: 44px;
   right: 4px;
   width: 160px;
-  height: 76px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1222,6 +1266,18 @@
   border-radius: 8px;
   background: var(--color-bg-primary);
   box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
+}
+.option-menu--footer {
+  top: 37px;
+  right: 0;
+}
+.option-menu--header.option-menu--above {
+  top: auto;
+  bottom: 44px;
+}
+.option-menu--footer.option-menu--above {
+  top: auto;
+  bottom: 37px;
 }
 .option-menu > button {
   width: 100%;
@@ -1239,6 +1295,10 @@
   line-height: 18px;
   letter-spacing: 0.252px;
 }
+.option-menu > button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
 .option-menu > button:hover,
 .option-menu > button:focus-visible {
   background: var(--color-bg-tertiary);
@@ -1253,6 +1313,19 @@
 .option-menu__delete > img {
   width: 20px;
   height: 20px;
+}
+.option-menu__receipt {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+.option-menu__receipt > img {
+  position: absolute;
+  top: 1.875px;
+  left: 3.542px;
+  width: 12.917px;
+  height: 16.25px;
+  max-width: none;
 }
 .option-menu__pencil {
   position: relative;
@@ -1364,7 +1437,6 @@
   overflow: hidden;
   border-radius: 30px 30px 0 0;
   background: var(--color-bg-primary);
-  box-shadow: inset 0 0 0 1px var(--color-border-secondary);
 }
 .bookmarks-page__header {
   height: 64px;
