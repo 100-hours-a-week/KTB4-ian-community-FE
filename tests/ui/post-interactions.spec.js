@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-async function prepare(page) {
+async function prepare(page, { postUserId = 7 } = {}) {
   const state = {
     liked: false,
     likeCount: 3,
@@ -18,7 +18,7 @@ async function prepare(page) {
   };
   const responsePost = () => ({
     post_id: 1,
-    user_id: 7,
+    user_id: postUserId,
     content: "상호작용 피드",
     nickname: "현재 사용자",
     profile_image: "/images/profile.svg",
@@ -178,7 +178,7 @@ for (const [name, path] of [
   test(`${name} 북마크는 SVG·aria 상태를 저장·재조회·삭제하고 실패 후 재시도한다`, async ({
     page,
   }) => {
-    const state = await prepare(page);
+    const state = await prepare(page, { postUserId: 8 });
     await page.goto(path);
     const bookmark = card(page).getByRole("button", { name: "북마크" });
     const icon = bookmark.locator("img");

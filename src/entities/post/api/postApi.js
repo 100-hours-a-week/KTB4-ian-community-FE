@@ -6,11 +6,11 @@ export const postApi = {
   bookmarks: ({ page = 0, size = 10, ...options } = {}) =>
     httpClient(`/api/posts/bookmarks?page=${page}&size=${size}`, options),
   detail: (postId, options) => httpClient(`/api/posts/${postId}`, options),
-  create: (userId, { content, image }) => {
+  create: ({ content, image }) => {
     const body = new FormData();
     body.append("content", content);
     if (image) body.append("image", image);
-    return httpClient(`/api/posts/${userId}`, { method: "POST", body });
+    return httpClient("/api/posts/me", { method: "POST", body });
   },
   update: (postId, { content, imageUrl }) =>
     httpClient(`/api/posts/${postId}`, {
@@ -28,18 +28,18 @@ export const postApi = {
     httpClient(`/api/posts/${postId}/bookmarks`, { method: "POST" }),
   deleteBookmark: (postId) =>
     httpClient(`/api/posts/${postId}/bookmarks`, { method: "DELETE" }),
-  comment: (postId, userId, comment) =>
-    httpClient(`/api/posts/${postId}/comments/users/${userId}`, {
+  comment: (postId, comment) =>
+    httpClient(`/api/posts/${postId}/comments/users/me`, {
       method: "POST",
       body: JSON.stringify({ comment }),
     }),
-  updateComment: (postId, commentId, userId, comment) =>
-    httpClient(`/api/posts/${postId}/comments/${commentId}/users/${userId}`, {
+  updateComment: (postId, commentId, comment) =>
+    httpClient(`/api/posts/${postId}/comments/${commentId}/users/me`, {
       method: "PATCH",
       body: JSON.stringify({ comment }),
     }),
-  removeComment: (postId, commentId, userId) =>
-    httpClient(`/api/posts/${postId}/comments/${commentId}/users/${userId}`, {
+  removeComment: (postId, commentId) =>
+    httpClient(`/api/posts/${postId}/comments/${commentId}/users/me`, {
       method: "DELETE",
     }),
 };

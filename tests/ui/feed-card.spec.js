@@ -63,6 +63,7 @@ async function prepare(page) {
             content: [
               {
                 post_id: 1,
+                user_id: 7,
                 content:
                   "분위기 좋은 다로베에서 화덕피자 먹고, 도보 5분 거리 재즈바 '포지티브 제로'로 이동하세요.\n조명이 예뻐서 서로 더 예뻐 보이는 마법의 코스입니다. (예약 필수!)",
                 nickname: "dlkfjls",
@@ -75,6 +76,7 @@ async function prepare(page) {
               },
               {
                 post_id: 2,
+                user_id: 8,
                 content: "두 번째 피드",
                 nickname: "dlkfjls",
                 profile_image: "/images/author.svg",
@@ -117,6 +119,9 @@ async function prepare(page) {
 
 async function waitForStableFeed(page) {
   await expect(page.getByText(/분위기 좋은 다로베에서 화덕피자/)).toBeVisible();
+  await expect(page.locator(".post-card")).toHaveCount(2);
+  await expect(page.locator(".post-actions__like")).toHaveCount(2);
+  await expect(page.locator(".post-action-label > img")).toHaveCount(2);
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
@@ -145,6 +150,7 @@ test("Feed Card는 Figma 크기·간격·타이포그래피를 사용한다", as
     const card = document.querySelector(".post-card");
     const content = document.querySelector(".post-card__content");
     const metadata = document.querySelector(".post-card__metadata");
+    const cards = [...document.querySelectorAll(".post-card")];
     return {
       card: measure(".post-card"),
       image: measure(".post-card__image"),
@@ -157,6 +163,16 @@ test("Feed Card는 Figma 크기·간격·타이포그래피를 사용한다", as
         lineHeight: getComputedStyle(content).lineHeight,
       },
       metadataColor: getComputedStyle(metadata).color,
+      likeWidths: cards.map(
+        (item) =>
+          item.querySelector(".post-actions__like").getBoundingClientRect()
+            .width,
+      ),
+      commentIconXs: cards.map(
+        (item) =>
+          item.querySelector(".post-action-label > img").getBoundingClientRect()
+            .x,
+      ),
     };
   });
   expect(metrics.card).toMatchObject({ x: 720, width: 480 });
@@ -170,6 +186,8 @@ test("Feed Card는 Figma 크기·간격·타이포그래피를 사용한다", as
     lineHeight: "18px",
   });
   expect(metrics.metadataColor).toBe("rgb(161, 161, 161)");
+  expect(metrics.likeWidths).toEqual([60, 60]);
+  expect(metrics.commentIconXs[0]).toBe(metrics.commentIconXs[1]);
   expect(network.consoleErrors).toEqual([]);
   expect(network.failedAssets).toEqual([]);
   await page.screenshot({
@@ -197,12 +215,19 @@ test("Feed Page는 Figma 1920×1080 Layout과 작성 진입 영역을 사용한�
     };
     const pageElement = document.querySelector(".feed-page");
     const heading = document.querySelector(".feed-page__intro h1");
+    const stroke = getComputedStyle(pageElement, "::after");
     return {
       page: measure(".feed-page"),
       heading: measure(".feed-page__intro h1"),
       trigger: measure(".create-trigger"),
       publish: measure(".create-trigger b"),
       radius: getComputedStyle(pageElement).borderRadius,
+      stroke: {
+        borderLeft: stroke.borderLeft,
+        pointerEvents: stroke.pointerEvents,
+        position: stroke.position,
+        zIndex: stroke.zIndex,
+      },
       headingFont: {
         fontSize: getComputedStyle(heading).fontSize,
         fontWeight: getComputedStyle(heading).fontWeight,
@@ -220,6 +245,12 @@ test("Feed Page는 Figma 1920×1080 Layout과 작성 진입 영역을 사용한�
   });
   expect(metrics.publish.height).toBe(34);
   expect(metrics.radius).toBe("30px 30px 0px 0px");
+  expect(metrics.stroke).toEqual({
+    borderLeft: "1px solid rgb(229, 229, 229)",
+    pointerEvents: "none",
+    position: "absolute",
+    zIndex: "30",
+  });
   expect(metrics.headingFont).toEqual({
     fontSize: "20px",
     fontWeight: "700",
@@ -229,6 +260,145 @@ test("Feed Page는 Figma 1920×1080 Layout과 작성 진입 영역을 사용한�
   expect(network.failedAssets).toEqual([]);
   await page.screenshot({
     path: "tests/visual/after/feed.png",
+    animations: "disabled",
+  });
+});
+
+test("내 글은 하단 더보기 메뉴를, 타인 글은 기존 북마크를 사용한다", async ({
+  page,
+}) => {
+  const network = await prepare(page);
+  await page.goto("/feed");
+  await waitForStableFeed(page);
+
+  const cards = page.locator(".post-card");
+  const ownerCard = cards.nth(0);
+  const otherCard = cards.nth(1);
+  const ownerOptions = ownerCard.getByRole("button", { name: "피드 옵션" });
+
+  await expect(
+    ownerCard.locator(".post-card__header", { has: ownerOptions }),
+  ).toHaveCount(0);
+  await expect(ownerOptions).toBeVisible();
+  await expect(ownerCard.getByRole("button", { name: "북마크" })).toHaveCount(
+    0,
+  );
+  await expect(otherCard.getByRole("button", { name: "북마크" })).toBeVisible();
+  await expect(
+    otherCard.getByRole("button", { name: "피드 옵션" }),
+  ).toHaveCount(0);
+
+  const ownerBody = ownerCard.locator(".post-card__body");
+  const lnbBackground = await page
+    .locator("body")
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  const bodyBackgroundBeforeHover = await ownerBody.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  expect(bodyBackgroundBeforeHover).toBe(lnbBackground);
+  await ownerBody.hover();
+  expect(
+    await ownerBody.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    ),
+  ).toBe(bodyBackgroundBeforeHover);
+  const likeBox = await ownerCard
+    .locator(".post-actions > button")
+    .first()
+    .boundingBox();
+  const commentBox = await ownerCard
+    .locator(".post-actions > .post-action-label")
+    .boundingBox();
+  const actionGap = commentBox.x - (likeBox.x + likeBox.width);
+  expect(actionGap).toBeGreaterThanOrEqual(4);
+  expect(actionGap).toBeLessThanOrEqual(12);
+
+  expect(
+    await ownerOptions.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    ),
+  ).toBe("rgba(0, 0, 0, 0)");
+  await ownerOptions.hover();
+  expect(
+    await ownerOptions.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    ),
+  ).toBe("rgb(245, 245, 245)");
+  const optionBox = await ownerOptions.boundingBox();
+  expect(optionBox).toMatchObject({ x: 1144, width: 36, height: 36 });
+  expect(optionBox.y).toBeGreaterThanOrEqual(569);
+  expect(optionBox.y).toBeLessThanOrEqual(570);
+  const optionCenters = await ownerOptions.evaluate((button) => {
+    const icon = button.querySelector("img");
+    const buttonRect = button.getBoundingClientRect();
+    const iconRect = icon.getBoundingClientRect();
+
+    return {
+      buttonX: buttonRect.x + buttonRect.width / 2,
+      buttonY: buttonRect.y + buttonRect.height / 2,
+      iconX: iconRect.x + iconRect.width / 2,
+      iconY: iconRect.y + iconRect.height / 2,
+    };
+  });
+  expect(
+    Math.abs(optionCenters.buttonX - optionCenters.iconX),
+  ).toBeLessThanOrEqual(0.5);
+  expect(
+    Math.abs(optionCenters.buttonY - optionCenters.iconY),
+  ).toBeLessThanOrEqual(0.5);
+
+  await ownerOptions.click();
+  const menu = ownerCard.getByRole("menu");
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole("menuitem")).toHaveText([
+    "저장하기",
+    "수정하기",
+    "삭제하기",
+  ]);
+  const menuBox = await menu.boundingBox();
+  expect(menuBox).toMatchObject({ x: 1020, width: 160, height: 112 });
+  expect(menuBox.y).toBeGreaterThanOrEqual(605);
+  expect(menuBox.y).toBeLessThanOrEqual(607);
+  await ownerOptions.click();
+  await expect(menu).toHaveCount(0);
+  await expect(ownerOptions).toHaveAttribute("aria-expanded", "false");
+  await ownerOptions.click();
+  await expect(ownerCard.getByRole("menu")).toBeVisible();
+
+  expect(network.consoleErrors).toEqual([]);
+  expect(network.failedAssets).toEqual([]);
+  await page.screenshot({
+    path: "tests/visual/after/feed-owner-options.png",
+    animations: "disabled",
+  });
+  await ownerCard.getByRole("menuitem", { name: "저장하기" }).click();
+  await expect(ownerCard.getByRole("menu")).toHaveCount(0);
+  await expect(ownerOptions).toBeFocused();
+});
+
+test("피드 더보기 메뉴는 아래 공간이 부족하면 위로 열린다", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 650 });
+  await prepare(page);
+  await page.goto("/feed");
+  await waitForStableFeed(page);
+
+  const options = page
+    .locator(".post-card")
+    .first()
+    .getByRole("button", { name: "피드 옵션" });
+  await options.click();
+  const menu = page.getByRole("menu");
+  const [optionsBox, menuBox] = await Promise.all([
+    options.boundingBox(),
+    menu.boundingBox(),
+  ]);
+
+  expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(optionsBox.y);
+  expect(menuBox.y).toBeGreaterThanOrEqual(8);
+  await page.screenshot({
+    path: "tests/visual/after/feed-owner-options-above.png",
     animations: "disabled",
   });
 });

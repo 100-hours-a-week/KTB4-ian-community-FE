@@ -103,8 +103,13 @@ async function finishSlice(page, lastText, moreButtonName) {
     .getByRole("button", { name: moreButtonName })
     .scrollIntoViewIfNeeded();
   await expect(page.getByText("피드 1", { exact: true })).toBeVisible();
-  await expect(page.getByText(lastText)).toHaveCount(1);
-  await expect(page.getByText(lastText)).toHaveAttribute("aria-live", "polite");
+  if (lastText) {
+    await expect(page.getByText(lastText)).toHaveCount(1);
+    await expect(page.getByText(lastText)).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
+  }
 }
 
 test("11개 Feed Slice를 병합하고 종료 뒤 Scroll·visibility 재조회를 막는다", async ({
@@ -112,7 +117,10 @@ test("11개 Feed Slice를 병합하고 종료 뒤 Scroll·visibility 재조회�
 }) => {
   const state = await prepare(page);
   await page.goto("/feed");
-  await finishSlice(page, "더 이상 조회할 피드가 없습니다.", "피드 더 보기");
+  await finishSlice(page, null, "피드 더 보기");
+  await expect(page.getByText("더 이상 조회할 피드가 없습니다.")).toHaveCount(
+    0,
+  );
 
   expect(state.feedRequests).toBe(2);
   await page.evaluate(() => {

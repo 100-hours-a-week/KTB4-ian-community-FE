@@ -60,7 +60,7 @@ describe("댓글 삭제 확인 Modal", () => {
       fireEvent.click(confirm);
     });
     expect(postApi.removeComment).toHaveBeenCalledTimes(1);
-    expect(postApi.removeComment).toHaveBeenCalledWith(31, 41, 7);
+    expect(postApi.removeComment).toHaveBeenCalledWith(31, 41);
     await act(async () => finish());
     expect(onDeleted).toHaveBeenCalledWith(41);
     expect(onClose).toHaveBeenCalledTimes(1);

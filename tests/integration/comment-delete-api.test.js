@@ -12,9 +12,9 @@ describe("댓글 삭제 API 통합", () => {
       .mockResolvedValue(new Response(null, { status: 204 }));
   });
   it("공통 Client로 Backend 댓글 DELETE Endpoint를 호출한다", async () => {
-    await postApi.removeComment(31, 41, 7);
+    await postApi.removeComment(31, 41);
     const [url, options] = fetch.mock.calls[0];
-    expect(url).toBe("http://api.test/api/posts/31/comments/41/users/7");
+    expect(url).toBe("http://api.test/api/posts/31/comments/41/users/me");
     expect(options).toMatchObject({ method: "DELETE", credentials: "include" });
     expect(options.headers.get("X-XSRF-TOKEN")).toBe("comment-delete");
   });

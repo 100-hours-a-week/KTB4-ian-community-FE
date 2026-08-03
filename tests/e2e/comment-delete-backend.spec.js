@@ -34,7 +34,7 @@ test("실제 Backend에서 댓글을 삭제하고 새로고침 후 다시 조회
   await expect(dialog).toBeVisible();
   const responsePromise = page.waitForResponse(
     (response) =>
-      /\/api\/posts\/\d+\/comments\/\d+\/users\/\d+$/.test(
+      /\/api\/posts\/\d+\/comments\/\d+\/users\/me$/.test(
         new URL(response.url()).pathname,
       ) && response.request().method() === "DELETE",
   );

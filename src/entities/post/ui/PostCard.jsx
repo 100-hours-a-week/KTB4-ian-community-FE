@@ -22,13 +22,20 @@ export function PostCard({
   bookmarkPending = false,
   onEdit,
   onDelete,
+  ownerOptionsInFooter = false,
 }) {
   const [imageOrientation, setImageOrientation] = useState("landscape");
   const [optionsOpen, setOptionsOpen] = useState(false);
   const optionsTriggerRef = useRef(null);
 
   return (
-    <article className="post-card">
+    <article
+      className={`post-card${
+        optionsOpen && ownerOptionsInFooter
+          ? " post-card--owner-options-open"
+          : ""
+      }`}
+    >
       <div
         className="post-card__body"
         role={onOpen ? "button" : undefined}
@@ -61,7 +68,7 @@ export function PostCard({
                 </>
               )}
             </span>
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete) && !ownerOptionsInFooter && (
               <button
                 className="post-card__options"
                 type="button"
@@ -70,7 +77,7 @@ export function PostCard({
                 aria-expanded={optionsOpen}
                 onClick={(event) => {
                   event.stopPropagation();
-                  setOptionsOpen(true);
+                  setOptionsOpen((current) => !current);
                 }}
                 ref={optionsTriggerRef}
               >
@@ -79,7 +86,7 @@ export function PostCard({
                 </span>
               </button>
             )}
-            {optionsOpen && (
+            {optionsOpen && !ownerOptionsInFooter && (
               <OptionMenu
                 onEdit={onEdit}
                 onDelete={onDelete}
@@ -108,6 +115,7 @@ export function PostCard({
       </div>
       <footer className="post-actions">
         <button
+          className="post-actions__like"
           type="button"
           aria-label="좋아요"
           aria-pressed={post.liked}
@@ -121,23 +129,55 @@ export function PostCard({
           <img src={commentIcon} alt="" />
           <span>{formatCount(post.commentCount)}</span>
         </span>
-        <button
-          className="post-actions__bookmark"
-          type="button"
-          aria-label="북마크"
-          aria-pressed={post.bookmarked}
-          disabled={!onBookmark || bookmarkPending}
-          onClick={onBookmark}
-        >
-          <span className="post-actions__receipt" aria-hidden="true">
-            <img
-              src={
-                post.bookmarked ? lnbReceiptFillVector : lnbReceiptStrokeVector
-              }
-              alt=""
-            />
+        {ownerOptionsInFooter ? (
+          <span className="post-actions__owner-menu">
+            <button
+              className="post-card__options"
+              type="button"
+              aria-label="피드 옵션"
+              aria-haspopup="menu"
+              aria-expanded={optionsOpen}
+              onClick={() => setOptionsOpen((current) => !current)}
+              ref={optionsTriggerRef}
+            >
+              <span aria-hidden="true">
+                <img src={moreDotsIcon} alt="" />
+              </span>
+            </button>
+            {optionsOpen && (
+              <OptionMenu
+                onBookmark={onBookmark}
+                bookmarked={post.bookmarked}
+                bookmarkPending={bookmarkPending}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onClose={() => setOptionsOpen(false)}
+                triggerRef={optionsTriggerRef}
+                placement="footer"
+              />
+            )}
           </span>
-        </button>
+        ) : (
+          <button
+            className="post-actions__bookmark"
+            type="button"
+            aria-label="북마크"
+            aria-pressed={post.bookmarked}
+            disabled={!onBookmark || bookmarkPending}
+            onClick={onBookmark}
+          >
+            <span className="post-actions__receipt" aria-hidden="true">
+              <img
+                src={
+                  post.bookmarked
+                    ? lnbReceiptFillVector
+                    : lnbReceiptStrokeVector
+                }
+                alt=""
+              />
+            </span>
+          </button>
+        )}
       </footer>
     </article>
   );

@@ -41,7 +41,6 @@ export function FeedPage({
   const [error, setError] = useState("");
   const [bookmarking, setBookmarking] = useState(new Set());
   const [liking, setLiking] = useState(new Set());
-  const [terminalMessage, setTerminalMessage] = useState("");
   const [editingPost, setEditingPost] = useState(null);
   const [deletingPost, setDeletingPost] = useState(null);
   const loadMoreRef = useRef(null);
@@ -76,7 +75,6 @@ export function FeedPage({
 
         setPage(targetPage);
         setHasNext(Boolean(result?.hasNext ?? result?.has_next));
-        setTerminalMessage(result?.message ?? "");
         setError("");
       } catch (cause) {
         setError(cause.message);
@@ -247,29 +245,26 @@ export function FeedPage({
           </div>
         ) : posts.length ? (
           <>
-            {posts.map((post) => (
-              <PostCard
-                key={post.postId}
-                post={post}
-                onOpen={() => onNavigate(`/posts/${post.postId}`)}
-                onLike={() => like(post.postId)}
-                likePending={liking.has(post.postId)}
-                onBookmark={() => bookmark(post.postId)}
-                bookmarkPending={bookmarking.has(post.postId)}
-                onEdit={
-                  post.author.userId != null &&
-                  post.author.userId === user.userId
-                    ? () => setEditingPost(post)
-                    : undefined
-                }
-                onDelete={
-                  post.author.userId != null &&
-                  post.author.userId === user.userId
-                    ? () => setDeletingPost(post)
-                    : undefined
-                }
-              />
-            ))}
+            {posts.map((post) => {
+              const isOwner =
+                post.author.userId != null &&
+                post.author.userId === user.userId;
+
+              return (
+                <PostCard
+                  key={post.postId}
+                  post={post}
+                  onOpen={() => onNavigate(`/posts/${post.postId}`)}
+                  onLike={() => like(post.postId)}
+                  likePending={liking.has(post.postId)}
+                  onBookmark={() => bookmark(post.postId)}
+                  bookmarkPending={bookmarking.has(post.postId)}
+                  onEdit={isOwner ? () => setEditingPost(post) : undefined}
+                  onDelete={isOwner ? () => setDeletingPost(post) : undefined}
+                  ownerOptionsInFooter={isOwner}
+                />
+              );
+            })}
             {error && <p className="feed-state error">{error}</p>}
             {hasNext && (
               <button
@@ -281,11 +276,6 @@ export function FeedPage({
               >
                 {loadingMore ? "피드를 불러오는 중입니다." : "피드 더 보기"}
               </button>
-            )}
-            {!hasNext && terminalMessage && (
-              <p className="feed-state end" aria-live="polite">
-                {terminalMessage}
-              </p>
             )}
           </>
         ) : (

@@ -2,3 +2,20 @@ node_modules/
 test-results/
 playwright-report/
 .DS_Store
+
+# Credentials and private environment files
+.aws/
+*.pem
+*.key
+*.ppk
+.env
+.env.*
+!.env.example
+
+# Private evidence and generated backups
+evidence/private/
+backup/
+*.sql
+*.sql.gz
+*.dump
+*.tar.gz

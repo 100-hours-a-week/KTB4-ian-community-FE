@@ -39,22 +39,32 @@ test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로
   const target = page.getByRole("article").filter({
     has: page.getByText(`${contentPrefix} 10`, { exact: true }),
   });
-  const bookmark = target.getByRole("button", { name: "북마크" });
-  await bookmark.click();
-  await expect(bookmark).toHaveAttribute("aria-pressed", "true");
+  await target.getByRole("button", { name: "피드 옵션" }).click();
+  const saveResponse = page.waitForResponse(
+    (response) =>
+      /\/api\/posts\/\d+\/bookmarks$/.test(new URL(response.url()).pathname) &&
+      response.request().method() === "POST",
+  );
+  await target.getByRole("menuitem", { name: "저장하기" }).click();
+  expect((await saveResponse).status()).toBe(200);
+
   await page.reload();
   const restored = page.getByRole("article").filter({
     has: page.getByText(`${contentPrefix} 10`, { exact: true }),
   });
+  await restored.getByRole("button", { name: "피드 옵션" }).click();
   await expect(
-    restored.getByRole("button", { name: "북마크" }),
-  ).toHaveAttribute("aria-pressed", "true");
+    restored.getByRole("menuitem", { name: "저장 취소" }),
+  ).toBeVisible();
+  await restored.getByRole("button", { name: "피드 옵션" }).click();
 
   await restored.getByText(`${contentPrefix} 10`).click();
   await expect(page).toHaveURL(/\/posts\/\d+$/);
+  const detail = page.getByRole("article");
+  await detail.getByRole("button", { name: "피드 옵션" }).click();
   await expect(
-    page.getByRole("article").getByRole("button", { name: "북마크" }),
-  ).toHaveAttribute("aria-pressed", "true");
+    detail.getByRole("menuitem", { name: "저장 취소" }),
+  ).toBeVisible();
 
   await page.getByText("북마크", { exact: true }).click();
   await expect(page).toHaveURL(/\/bookmarks$/);

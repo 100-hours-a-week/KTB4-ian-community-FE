@@ -16,7 +16,10 @@ const feed = {
   comment: [],
 };
 
-async function prepare(page, { createFails = false, feedDelay = 0 } = {}) {
+async function prepare(
+  page,
+  { createFails = false, feedDelay = 0, detailUserId = null } = {},
+) {
   let bookmarked = false;
   const cors = {
     "Access-Control-Allow-Origin": "http://127.0.0.1:4173",
@@ -93,8 +96,19 @@ async function prepare(page, { createFails = false, feedDelay = 0 } = {}) {
         headers: cors,
       });
     if (url.pathname === "/api/posts/1" && route.request().method() === "GET")
-      return route.fulfill({ json: { data: feed }, headers: cors });
-    if (url.pathname === "/api/posts/7" && createFails)
+      return route.fulfill({
+        json: {
+          data:
+            detailUserId == null
+              ? feed
+              : {
+                  ...feed,
+                  user_id: detailUserId,
+                },
+        },
+        headers: cors,
+      });
+    if (url.pathname === "/api/posts/me" && createFails)
       return route.fulfill({
         status: 500,
         json: { code: "INTERNAL_SERVER_ERROR", message: "internal detail" },
@@ -184,6 +198,110 @@ test("댓글 버튼은 trim과 pending 상태를 반영하고 색상이 다르�
   await input.fill("   ");
   await expect(button).toBeDisabled();
 });
+test("피드·상세·북마크 카드는 같은 배경이고 호버해도 바뀌지 않는다", async ({
+  page,
+}) => {
+  await prepare(page);
+  await page.goto("/feed");
+  const surfaceBackground = await page
+    .locator("body")
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  const feedBody = page.locator(".post-card__body");
+  await expect(feedBody).toHaveCSS("background-color", surfaceBackground);
+  const feedBookmark = page
+    .locator(".post-actions")
+    .getByRole("button", { name: "북마크" });
+  await feedBookmark.click();
+  await page.getByText("북마크", { exact: true }).click();
+
+  const bookmarkBody = page.locator(".post-card__body");
+  const bookmarkBackground = await bookmarkBody.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  expect(bookmarkBackground).toBe(surfaceBackground);
+  await bookmarkBody.hover();
+  expect(
+    await bookmarkBody.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    ),
+  ).toBe(bookmarkBackground);
+
+  await page.goto("/posts/1");
+  const detailBody = page.locator(".post-card__body");
+  const detailBackground = await detailBody.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  expect(detailBackground).toBe(surfaceBackground);
+  await detailBody.hover();
+  expect(
+    await detailBody.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    ),
+  ).toBe(detailBackground);
+});
+test("피드 상세는 내 글에 하단 더보기 메뉴를 표시한다", async ({ page }) => {
+  await prepare(page, { detailUserId: 7 });
+  await page.goto("/posts/1");
+
+  const card = page.locator(".post-card");
+  const options = card
+    .locator(".post-actions")
+    .getByRole("button", { name: "피드 옵션" });
+  await expect(card.getByRole("button", { name: "북마크" })).toHaveCount(0);
+  await expect(
+    card
+      .locator(".post-card__header")
+      .getByRole("button", { name: "피드 옵션" }),
+  ).toHaveCount(0);
+  await expect(options).toBeVisible();
+  await expect(options).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await options.hover();
+  await expect(options).toHaveCSS("background-color", "rgb(245, 245, 245)");
+
+  await options.click();
+  await expect(card.getByRole("menuitem")).toHaveText([
+    "저장하기",
+    "수정하기",
+    "삭제하기",
+  ]);
+  await options.click();
+  await expect(card.getByRole("menu")).toHaveCount(0);
+  await expect(options).toHaveAttribute("aria-expanded", "false");
+  await options.click();
+  await expect(card.getByRole("menu")).toBeVisible();
+  await page.screenshot({
+    path: "tests/visual/after/post-detail-owner-options.png",
+    animations: "disabled",
+  });
+});
+test("피드 상세 더보기 메뉴는 아래 공간이 부족하면 위로 열린다", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 320 });
+  await prepare(page, { detailUserId: 7 });
+  await page.goto("/posts/1");
+
+  const options = page
+    .locator(".post-actions")
+    .getByRole("button", { name: "피드 옵션" });
+  await options.click();
+  const menu = page.getByRole("menu");
+  const [optionsBox, menuBox] = await Promise.all([
+    options.boundingBox(),
+    menu.boundingBox(),
+  ]);
+
+  expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(optionsBox.y);
+  expect(menuBox.y).toBeGreaterThanOrEqual(8);
+});
+test("피드 상세는 타인 글에 기존 북마크 버튼을 표시한다", async ({ page }) => {
+  await prepare(page, { detailUserId: 8 });
+  await page.goto("/posts/1");
+
+  const card = page.locator(".post-card");
+  await expect(card.getByRole("button", { name: "북마크" })).toBeVisible();
+  await expect(card.getByRole("button", { name: "피드 옵션" })).toHaveCount(0);
+});
 test("북마크는 Feed에서 저장하고 목록에서 삭제할 수 있다", async ({ page }) => {
   await prepare(page);
   await page.goto("/feed");
@@ -204,6 +322,10 @@ test("북마크는 Feed에서 저장하고 목록에서 삭제할 수 있다", a
     const headerRect = document
       .querySelector(".bookmarks-page__header")
       .getBoundingClientRect();
+    const stroke = getComputedStyle(
+      document.querySelector(".bookmarks-page"),
+      "::after",
+    );
     return {
       page: {
         x: pageRect.x,
@@ -211,10 +333,22 @@ test("북마크는 Feed에서 저장하고 목록에서 삭제할 수 있다", a
         width: pageRect.width,
       },
       headerHeight: headerRect.height,
+      stroke: {
+        borderLeft: stroke.borderLeft,
+        pointerEvents: stroke.pointerEvents,
+        position: stroke.position,
+        zIndex: stroke.zIndex,
+      },
     };
   });
   expect(layout.page).toEqual({ x: 720, y: 40, width: 480 });
   expect(layout.headerHeight).toBe(64);
+  expect(layout.stroke).toEqual({
+    borderLeft: "1px solid rgb(229, 229, 229)",
+    pointerEvents: "none",
+    position: "absolute",
+    zIndex: "30",
+  });
   await page.screenshot({
     path: "tests/visual/after/bookmarks.png",
     fullPage: true,
