@@ -10,12 +10,32 @@ const NO_REFRESH_PATHS = new Set([
   "/api/users/logout",
   "/api/users/refresh",
 ]);
+const TERMINAL_REFRESH_CODES = new Set([
+  "REFRESH_TOKEN_NOT_FOUND",
+  "INVALID_REFRESH_TOKEN",
+  "EXPIRED_REFRESH_TOKEN",
+  "REFRESH_TOKEN_REUSED",
+  "REFRESH_TOKEN_USER_MISMATCH",
+  "REFRESH_TOKEN_FAMILY_MISMATCH",
+  "USER_NOT_FOUND",
+  "USER_ALREADY_DELETED",
+]);
 const EXPIRY_STORAGE_KEY = "community.accessTokenExpiresAt";
-const REFRESH_WINDOW_MS = 45_000;
+const RETRY_STORAGE_KEY = "community.accessTokenRefreshRetry";
+const AUTH_EVENT_STORAGE_KEY = "community.authEvent";
+const REFRESH_CHANNEL_NAME = "community.auth";
+const REFRESH_LOCK_NAME = "community.auth.refresh";
+const REFRESH_WINDOW_MS = 60_000;
+const TRANSIENT_RETRY_MS = 10_000;
+const RETRY_DEFERRED_CODE = "REFRESH_RETRY_SCHEDULED";
+
 let refreshPromise = null;
 let refreshTimer = null;
+let retryTimer = null;
 let redirecting = false;
+let sessionFailureHandled = false;
 let accessTokenExpiresAt = null;
+let authChannel = null;
 
 function readCookie(name) {
   return (
@@ -24,6 +44,79 @@ function readCookie(name) {
       .find((item) => item.startsWith(`${name}=`))
       ?.slice(name.length + 1) ?? null
   );
+}
+
+function localStorageValue(key) {
+  try {
+    return globalThis.localStorage?.getItem(key) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function setLocalStorageValue(key, value) {
+  try {
+    globalThis.localStorage?.setItem(key, value);
+  } catch {
+    // 공유 저장소를 사용할 수 없어도 현재 탭의 갱신은 계속한다.
+  }
+}
+
+function removeLocalStorageValue(key) {
+  try {
+    globalThis.localStorage?.removeItem(key);
+  } catch {
+    // 공유 저장소를 사용할 수 없어도 현재 탭의 정리는 계속한다.
+  }
+}
+
+function parseStoredJson(value) {
+  if (!value) return null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function validExpiry(value) {
+  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function readSharedExpiry() {
+  const value = localStorageValue(EXPIRY_STORAGE_KEY);
+  return validExpiry(value) ? value : null;
+}
+
+function readRetryState() {
+  const value = parseStoredJson(localStorageValue(RETRY_STORAGE_KEY));
+  if (!value || typeof value !== "object") return null;
+  return value;
+}
+
+function writeRetryState(value) {
+  if (!value) {
+    removeLocalStorageValue(RETRY_STORAGE_KEY);
+    return;
+  }
+  setLocalStorageValue(RETRY_STORAGE_KEY, JSON.stringify(value));
+  publishMessage({ type: "refresh-retry", state: value });
+}
+
+function normalizeCode(value) {
+  return typeof value === "string" ? value.trim().toUpperCase() : "";
+}
+
+function isTerminalRefreshFailure(cause) {
+  return TERMINAL_REFRESH_CODES.has(normalizeCode(cause?.code));
+}
+
+function isAbortError(cause) {
+  return cause?.name === "AbortError";
+}
+
+function isDeferredRetry(cause) {
+  return normalizeCode(cause?.code) === RETRY_DEFERRED_CODE;
 }
 
 async function parse(response) {
@@ -90,36 +183,111 @@ function expiryValue(value) {
   return value?.accessTokenExpiresAt ?? value?.access_token_expires_at ?? null;
 }
 
-export function clearAccessTokenRefresh() {
-  if (refreshTimer) clearTimeout(refreshTimer);
-  refreshTimer = null;
-  accessTokenExpiresAt = null;
-  sessionStorage.removeItem(EXPIRY_STORAGE_KEY);
+function tabHasAuthenticatedSession() {
+  try {
+    return Boolean(
+      globalThis.sessionStorage?.getItem("community.user") ||
+      globalThis.sessionStorage?.getItem("userId"),
+    );
+  } catch {
+    return false;
+  }
 }
 
-export function setAccessTokenExpiresAt(value) {
-  if (!value || Number.isNaN(Date.parse(value))) return;
-  accessTokenExpiresAt = value;
-  sessionStorage.setItem(EXPIRY_STORAGE_KEY, value);
-  if (refreshTimer) clearTimeout(refreshTimer);
-  const delay = Math.max(Date.parse(value) - Date.now() - REFRESH_WINDOW_MS, 0);
-  refreshTimer = setTimeout(() => {
-    refresh().catch(handleSessionFailure);
-  }, delay);
-}
-
-function expiringSoon() {
+function expiringSoon(value = accessTokenExpiresAt) {
   return Boolean(
-    accessTokenExpiresAt &&
-    Date.parse(accessTokenExpiresAt) - Date.now() <= REFRESH_WINDOW_MS,
+    validExpiry(value) && Date.parse(value) - Date.now() <= REFRESH_WINDOW_MS,
   );
 }
 
-function handleSessionFailure() {
+function clearRefreshTimer() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = null;
+}
+
+function clearRetryTimer() {
+  if (retryTimer) clearTimeout(retryTimer);
+  retryTimer = null;
+}
+
+function scheduleRefreshTimer(value) {
+  clearRefreshTimer();
+  if (!validExpiry(value)) return;
+  const delay = Math.max(Date.parse(value) - Date.now() - REFRESH_WINDOW_MS, 0);
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    executeRefresh({ trigger: "timer" }).catch(() => {});
+  }, delay);
+}
+
+function scheduleRetryTimer(state) {
+  clearRefreshTimer();
+  clearRetryTimer();
+  if (!state?.retryAt || state.exhausted) return;
+  const delay = Math.max(Number(state.retryAt) - Date.now(), 0);
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    executeRefresh({ force: true, trigger: "retry" }).catch(() => {});
+  }, delay);
+}
+
+function applyAccessTokenExpiresAt(
+  value,
+  { persist = false, publish = false, schedule = true } = {},
+) {
+  if (!validExpiry(value)) return false;
+  accessTokenExpiresAt = value;
+  redirecting = false;
+  sessionFailureHandled = false;
+  clearRetryTimer();
+  if (persist) {
+    setLocalStorageValue(EXPIRY_STORAGE_KEY, value);
+    writeRetryState(null);
+  }
+  if (schedule) scheduleRefreshTimer(value);
+  if (publish)
+    publishMessage({ type: "refresh-succeeded", accessTokenExpiresAt: value });
+  return true;
+}
+
+export function setAccessTokenExpiresAt(value) {
+  applyAccessTokenExpiresAt(value, { persist: true, publish: true });
+}
+
+export function clearAccessTokenRefresh({ broadcast = false } = {}) {
+  clearRefreshTimer();
+  clearRetryTimer();
+  accessTokenExpiresAt = null;
+  removeLocalStorageValue(EXPIRY_STORAGE_KEY);
+  removeLocalStorageValue(RETRY_STORAGE_KEY);
+  try {
+    globalThis.sessionStorage?.removeItem(EXPIRY_STORAGE_KEY);
+  } catch {
+    // 이전 버전의 탭 단위 만료 메타데이터 정리 실패는 무시한다.
+  }
+  if (broadcast) publishMessage({ type: "session-expired" });
+}
+
+function publishMessage(message) {
+  try {
+    authChannel?.postMessage(message);
+  } catch {
+    // BroadcastChannel을 사용할 수 없으면 storage 이벤트만 사용한다.
+  }
+  setLocalStorageValue(
+    AUTH_EVENT_STORAGE_KEY,
+    JSON.stringify({ ...message, sentAt: Date.now(), nonce: Math.random() }),
+  );
+}
+
+function handleSessionFailure({ broadcast = true } = {}) {
+  if (sessionFailureHandled) return;
+  sessionFailureHandled = true;
   clearAccessTokenRefresh();
   sessionStorage.removeItem("community.user");
   sessionStorage.removeItem("userId");
   globalThis.dispatchEvent?.(new CustomEvent("auth:expired"));
+  if (broadcast) publishMessage({ type: "session-expired" });
   if (!redirecting && globalThis.location?.pathname !== "/login") {
     redirecting = true;
     history.replaceState({}, "", "/login");
@@ -127,34 +295,150 @@ function handleSessionFailure() {
   }
 }
 
-async function refresh(signal) {
+function handleSharedMessage(message) {
+  if (!message || typeof message !== "object") return;
+  if (message.type === "refresh-succeeded") {
+    if (tabHasAuthenticatedSession())
+      applyAccessTokenExpiresAt(message.accessTokenExpiresAt);
+    return;
+  }
+  if (message.type === "refresh-retry") {
+    if (tabHasAuthenticatedSession()) scheduleRetryTimer(message.state);
+    return;
+  }
+  if (message.type === "session-expired") {
+    handleSessionFailure({ broadcast: false });
+  }
+}
+
+function deferredRetryError() {
+  return new ApiError("세션 갱신을 잠시 후 다시 시도합니다.", {
+    code: RETRY_DEFERRED_CODE,
+  });
+}
+
+function retryStateMatchesExpiry(state, expiry) {
+  return Boolean(state && state.accessTokenExpiresAt === expiry);
+}
+
+function recordTransientFailure(trigger, currentExpiry) {
+  const current = readRetryState();
+  const retryAttempt = trigger === "retry" || current?.attempted;
+  const next = retryAttempt
+    ? {
+        accessTokenExpiresAt: currentExpiry,
+        attempted: true,
+        exhausted: true,
+        retryAt: null,
+      }
+    : {
+        accessTokenExpiresAt: currentExpiry,
+        attempted: true,
+        exhausted: false,
+        retryAt: Date.now() + TRANSIENT_RETRY_MS,
+      };
+  writeRetryState(next);
+  scheduleRetryTimer(next);
+}
+
+async function performRefreshRequest() {
+  const response = await send("/api/users/refresh", { method: "POST" });
+  const body = await parse(response);
+  if (!response.ok) throw toApiError(response, body);
+  const value = body?.data ?? body;
+  const expiresAt = expiryValue(value);
+  if (!validExpiry(expiresAt)) {
+    throw new ApiError("Refresh 응답에 Access Token 만료 시각이 없습니다.", {
+      status: response.status,
+      code: "INVALID_REFRESH_RESPONSE",
+      response,
+    });
+  }
+  applyAccessTokenExpiresAt(expiresAt, { persist: true, publish: true });
+  return value;
+}
+
+async function runRefreshInsideLock({ force, observedExpiry, trigger }) {
+  const sharedExpiry = readSharedExpiry() ?? accessTokenExpiresAt;
+  if (
+    validExpiry(observedExpiry) &&
+    !validExpiry(sharedExpiry) &&
+    !tabHasAuthenticatedSession()
+  ) {
+    throw new ApiError("활성 세션이 없습니다.", {
+      code: "SESSION_NOT_ACTIVE",
+    });
+  }
+  if (
+    validExpiry(sharedExpiry) &&
+    sharedExpiry !== observedExpiry &&
+    !expiringSoon(sharedExpiry)
+  ) {
+    applyAccessTokenExpiresAt(sharedExpiry);
+    return { accessTokenExpiresAt: sharedExpiry, refreshed: false };
+  }
+
+  let retryState = readRetryState();
+  if (retryState && !retryStateMatchesExpiry(retryState, sharedExpiry)) {
+    writeRetryState(null);
+    retryState = null;
+  }
+  if (retryState?.retryAt && Number(retryState.retryAt) > Date.now()) {
+    scheduleRetryTimer(retryState);
+    throw deferredRetryError();
+  }
+  if (trigger === "retry" && retryState?.exhausted) {
+    throw deferredRetryError();
+  }
+  if (trigger !== "retry" && retryState?.exhausted) {
+    writeRetryState(null);
+  }
+  if (!force && validExpiry(sharedExpiry) && !expiringSoon(sharedExpiry)) {
+    applyAccessTokenExpiresAt(sharedExpiry);
+    return { accessTokenExpiresAt: sharedExpiry, refreshed: false };
+  }
+
+  try {
+    return await performRefreshRequest();
+  } catch (cause) {
+    if (isTerminalRefreshFailure(cause)) {
+      handleSessionFailure();
+    } else if (!isAbortError(cause) && !isDeferredRetry(cause)) {
+      recordTransientFailure(trigger, sharedExpiry);
+    }
+    throw cause;
+  }
+}
+
+async function withRefreshLock(callback) {
+  const locks = globalThis.navigator?.locks;
+  if (typeof locks?.request !== "function") return callback();
+  return locks.request(REFRESH_LOCK_NAME, { mode: "exclusive" }, callback);
+}
+
+async function executeRefresh({ force = false, trigger = "request" } = {}) {
   if (!refreshPromise) {
-    refreshPromise = send("/api/users/refresh", { method: "POST", signal })
-      .then(async (response) => {
-        const body = await parse(response);
-        if (!response.ok) throw toApiError(response, body);
-        const value = body?.data ?? body;
-        const expiresAt = expiryValue(value);
-        if (expiresAt) setAccessTokenExpiresAt(expiresAt);
-        return value;
-      })
-      .finally(() => {
-        refreshPromise = null;
-      });
+    const observedExpiry = readSharedExpiry() ?? accessTokenExpiresAt;
+    refreshPromise = withRefreshLock(() =>
+      runRefreshInsideLock({ force, observedExpiry, trigger }),
+    ).finally(() => {
+      refreshPromise = null;
+    });
   }
   return refreshPromise;
 }
 
-export async function checkAccessTokenExpiry() {
+export async function checkAccessTokenExpiry(trigger = "request") {
   if (!expiringSoon()) return false;
-  await refresh();
+  await executeRefresh({ trigger });
   return true;
 }
 
 export async function httpClient(path, options = {}) {
   const pathname = path.split("?")[0];
   try {
-    if (!NO_REFRESH_PATHS.has(pathname)) await checkAccessTokenExpiry();
+    if (!NO_REFRESH_PATHS.has(pathname))
+      await checkAccessTokenExpiry("request");
     let response = await send(path, options);
     let body = await parse(response);
     const expired =
@@ -162,12 +446,7 @@ export async function httpClient(path, options = {}) {
       (body?.code === "EXPIRED_ACCESS_TOKEN" ||
         body?.message === "expired_access_token");
     if (expired && !options.__retried && !NO_REFRESH_PATHS.has(pathname)) {
-      try {
-        await refresh(options.signal);
-      } catch (cause) {
-        handleSessionFailure();
-        throw cause;
-      }
+      await executeRefresh({ force: true, trigger: "reactive" });
       response = await send(path, { ...options, __retried: true });
       body = await parse(response);
     }
@@ -177,20 +456,50 @@ export async function httpClient(path, options = {}) {
     if (expiresAt) setAccessTokenExpiresAt(expiresAt);
     return value;
   } catch (cause) {
-    if (cause?.name === "AbortError" || cause instanceof ApiError) throw cause;
+    if (isAbortError(cause) || cause instanceof ApiError) throw cause;
     throw new ApiError("백엔드 서버에 연결할 수 없습니다.", { cause });
   }
 }
 
 function restoreExpiry() {
-  const stored = sessionStorage.getItem(EXPIRY_STORAGE_KEY);
-  if (stored) setAccessTokenExpiresAt(stored);
+  if (!tabHasAuthenticatedSession()) return;
+  const stored = readSharedExpiry();
+  if (stored) applyAccessTokenExpiresAt(stored);
+}
+
+function initializeSharedEvents() {
+  if (typeof globalThis.BroadcastChannel === "function") {
+    try {
+      authChannel = new BroadcastChannel(REFRESH_CHANNEL_NAME);
+      authChannel.addEventListener("message", (event) =>
+        handleSharedMessage(event.data),
+      );
+    } catch {
+      authChannel = null;
+    }
+  }
+  globalThis.addEventListener?.("storage", (event) => {
+    if (event.key === EXPIRY_STORAGE_KEY && validExpiry(event.newValue)) {
+      if (tabHasAuthenticatedSession())
+        applyAccessTokenExpiresAt(event.newValue);
+      return;
+    }
+    if (event.key === RETRY_STORAGE_KEY) {
+      const state = parseStoredJson(event.newValue);
+      if (tabHasAuthenticatedSession() && state) scheduleRetryTimer(state);
+      return;
+    }
+    if (event.key === AUTH_EVENT_STORAGE_KEY) {
+      handleSharedMessage(parseStoredJson(event.newValue));
+    }
+  });
 }
 
 if (typeof document !== "undefined") {
+  initializeSharedEvents();
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible")
-      checkAccessTokenExpiry().catch(handleSessionFailure);
+      checkAccessTokenExpiry("visibility").catch(() => {});
   });
   restoreExpiry();
 }
@@ -198,5 +507,7 @@ if (typeof document !== "undefined") {
 export function resetHttpClientForTests() {
   refreshPromise = null;
   redirecting = false;
+  sessionFailureHandled = false;
   clearAccessTokenRefresh();
+  removeLocalStorageValue(AUTH_EVENT_STORAGE_KEY);
 }

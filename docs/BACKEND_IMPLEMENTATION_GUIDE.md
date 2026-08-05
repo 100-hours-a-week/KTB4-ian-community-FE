@@ -5,7 +5,7 @@
 ## 현재 계약 확인
 
 - 인증: Access/Refresh Token은 모두 HttpOnly 쿠키다. Access 경로는 `/`, Refresh 경로는 `/api/users`다.
-- 갱신: `POST /api/users/refresh`, 성공은 본문 없는 `204`이며 두 쿠키를 회전한다.
+- 갱신: `POST /api/users/refresh`, 성공은 `200`과 `{ "accessTokenExpiresAt": "<UTC ISO-8601>" }` 메타데이터를 반환하며 Access/Refresh HttpOnly 쿠키를 함께 회전한다.
 - 게시글: 목록 `GET /api/posts`, 상세 `GET /api/posts/{postId}`, 생성 `POST /api/posts/{userId}`, 수정·삭제 `PATCH|DELETE /api/posts/{postId}`다.
 - 댓글: 현재 경로에 `/users/{userId}`가 포함되며 본문 필드는 `comment`다.
 - 게시글 생성 DTO에는 `content`, `imageUrl`이 있고 수정 DTO에는 `title`, `content`, `imageUrl`이 필요하다.
@@ -61,12 +61,13 @@ DELETE /api/posts/{postId}/comments/{commentId}
 
 ## JWT·CORS 점검
 
-- Refresh 성공 `204`, Access/Refresh 쿠키 동시 회전, 캐시 방지 헤더를 검증한다.
+- Refresh 성공 `200`, `accessTokenExpiresAt` 메타데이터, Access/Refresh 쿠키 동시 회전을 검증한다.
 - 개발 HTTP와 운영 HTTPS의 `Secure`, `SameSite`를 환경별로 적용한다.
 - CORS는 정확한 프론트 Origin과 `allowCredentials(true)`를 사용한다.
-- `expired_access_token`과 `invalid_refresh_token`, `expired_refresh_token`, `refresh_token_reused`, family/user mismatch 응답을 일관되게 유지한다.
+- `EXPIRED_ACCESS_TOKEN`, `INVALID_REFRESH_TOKEN`, `EXPIRED_REFRESH_TOKEN`, `REFRESH_TOKEN_REUSED`, family/user mismatch 오류 코드를 일관되게 유지한다.
 - 프론트에 토큰 문자열을 JSON으로 노출하지 않는다.
-- 현재 Access Cookie의 `Max-Age`와 JWT 만료가 모두 600초라 브라우저가 쿠키를 먼저 제거하면 서버는 `expired_access_token` 대신 일반 `unauthorized`를 반환할 수 있다. 서버가 만료 사유를 일관되게 판별해야 한다면 Access Cookie 수명을 JWT보다 조금 길게 두거나, 만료 직전 Refresh를 공식 클라이언트 계약으로 명시한다. 프론트는 현재 로그인/갱신 후 9분이 지난 첫 보호 요청 전에 선제 Refresh한다.
+- Access JWT는 600초, Access Cookie `Max-Age`는 660초다. 프론트는 서버가 반환한 만료 시각을 기준으로 만료 60초 전, 즉 정상 발급 약 9분 후 선제 Refresh한다. 브라우저가 백그라운드 Timer를 지연하면 탭 복귀 또는 다음 보호 요청 전에 즉시 보정한다.
+- 지원 브라우저에서는 Web Locks와 공유 만료 메타데이터로 여러 탭의 Refresh를 한 번으로 합친다. Web Locks 미지원 환경은 탭 내부 single-flight와 백엔드의 원자적 Refresh Token Rotation으로 fail-closed 처리한다.
 
 ## 백엔드 테스트 요구사항
 

@@ -23,7 +23,10 @@ describe("React HTTP Client", () => {
     fetch.mockImplementation(async (url) => {
       const path = new URL(url).pathname;
       calls.set(path, (calls.get(path) || 0) + 1);
-      if (path === "/api/users/refresh") return response(204);
+      if (path === "/api/users/refresh")
+        return response(200, {
+          accessTokenExpiresAt: new Date(Date.now() + 600_000).toISOString(),
+        });
       if (calls.get(path) === 1)
         return response(401, { message: "expired_access_token" });
       return response(200, { data: { ok: true } });
@@ -54,8 +57,13 @@ describe("React HTTP Client", () => {
   });
 
   it("AbortError를 API Error로 바꾸지 않는다", async () => {
+    sessionStorage.setItem("community.user", "{}");
+    sessionStorage.setItem("userId", "1");
+    history.replaceState({}, "", "/feed");
     const error = new DOMException("aborted", "AbortError");
     fetch.mockRejectedValue(error);
     await expect(httpClient("/api/posts")).rejects.toBe(error);
+    expect(sessionStorage.getItem("community.user")).toBe("{}");
+    expect(location.pathname).toBe("/feed");
   });
 });

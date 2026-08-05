@@ -18,9 +18,9 @@
 - LNB와 아이콘 경로는 공통 모듈에서 관리한다.
 - 기존 직접 주소 페이지는 접근성 fallback으로 유지하고, 일반 LNB 흐름은 현재 화면 위 모달을 사용한다.
 - 서버에 없는 북마크 영구 저장과 이미지 업로드는 UI를 완성하고 백엔드 가이드로 분리했다.
-- Access Token 쿠키가 JWT와 함께 10분에 제거되는 실제 백엔드 계약을 고려해 로그인/재발급 시각만 기록하고, 9분 이후 첫 보호 요청 전에 Refresh Token 회전을 single-flight로 선제 실행한다. 토큰 값은 브라우저 저장소에 복사하지 않는다.
+- Access JWT는 10분, Access Cookie는 11분 동안 유지된다. 서버가 반환한 `accessTokenExpiresAt`만 공유 저장소에 기록하고 만료 60초 전인 발급 약 9분 시점에 Refresh Token을 선제 회전한다. 지원 환경에서는 탭 내부 single-flight와 Web Locks를 함께 사용하며 토큰 값은 브라우저 저장소에 복사하지 않는다.
 - 댓글은 응답의 `user_id`로 소유권을 판정한다. 게시글 상세 응답에는 작성자 ID가 없으므로 현재 계약에서는 닉네임을 보조 판정으로 사용한다.
 
 ## 접근성·성능
 
-모달은 Escape/딤드/포커스 복원/트랩/스크롤 잠금, 메뉴는 Escape/외부 클릭/ARIA 상태를 제공한다. 토글은 `aria-pressed`, 내비게이션은 `aria-current`, 폼은 label과 오류 연결을 사용한다. 공통 관리자는 열고 닫을 때 전역 listener를 정리하며 Refresh 요청은 동시 호출을 합친다.
+모달은 Escape/딤드/포커스 복원/트랩/스크롤 잠금, 메뉴는 Escape/외부 클릭/ARIA 상태를 제공한다. 토글은 `aria-pressed`, 내비게이션은 `aria-current`, 폼은 label과 오류 연결을 사용한다. 공통 관리자는 열고 닫을 때 전역 listener를 정리한다. Refresh 요청은 같은 탭에서 Promise로, 지원 브라우저의 여러 탭에서는 Web Locks로 합치며 만료 시각과 세션 종료 이벤트만 탭 사이에 공유한다.

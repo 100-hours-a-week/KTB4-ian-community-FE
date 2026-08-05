@@ -2,9 +2,9 @@
 
 ## 범위
 
-- 단위: Day.js 상대 시간 경계, BookmarkStore, LikeStore, 소유권 판정, ModalManager, JWT single-flight·9분 선제 갱신
+- 단위: Day.js 상대 시간 경계, BookmarkStore, LikeStore, 소유권 판정, ModalManager, JWT single-flight·정확한 9분 선제 갱신·코드 기반 실패 처리
 - 통합: 피드 LNB/좋아요/북마크/작성 진입, 인증 폼 구조, POST 재시도 보존
-- UI: 피드 수치·생성/편집 액션, 전체 딤드, 인증 50/50, 북마크·좋아요 페이지 공유, 상세/댓글 소유권 옵션, 설정 사용자 정보·Title3 중앙 제목, Access Token 선제 갱신
+- UI: 피드 수치·생성/편집 액션, 전체 딤드, 인증 50/50, 북마크·좋아요 페이지 공유, 상세/댓글 소유권 옵션, 설정 사용자 정보·Title3 중앙 제목, 여러 탭 Access Token 선제 갱신
 
 ## 환경과 수치
 
@@ -13,14 +13,20 @@
 - 콘솔 오류와 로컬 에셋 404: 테스트 경로에서 발견되지 않음
 - 목록 렌더링은 단일 요청/단일 fragment 교체, 좋아요·북마크·댓글 변경은 대상 DOM만 갱신
 - 동시 만료 2건에서 Refresh 네트워크 호출 1회, 각 원 요청 1회 재시도
-- 발급 후 9분 경과 상태에서 보호 API보다 Refresh가 먼저 1회 호출되고 피드 화면과 URL이 유지됨
+- 발급 후 8분 59초에는 Refresh하지 않고, 정확히 9분 시점에 보호 API보다 Refresh를 먼저 호출
+- 동시에 만료 임박한 Chromium 두 탭에서 Web Lock을 사용해 Refresh 네트워크 호출 1회, 만료 시각 동기화와 화면·URL 유지
+- Refresh 실패는 상태가 아닌 서버 오류 코드로 분류하며, 세션 종료 코드는 즉시 로그아웃하고 일시 오류는 세션 유지 후 10초 뒤 한 번만 재시도
 
 ## 최종 결과
 
-| 구분               | 결과 |
-| ------------------ | ---- |
-| CSS 빌드           | PASS |
-| 단위 30개          | PASS |
-| 페이지 통합 9개    | PASS |
-| Playwright UI 9개  | PASS |
-| `npm run test:all` | PASS |
+| 구분                       | 결과                                |
+| -------------------------- | ----------------------------------- |
+| 백엔드 Gradle 테스트 63개  | PASS                                |
+| 프론트 단위 테스트 140개   | PASS                                |
+| 프론트 통합 테스트 19개    | PASS                                |
+| Playwright UI 테스트 111개 | PASS                                |
+| 프로덕션 빌드              | PASS (기존 에셋 크기 경고 3건)      |
+| 변경 파일 Prettier 검사    | PASS                                |
+| 전체 `format:check`        | BLOCKED (기존 미추적 회고 문서 5개) |
+
+전체 `format:check`에서 검출된 파일은 이번 JWT 작업 범위 밖의 기존 미추적 문서이며, 이번 변경 파일은 모두 Prettier 검사를 통과했다.

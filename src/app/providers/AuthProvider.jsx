@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem("userId", String(next.userId));
       },
       clear() {
-        clearAccessTokenRefresh();
+        clearAccessTokenRefresh({ broadcast: true });
         setUser(null);
         setStatus("unauthenticated");
         sessionStorage.removeItem("community.user");

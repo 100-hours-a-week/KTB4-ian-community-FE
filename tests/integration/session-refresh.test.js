@@ -22,7 +22,9 @@ describe("React 페이지 세션 자동 복구", () => {
     let posts = 0;
     fetch.mockImplementation(async (url, options) => {
       if (new URL(url).pathname === "/api/users/refresh")
-        return new Response(null, { status: 204 });
+        return json(200, {
+          accessTokenExpiresAt: new Date(Date.now() + 600_000).toISOString(),
+        });
       posts += 1;
       if (posts === 1) return json(401, { message: "expired_access_token" });
       expect(url).toContain("draft=true");
