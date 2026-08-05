@@ -1,9 +1,12 @@
 import { expect, test } from "@playwright/test";
 
-async function prepare(page, { postUserId = 7 } = {}) {
+async function prepare(
+  page,
+  { postUserId = 7, liked = false, likeCount = 3 } = {},
+) {
   const state = {
-    liked: false,
-    likeCount: 3,
+    liked,
+    likeCount,
     bookmarked: false,
     likeRequests: [],
     bookmarkRequests: [],
@@ -66,11 +69,20 @@ async function prepare(page, { postUserId = 7 } = {}) {
         body: "<svg xmlns='http://www.w3.org/2000/svg'/>",
         headers: cors,
       });
-    if (request.method() === "GET" && url.pathname === "/api/posts")
+    if (
+      request.method() === "GET" &&
+      (url.pathname === "/api/posts" || url.pathname === "/api/posts/bookmarks")
+    )
       return route.fulfill({
         json: {
           data: {
-            content: [responsePost()],
+            content: [
+              {
+                ...responsePost(),
+                bookmarked:
+                  url.pathname === "/api/posts/bookmarks" || state.bookmarked,
+              },
+            ],
             page: 0,
             size: 10,
             hasNext: false,
@@ -138,6 +150,74 @@ async function prepare(page, { postUserId = 7 } = {}) {
 function card(page) {
   return page.locator(".post-card").first();
 }
+
+test("피드 좋아요는 상세 왕복 후 아이콘과 수를 유지하고 바로 취소된다", async ({
+  page,
+}) => {
+  const state = await prepare(page, { likeCount: 0 });
+  await page.goto("/feed");
+
+  const feedLike = card(page).getByRole("button", { name: "좋아요" });
+  await feedLike.click();
+  await expect(feedLike).toBeEnabled();
+  await expect(feedLike).toHaveAttribute("aria-pressed", "true");
+  await expect(feedLike).toHaveText("1");
+
+  await card(page).locator(".post-card__body").click();
+  await expect(page).toHaveURL(/\/posts\/1$/);
+  await expect(
+    card(page).getByRole("button", { name: "좋아요" }),
+  ).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "뒤로가기" }).click();
+  await expect(page).toHaveURL(/\/feed$/);
+
+  const returnedLike = card(page).getByRole("button", { name: "좋아요" });
+  await expect(returnedLike).toHaveAttribute("aria-pressed", "true");
+  await expect(returnedLike).toHaveText("1");
+  await expect(returnedLike.locator("img")).toHaveAttribute(
+    "src",
+    /heart-fill\.svg$/,
+  );
+
+  await returnedLike.click();
+  await expect(returnedLike).toBeDisabled();
+  await expect(returnedLike).toHaveAttribute("aria-pressed", "false");
+  await expect(returnedLike).toHaveText("0");
+  await expect(returnedLike).toBeEnabled();
+  expect(state.likeRequests).toHaveLength(2);
+});
+
+test("북마크에서도 좋아요 수와 heart 아이콘을 토글한다", async ({ page }) => {
+  const state = await prepare(page, { likeCount: 10 });
+  await page.goto("/bookmarks");
+
+  const like = card(page).getByRole("button", { name: "좋아요" });
+  await expect(like).toBeEnabled();
+  await expect(like).toHaveAttribute("aria-pressed", "false");
+  await expect(like).toHaveText("10");
+  await expect(like.locator("img")).toHaveAttribute(
+    "src",
+    /heart-stroke\.svg$/,
+  );
+
+  await like.click();
+  await expect(like).toBeDisabled();
+  await expect(like).toHaveAttribute("aria-pressed", "true");
+  await expect(like).toHaveText("11");
+  await expect(like.locator("img")).toHaveAttribute("src", /heart-fill\.svg$/);
+  await expect(like).toBeEnabled();
+
+  await like.click();
+  await expect(like).toHaveAttribute("aria-pressed", "false");
+  await expect(like).toHaveText("10");
+  await expect(like.locator("img")).toHaveAttribute(
+    "src",
+    /heart-stroke\.svg$/,
+  );
+  await expect(like).toBeEnabled();
+  expect(state.likeRequests).toHaveLength(2);
+});
 
 for (const [name, path] of [
   ["피드", "/feed"],

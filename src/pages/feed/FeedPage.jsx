@@ -15,6 +15,7 @@ import { FeedPageSkeleton } from "./FeedPageSkeleton.jsx";
 import { Button } from "../../shared/ui/Button.jsx";
 
 const PAGE_SIZE = 10;
+const PREFETCH_REMAINING = 5;
 
 function appendUnique(current, next) {
   const unique = new Map(current.map((post) => [post.postId, post]));
@@ -45,6 +46,7 @@ export function FeedPage({
   const [deletingPost, setDeletingPost] = useState(null);
   const loadMoreRef = useRef(null);
   const loadMorePendingRef = useRef(false);
+  const autoLoadPageRef = useRef(null);
   const reveal = useSkeletonReveal();
 
   const load = useCallback(
@@ -54,6 +56,7 @@ export function FeedPage({
       }
 
       if (replace) {
+        autoLoadPageRef.current = null;
         reveal.startLoading();
         setLoading(true);
       } else {
@@ -107,9 +110,13 @@ export function FeedPage({
     }
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        load(page + 1, false);
-      }
+      const targetPage = page + 1;
+
+      if (!entry.isIntersecting || autoLoadPageRef.current === targetPage)
+        return;
+
+      autoLoadPageRef.current = targetPage;
+      load(targetPage, false);
     });
 
     observer.observe(loadMoreRef.current);
@@ -245,15 +252,18 @@ export function FeedPage({
           </div>
         ) : posts.length ? (
           <>
-            {posts.map((post) => {
+            {posts.map((post, index) => {
               const isOwner =
                 post.author.userId != null &&
                 post.author.userId === user.userId;
+              const isPrefetchTarget =
+                hasNext && index === posts.length - PREFETCH_REMAINING;
 
               return (
                 <PostCard
                   key={post.postId}
                   post={post}
+                  cardRef={isPrefetchTarget ? loadMoreRef : undefined}
                   onOpen={() => onNavigate(`/posts/${post.postId}`)}
                   onLike={() => like(post.postId)}
                   likePending={liking.has(post.postId)}
@@ -268,7 +278,6 @@ export function FeedPage({
             {error && <p className="feed-state error">{error}</p>}
             {hasNext && (
               <button
-                ref={loadMoreRef}
                 className="feed-state loading"
                 type="button"
                 disabled={loadingMore}

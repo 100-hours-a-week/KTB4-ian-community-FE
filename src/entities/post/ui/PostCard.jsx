@@ -15,6 +15,7 @@ import { OptionMenu } from "../../../shared/ui/OptionMenu.jsx";
 
 export function PostCard({
   post,
+  cardRef,
   onOpen,
   onLike,
   likePending = false,
@@ -30,6 +31,7 @@ export function PostCard({
 
   return (
     <article
+      ref={cardRef}
       className={`post-card${
         optionsOpen && ownerOptionsInFooter
           ? " post-card--owner-options-open"
