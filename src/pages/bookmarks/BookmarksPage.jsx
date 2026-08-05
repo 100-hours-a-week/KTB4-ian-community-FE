@@ -2,6 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { postApi } from "../../entities/post/api/postApi.js";
 import { normalizePost } from "../../entities/post/model/normalizePost.js";
 import { PostCard } from "../../entities/post/ui/PostCard.jsx";
+import {
+  optimisticLike,
+  togglePostLike,
+} from "../../features/post/like/togglePostLike.js";
 import { Button } from "../../shared/ui/Button.jsx";
 
 const PAGE_SIZE = 10;
@@ -13,6 +17,7 @@ export function BookmarksPage({ onNavigate = () => {}, refreshKey = 0 }) {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [pending, setPending] = useState(new Set());
+  const [liking, setLiking] = useState(new Set());
   const [error, setError] = useState("");
   const [terminalMessage, setTerminalMessage] = useState("");
   const loadMoreRef = useRef(null);
@@ -94,6 +99,37 @@ export function BookmarksPage({ onNavigate = () => {}, refreshKey = 0 }) {
     }
   }
 
+  async function like(postId) {
+    const before = posts.find((post) => post.postId === postId);
+    if (!before || liking.has(postId)) return;
+
+    setLiking((current) => new Set(current).add(postId));
+    setPosts((current) =>
+      current.map((post) =>
+        post.postId === postId ? optimisticLike(post) : post,
+      ),
+    );
+
+    try {
+      const updated = await togglePostLike(before);
+      setPosts((current) =>
+        current.map((post) => (post.postId === postId ? updated : post)),
+      );
+      setError("");
+    } catch (cause) {
+      setPosts((current) =>
+        current.map((post) => (post.postId === postId ? before : post)),
+      );
+      setError(cause.message);
+    } finally {
+      setLiking((current) => {
+        const next = new Set(current);
+        next.delete(postId);
+        return next;
+      });
+    }
+  }
+
   useEffect(() => {
     load(0, true);
   }, [load, refreshKey]);
@@ -144,6 +180,8 @@ export function BookmarksPage({ onNavigate = () => {}, refreshKey = 0 }) {
               key={post.postId}
               post={post}
               onOpen={() => onNavigate(`/posts/${post.postId}`)}
+              onLike={() => like(post.postId)}
+              likePending={liking.has(post.postId)}
               onBookmark={() => remove(post)}
               bookmarkPending={pending.has(post.postId)}
             />

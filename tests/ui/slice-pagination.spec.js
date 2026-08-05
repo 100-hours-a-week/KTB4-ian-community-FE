@@ -15,6 +15,7 @@ function post(postId, content, createdAt) {
     nickname: user.nickname,
     profile_image: user.profile_image,
     like_count: 0,
+    liked: false,
     comment_count: 0,
     view_count: 0,
     created_at: createdAt,
@@ -24,7 +25,11 @@ function post(postId, content, createdAt) {
 }
 
 async function prepare(page, { empty = false } = {}) {
-  const state = { feedRequests: 0, bookmarkRequests: 0 };
+  const state = {
+    feedRequests: 0,
+    feedRequestedPages: [],
+    bookmarkRequests: 0,
+  };
   const headers = {
     "Access-Control-Allow-Origin": "http://127.0.0.1:4173",
     "Access-Control-Allow-Credentials": "true",
@@ -37,6 +42,12 @@ async function prepare(page, { empty = false } = {}) {
       `피드 ${11 - index}`,
       index < 2 ? "2026-07-29T10:00:00Z" : `2026-07-29T0${9 - index}:00:00Z`,
     ),
+  );
+  const feedFirst = Array.from({ length: 10 }, (_, index) =>
+    post(21 - index, `피드 ${21 - index}`, `2026-07-30T${20 - index}:00:00Z`),
+  );
+  const feedSecond = Array.from({ length: 10 }, (_, index) =>
+    post(11 - index, `피드 ${11 - index}`, `2026-07-29T${20 - index}:00:00Z`),
   );
   const last = [post(1, "피드 1", "2026-07-28T23:00:00Z")];
 
@@ -69,10 +80,25 @@ async function prepare(page, { empty = false } = {}) {
       request.method() === "GET" &&
       (url.pathname === "/api/posts" || isBookmarks)
     ) {
-      if (isBookmarks) state.bookmarkRequests += 1;
-      else state.feedRequests += 1;
-      const content = empty ? [] : pageNumber === 0 ? first : last;
-      const hasNext = !empty && pageNumber === 0;
+      if (isBookmarks) {
+        state.bookmarkRequests += 1;
+      } else {
+        state.feedRequests += 1;
+        state.feedRequestedPages.push(pageNumber);
+      }
+      const content = empty
+        ? []
+        : isBookmarks
+          ? pageNumber === 0
+            ? first
+            : last
+          : pageNumber === 0
+            ? feedFirst
+            : pageNumber === 1
+              ? feedSecond
+              : last;
+      const hasNext =
+        !empty && (isBookmarks ? pageNumber === 0 : pageNumber < 2);
       return route.fulfill({
         json: {
           data: {
@@ -112,25 +138,37 @@ async function finishSlice(page, lastText, moreButtonName) {
   }
 }
 
-test("11개 Feed Slice를 병합하고 종료 뒤 Scroll·visibility 재조회를 막는다", async ({
+test("Feed는 6번째·16번째 카드 진입 시 선조회하고 종료 후 재조회하지 않는다", async ({
   page,
 }) => {
   const state = await prepare(page);
+  await page.setViewportSize({ width: 1920, height: 320 });
   await page.goto("/feed");
-  await finishSlice(page, null, "피드 더 보기");
+  await expect(page.getByText("피드 21", { exact: true })).toBeVisible();
+  await expect(page.locator(".post-card")).toHaveCount(10);
+  expect(state.feedRequestedPages).toEqual([0]);
+
+  await page.locator(".post-card").nth(5).scrollIntoViewIfNeeded();
+  await expect(page.locator(".post-card")).toHaveCount(20);
+  expect(state.feedRequestedPages).toEqual([0, 1]);
+
+  await page.locator(".post-card").nth(15).scrollIntoViewIfNeeded();
+  await expect(page.locator(".post-card")).toHaveCount(21);
+  expect(state.feedRequestedPages).toEqual([0, 1, 2]);
   await expect(page.getByText("더 이상 조회할 피드가 없습니다.")).toHaveCount(
     0,
   );
 
-  expect(state.feedRequests).toBe(2);
+  expect(state.feedRequests).toBe(3);
   await page.evaluate(() => {
     window.scrollTo(0, document.body.scrollHeight);
     document.dispatchEvent(new Event("visibilitychange"));
     document.dispatchEvent(new Event("visibilitychange"));
   });
   await page.waitForTimeout(100);
-  expect(state.feedRequests).toBe(2);
-  await expect(page.locator(".post-card")).toHaveCount(11);
+  expect(state.feedRequests).toBe(3);
+  expect(state.feedRequestedPages).toEqual([0, 1, 2]);
+  await expect(page.locator(".post-card")).toHaveCount(21);
 });
 
 test("11개 Bookmark Slice를 병합하고 종료 뒤 Scroll·visibility 재조회를 막는다", async ({
