@@ -26,7 +26,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-platform="$(docker image inspect --platform linux/amd64 --format '{{.Os}}/{{.Architecture}}' "${image_tag}")"
+platform="$(docker image inspect --format '{{.Os}}/{{.Architecture}}' "${image_tag}")"
 [[ "${platform}" == "linux/amd64" ]] || {
   echo "FAIL: expected linux/amd64, found ${platform}" >&2
   exit 1
