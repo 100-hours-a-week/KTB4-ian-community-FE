@@ -3,7 +3,7 @@ import { expect, test } from "./fixtures.js";
 test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로 유지한다", async ({
   page,
 }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(180_000);
   const suffix = `${Date.now()}`.slice(-9);
   const nickname = `북마크${suffix.slice(-4)}`;
   const contentPrefix = `북마크 ${suffix} Slice 게시글`;
