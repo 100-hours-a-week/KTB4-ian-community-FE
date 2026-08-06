@@ -29,7 +29,9 @@ test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로
     expect((await createResponse).status()).toBe(201);
     await expect(page.getByRole("dialog", { name: "피드 생성" })).toBeHidden();
     await expect(
-      page.getByRole("article").filter({ hasText: content }),
+      page.getByRole("article").filter({
+        has: page.getByText(content, { exact: true }),
+      }),
     ).toBeVisible();
   }
 
