@@ -20,8 +20,17 @@ test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로
     const content = `${contentPrefix} ${index}`;
     await page.getByRole("button", { name: "피드 게시하기" }).click();
     await page.getByLabel("피드 본문").fill(content);
+    const createResponse = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/api/posts/me" &&
+        response.request().method() === "POST",
+    );
     await page.getByRole("button", { name: "피드 게시", exact: true }).click();
-    await expect(page.getByText(content, { exact: true })).toBeVisible();
+    expect((await createResponse).status()).toBe(201);
+    await expect(page.getByRole("dialog", { name: "피드 생성" })).toBeHidden();
+    await expect(
+      page.getByRole("article").filter({ hasText: content }),
+    ).toBeVisible();
   }
 
   const firstSliceResponse = page.waitForResponse((response) => {
