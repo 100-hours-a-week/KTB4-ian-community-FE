@@ -157,6 +157,7 @@ jobs:
           root="${RUNNER_TEMP}/community-fe-smoke"
           compose_root="${GITHUB_WORKSPACE}/backend-deployment/deployment/ec2-compose"
           project="community-fe-${GITHUB_RUN_ID}"
+          install -d -m 0750 "${root}"
           sudo install -d -o 999 -g 999 -m 0750 "${root}/data/mysql"
           sudo install -d -o 10001 -g 10001 -m 0750 "${root}/data/uploads"
           sudo install -d -o root -g 20000 -m 0750 "${root}/secrets"
