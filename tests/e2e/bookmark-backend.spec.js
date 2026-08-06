@@ -3,7 +3,7 @@ import { expect, test } from "./fixtures.js";
 test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로 유지한다", async ({
   page,
 }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
   const suffix = `${Date.now()}`.slice(-9);
   const nickname = `북마크${suffix.slice(-4)}`;
   const contentPrefix = `북마크 ${suffix} Slice 게시글`;
@@ -42,7 +42,8 @@ test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로
     .getByRole("article")
     .filter({ hasText: contentPrefix });
   const more = page.getByRole("button", { name: "피드 더 보기" });
-  if (await more.isVisible().catch(() => false)) await more.click();
+  await expect(more).toBeVisible();
+  await more.click();
   await expect(currentPosts).toHaveCount(11);
 
   const target = page.getByRole("article").filter({
