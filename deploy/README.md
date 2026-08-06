@@ -1,16 +1,14 @@
-# EC2 Nginx deployment
+# EC2 Nginx 배포
 
-The production frontend uses the browser's HTTPS origin for API and image
-requests. Nginx serves the SPA and proxies `/api/`, `/uploads/`, and `/images/`
-to the backend bound to `127.0.0.1:8080`.
+운영 프론트엔드는 브라우저의 HTTPS 출처를 API 및 이미지 요청에 사용합니다. Nginx는
+SPA를 제공하고 `/api/`, `/uploads/`, `/images/`를 `127.0.0.1:8080`에 바인드된
+백엔드로 전달합니다.
 
-1. Run `npm ci` and `npm run build:react`.
-2. Copy `index.html` and `dist/` to `/var/www/pulse`.
-3. Copy `deploy/nginx/pulse.conf.example` to the Nginx sites directory.
-4. Replace `community.example.com` with the real domain and configure a valid
-   TLS certificate.
-5. Validate with `sudo nginx -t`, then reload Nginx.
+1. `npm ci`와 `npm run build:react`를 실행합니다.
+2. `index.html`과 `dist/`를 `/var/www/pulse`로 복사합니다.
+3. `deploy/nginx/pulse.conf.example`을 Nginx 사이트 디렉터리로 복사합니다.
+4. `community.example.com`을 실제 도메인으로 교체하고 유효한 TLS 인증서를 설정합니다.
+5. `sudo nginx -t`로 검증한 다음 Nginx 설정을 다시 불러옵니다.
 
-Do not proxy `/h2-console`. Keep backend port 8080 private and expose only HTTPS
-443 publicly. Port 80 should be used only for redirecting to HTTPS or certificate
-validation.
+`/h2-console`을 프록시하지 않습니다. 백엔드 포트 8080은 비공개로 유지하고 HTTPS 443만
+외부에 공개합니다. 포트 80은 HTTPS 리디렉션이나 인증서 검증에만 사용합니다.
