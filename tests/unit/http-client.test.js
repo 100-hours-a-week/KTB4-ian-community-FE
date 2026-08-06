@@ -56,6 +56,28 @@ describe("React HTTP Client", () => {
     expect(fetch.mock.calls.at(-1)[1].headers.has("Content-Type")).toBe(false);
   });
 
+  it("CSRF 쿠키가 요청 직전에 갱신되면 최신 토큰을 헤더에 사용한다", async () => {
+    const cookie = vi
+      .spyOn(document, "cookie", "get")
+      .mockReturnValueOnce("XSRF-TOKEN=before-refresh")
+      .mockReturnValue("XSRF-TOKEN=after-refresh");
+    fetch.mockImplementation(async (_url, options) => {
+      const cookieToken = document.cookie.split("=").at(-1);
+      const headerToken = options.headers.get("X-XSRF-TOKEN");
+      return headerToken === cookieToken
+        ? response(204)
+        : response(403, { code: "INVALID_CSRF_TOKEN" });
+    });
+
+    await expect(
+      httpClient("/api/posts", { method: "POST" }),
+    ).resolves.toBeNull();
+    expect(fetch.mock.calls.at(-1)[1].headers.get("X-XSRF-TOKEN")).toBe(
+      "after-refresh",
+    );
+    cookie.mockRestore();
+  });
+
   it("AbortError를 API Error로 바꾸지 않는다", async () => {
     sessionStorage.setItem("community.user", "{}");
     sessionStorage.setItem("userId", "1");

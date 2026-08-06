@@ -3,137 +3,136 @@
 set -Eeuo pipefail
 
 require_command() {
-  if ! command -v "$1" >/dev/null 2>&1; then
+  command -v "$1" >/dev/null 2>&1 || {
     echo "Required command not found: $1" >&2
     exit 1
-  fi
+  }
+}
+
+http_status() {
+  docker exec "${container_name}" wget --server-response --spider "$1" 2>&1 \
+    | tr -d '\r' \
+    | sed -nE 's/.*HTTP\/[0-9.]+[[:space:]]+([0-9]{3}).*/\1/p' \
+    | tail -n 1
 }
 
 require_command docker
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 image_tag="${IMAGE_TAG:?Set IMAGE_TAG to the frontend image to verify}"
-suffix="${RANDOM}-$$"
-network_name="community-frontend-verify-${suffix}"
-backend_name="backend-${suffix}"
-frontend_name="frontend-${suffix}"
-stub_root="$(mktemp -d "${SCRIPT_DIR}/.verify-backend.XXXXXX")"
+container_name="frontend-verify-${RANDOM}-$$"
 
 cleanup() {
-  docker rm --force "${frontend_name}" "${backend_name}" \
-    >/dev/null 2>&1 || true
-  docker network rm "${network_name}" >/dev/null 2>&1 || true
-  rm -rf -- "${stub_root}"
+  docker rm --force "${container_name}" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
-mkdir -p "${stub_root}/api"
-printf 'backend\n' >"${stub_root}/api/index.html"
-
-platform="$(
-  docker image inspect \
-    --platform linux/amd64 \
-    --format '{{.Os}}/{{.Architecture}}' \
-    "${image_tag}"
-)"
+platform="$(docker image inspect --platform linux/amd64 --format '{{.Os}}/{{.Architecture}}' "${image_tag}")"
 [[ "${platform}" == "linux/amd64" ]] || {
   echo "FAIL: expected linux/amd64, found ${platform}" >&2
   exit 1
 }
 
-runtime_user="$(
-  docker image inspect --format '{{.Config.User}}' "${image_tag}"
-)"
-[[ -n "${runtime_user}" && "${runtime_user}" != "0" ]] || {
-  echo "FAIL: frontend runtime image is configured as root" >&2
+runtime_user="$(docker image inspect --format '{{.Config.User}}' "${image_tag}")"
+[[ "${runtime_user}" == "101:101" ]] || {
+  echo "FAIL: expected runtime user 101:101, found ${runtime_user:-root}" >&2
   exit 1
 }
 
-docker network create "${network_name}" >/dev/null
-docker run --detach \
-  --name "${backend_name}" \
-  --network "${network_name}" \
-  --network-alias backend \
-  --volume "${stub_root}:/www:ro" \
-  busybox:1.37 \
-  httpd -f -p 8080 -h /www >/dev/null
-
-if [[ "$(docker inspect --format '{{.State.Running}}' "${backend_name}")" != "true" ]]; then
-  echo "FAIL: backend verification stub did not start" >&2
+exposed_ports="$(docker image inspect --format '{{json .Config.ExposedPorts}}' "${image_tag}")"
+[[ "${exposed_ports}" == '{"8080/tcp":{}}' ]] || {
+  echo "FAIL: expected only port 8080, found ${exposed_ports}" >&2
   exit 1
-fi
+}
 
-stub_ready=false
-for _ in {1..10}; do
-  if docker exec "${backend_name}" \
-    wget --quiet --output-document=- \
-    http://127.0.0.1:8080/api/index.html |
-    grep -qx 'backend'; then
-    stub_ready=true
-    break
-  fi
-  sleep 1
+for label in org.opencontainers.image.source org.opencontainers.image.revision org.opencontainers.image.version; do
+  value="$(docker image inspect --format "{{index .Config.Labels \"${label}\"}}" "${image_tag}")"
+  [[ -n "${value}" && "${value}" != '<no value>' ]] || {
+    echo "FAIL: missing OCI label ${label}" >&2
+    exit 1
+  }
 done
-[[ "${stub_ready}" == "true" ]] || {
-  echo "FAIL: backend verification stub did not serve its fixture" >&2
+
+healthcheck="$(docker image inspect --format '{{json .Config.Healthcheck.Test}}' "${image_tag}")"
+[[ "${healthcheck}" == *'/healthz'* ]] || {
+  echo "FAIL: frontend image healthcheck is missing" >&2
   exit 1
 }
 
 docker run --detach \
   --platform linux/amd64 \
-  --name "${frontend_name}" \
-  --network "${network_name}" \
+  --name "${container_name}" \
   --read-only \
-  --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+  --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m,uid=101,gid=101 \
   --cap-drop ALL \
-  --cap-add NET_BIND_SERVICE \
   --security-opt no-new-privileges:true \
   "${image_tag}" >/dev/null
 
 ready=false
 for _ in {1..30}; do
-  if docker exec "${frontend_name}" \
-    wget --quiet --tries=1 --spider http://127.0.0.1/healthz \
-    2>/dev/null; then
+  if docker exec "${container_name}" wget --quiet --tries=1 --spider \
+    http://127.0.0.1:8080/healthz 2>/dev/null; then
     ready=true
     break
   fi
   sleep 1
 done
 [[ "${ready}" == "true" ]] || {
-  docker logs --tail 50 "${frontend_name}" >&2 || true
+  docker logs --tail 50 "${container_name}" >&2 || true
   echo "FAIL: frontend health endpoint did not become ready" >&2
   exit 1
 }
 
-if ! docker exec "${frontend_name}" \
-  wget --quiet --output-document=- \
-  http://127.0.0.1/route/that/needs/spa |
-  grep -q 'id="root"'; then
+docker exec "${container_name}" wget --quiet --output-document=- \
+  http://127.0.0.1:8080/route/that/needs/spa | grep -q 'id="root"' || {
   echo "FAIL: SPA fallback did not return index.html" >&2
   exit 1
-fi
+}
 
-if ! docker exec "${frontend_name}" \
-  wget --quiet --output-document=- http://127.0.0.1/api/index.html |
-  grep -qx 'backend'; then
-  echo "FAIL: /api reverse proxy did not reach the backend stub" >&2
-  exit 1
-fi
+for backend_path in api uploads images; do
+  status="$(http_status "http://127.0.0.1:8080/${backend_path}/probe" || true)"
+  [[ "${status}" == "404" ]] || {
+    echo "FAIL: /${backend_path} must return 404, found ${status:-no response}" >&2
+    exit 1
+  }
+done
 
-if ! docker exec "${frontend_name}" \
-  wget --server-response --spider http://127.0.0.1/dist/app.js \
-  2>&1 |
-  tr -d '\r' |
-  grep -Eiq '^[[:space:]]*Cache-Control: .*immutable'; then
+docker exec "${container_name}" wget --server-response --spider \
+  http://127.0.0.1:8080/dist/app.js 2>&1 \
+  | tr -d '\r' \
+  | grep -Eiq '^[[:space:]]*Cache-Control: .*immutable' || {
   echo "FAIL: static asset cache header is missing" >&2
   exit 1
-fi
+}
 
-docker exec "${frontend_name}" nginx -t >/dev/null
-if docker exec "${frontend_name}" sh -c 'command -v node >/dev/null'; then
+docker exec "${container_name}" wget --server-response --spider \
+  http://127.0.0.1:8080/index.html 2>&1 \
+  | tr -d '\r' \
+  | grep -Eiq '^[[:space:]]*Cache-Control: .*no-(store|cache)' || {
+  echo "FAIL: index.html no-cache header is missing" >&2
+  exit 1
+}
+
+docker exec "${container_name}" nginx -t >/dev/null
+if docker exec "${container_name}" nginx -T 2>&1 | grep -q 'proxy_pass'; then
+  echo "FAIL: static origin contains reverse proxy configuration" >&2
+  exit 1
+fi
+if docker exec "${container_name}" sh -c 'command -v node >/dev/null'; then
   echo "FAIL: Node.js exists in the runtime image" >&2
   exit 1
 fi
+if docker exec "${container_name}" sh -ec 'find /usr/share/nginx/html -type f -name "*.map" -print -quit | grep -q .'; then
+  echo "FAIL: source map exists in the runtime image" >&2
+  exit 1
+fi
+if docker exec "${container_name}" sh -ec '
+  for file in $(find /usr/share/nginx/html -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" \) -print); do
+    grep -Eq -- "AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{30,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----" "$file" && exit 0
+  done
+  exit 1
+'; then
+  echo "FAIL: credential-shaped content exists in the runtime image" >&2
+  exit 1
+fi
 
-echo "PASS: ${image_tag} is linux/amd64, non-root, SPA-ready, and proxies /api."
+echo "PASS: ${image_tag} is an amd64, non-root, read-only static origin on 8080."

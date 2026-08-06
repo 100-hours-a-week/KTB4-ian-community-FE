@@ -1,11 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 test("실제 Backend 로그인 실패 후 성공하고 현재 사용자를 표시한다", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
   const suffix = `${Date.now()}`.slice(-9);
   const email = `login-${suffix}@example.com`;
   const password = "Signup123!";
