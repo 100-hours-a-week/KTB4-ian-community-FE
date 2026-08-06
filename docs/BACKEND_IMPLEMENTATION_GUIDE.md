@@ -4,8 +4,8 @@
 
 ## 현재 계약 확인
 
-- 인증: Access/Refresh Token은 모두 HttpOnly 쿠키다. Access 경로는 `/`, Refresh 경로는 `/api/users`다.
-- 갱신: `POST /api/users/refresh`, 성공은 `200`과 `{ "accessTokenExpiresAt": "<UTC ISO-8601>" }` 메타데이터를 반환하며 Access/Refresh HttpOnly 쿠키를 함께 회전한다.
+- 인증: 접근/갱신 토큰은 모두 HttpOnly 쿠키다. 접근 경로는 `/`, 갱신 경로는 `/api/users`다.
+- 갱신: `POST /api/users/refresh`, 성공은 `200`과 `{ "accessTokenExpiresAt": "<UTC ISO-8601>" }` 메타데이터를 반환하며 접근/갱신 HttpOnly 쿠키를 함께 교체한다.
 - 게시글: 목록 `GET /api/posts`, 상세 `GET /api/posts/{postId}`, 생성 `POST /api/posts/{userId}`, 수정·삭제 `PATCH|DELETE /api/posts/{postId}`다.
 - 댓글: 현재 경로에 `/users/{userId}`가 포함되며 본문 필드는 `comment`다.
 - 게시글 생성 DTO에는 `content`, `imageUrl`이 있고 수정 DTO에는 `title`, `content`, `imageUrl`이 필요하다.
@@ -13,7 +13,7 @@
 
 ## 북마크 영구 저장
 
-권장 엔티티는 `Bookmark(bookmarkId, userId FK, postId FK, createdAt)`이며 `(userId, postId)` unique 제약을 둔다.
+권장 엔티티는 `Bookmark(bookmarkId, userId FK, postId FK, createdAt)`이며 `(userId, postId)` 고유 제약을 둔다.
 
 ```text
 POST   /api/posts/{postId}/bookmarks
@@ -22,21 +22,21 @@ GET    /api/bookmarks?page=0&size=10
 GET    /api/posts/{postId}/bookmark-status
 ```
 
-응답은 최소 `{ "postId": 1, "bookmarked": true }`를 제공한다. 중복 POST와 이미 삭제된 DELETE는 멱등하게 처리하고, 소유자는 URL의 사용자 ID가 아니라 Principal로 판정한다. 프론트는 이 API 전까지 `localStorage` snapshot으로 같은 브라우저 내 동작을 제공한다.
+응답은 최소 `{ "postId": 1, "bookmarked": true }`를 제공한다. 중복 POST와 이미 삭제된 DELETE는 멱등하게 처리하고, 소유자는 URL의 사용자 ID가 아니라 인증 주체로 판정한다. 프론트는 이 API 전까지 `localStorage` 스냅샷으로 같은 브라우저 내 동작을 제공한다.
 
 ## 이미지 업로드
 
 - 게시글 이미지 최대 1개, PNG/JPEG/WebP, 권장 최대 10MB
-- MIME 헤더뿐 아니라 실제 파일 signature를 검증한다.
-- `POST /api/uploads/images` 후 URL을 DTO에 넣거나 게시글 API를 multipart로 전환한다.
+- MIME 헤더뿐 아니라 실제 파일 시그니처를 검증한다.
+- `POST /api/uploads/images` 후 URL을 DTO에 넣거나 게시글 API를 멀티파트 방식으로 전환한다.
 - 로컬 개발 저장소와 S3 호환 운영 저장소를 환경별로 분리한다.
 - UUID 기반 파일명, 접근 가능한 HTTPS URL, 업로드 실패 원자성을 보장한다.
-- 게시글 수정·삭제와 회원탈퇴 시 교체된 파일 및 orphan 파일을 정리한다.
-- 프로필도 multipart 업로드, 기존 이미지 삭제, 기본 이미지 정책, 새 `profileImage` URL 응답을 제공한다.
+- 게시글 수정·삭제와 회원탈퇴 시 교체된 파일 및 고아 파일을 정리한다.
+- 프로필도 멀티파트 업로드, 기존 이미지 삭제, 기본 이미지 정책, 새 `profileImage` URL 응답을 제공한다.
 
 ## API 개선 권고
 
-Principal과 중복되는 사용자 경로를 제거한다.
+인증 주체와 중복되는 사용자 경로를 제거한다.
 
 현재 로그인 응답은 사용자 ID 본문을 제공하지 않고 별도의 `GET /api/users/me`도 없다. 새 세션에서 프로필·댓글 등 사용자 ID 경로를 안정적으로 조립하려면 `GET /api/users/me`를 추가해 `userId`, `email`, `nickname`, `profileImage`를 반환하거나, 아래처럼 사용자 ID 경로 자체를 제거해야 한다.
 
@@ -49,7 +49,7 @@ PATCH  /api/posts/{postId}/comments/{commentId}
 DELETE /api/posts/{postId}/comments/{commentId}
 ```
 
-게시글 생성/수정 DTO도 필수 필드가 서로 다르지 않게 정리한다. 모든 시간은 UTC `Z` 또는 offset이 있는 ISO-8601로 반환한다. 오류는 `{ "code": "POST_NOT_FOUND", "message": "피드를 찾을 수 없습니다." }`처럼 일관되게 반환한다.
+게시글 생성/수정 DTO도 필수 필드가 서로 다르지 않게 정리한다. 모든 시간은 UTC `Z` 또는 오프셋이 있는 ISO-8601로 반환한다. 오류는 `{ "code": "POST_NOT_FOUND", "message": "피드를 찾을 수 없습니다." }`처럼 일관되게 반환한다.
 
 | 상황                  | 권장 상태 | 코드                                    |
 | --------------------- | --------: | --------------------------------------- |
@@ -61,14 +61,14 @@ DELETE /api/posts/{postId}/comments/{commentId}
 
 ## JWT·CORS 점검
 
-- Refresh 성공 `200`, `accessTokenExpiresAt` 메타데이터, Access/Refresh 쿠키 동시 회전을 검증한다.
+- 갱신 성공 `200`, `accessTokenExpiresAt` 메타데이터, 접근/갱신 쿠키 동시 교체를 검증한다.
 - 개발 HTTP와 운영 HTTPS의 `Secure`, `SameSite`를 환경별로 적용한다.
-- CORS는 정확한 프론트 Origin과 `allowCredentials(true)`를 사용한다.
-- `EXPIRED_ACCESS_TOKEN`, `INVALID_REFRESH_TOKEN`, `EXPIRED_REFRESH_TOKEN`, `REFRESH_TOKEN_REUSED`, family/user mismatch 오류 코드를 일관되게 유지한다.
+- CORS는 정확한 프론트 출처와 `allowCredentials(true)`를 사용한다.
+- `EXPIRED_ACCESS_TOKEN`, `INVALID_REFRESH_TOKEN`, `EXPIRED_REFRESH_TOKEN`, `REFRESH_TOKEN_REUSED`, 패밀리/사용자 불일치 오류 코드를 일관되게 유지한다.
 - 프론트에 토큰 문자열을 JSON으로 노출하지 않는다.
-- Access JWT는 600초, Access Cookie `Max-Age`는 660초다. 프론트는 서버가 반환한 만료 시각을 기준으로 만료 60초 전, 즉 정상 발급 약 9분 후 선제 Refresh한다. 브라우저가 백그라운드 Timer를 지연하면 탭 복귀 또는 다음 보호 요청 전에 즉시 보정한다.
-- 지원 브라우저에서는 Web Locks와 공유 만료 메타데이터로 여러 탭의 Refresh를 한 번으로 합친다. Web Locks 미지원 환경은 탭 내부 single-flight와 백엔드의 원자적 Refresh Token Rotation으로 fail-closed 처리한다.
+- 접근 JWT는 600초, 접근 쿠키 `Max-Age`는 660초다. 프론트는 서버가 반환한 만료 시각을 기준으로 만료 60초 전, 즉 정상 발급 약 9분 후 선제 갱신한다. 브라우저가 백그라운드 타이머를 지연하면 탭 복귀 또는 다음 보호 요청 전에 즉시 보정한다.
+- 지원 브라우저에서는 웹 락과 공유 만료 메타데이터로 여러 탭의 갱신을 한 번으로 합친다. 웹 락 미지원 환경은 탭 내부 단일 실행과 백엔드의 원자적 갱신 토큰 교체로 실패 시 차단 처리한다.
 
 ## 백엔드 테스트 요구사항
 
-북마크 중복·타인 삭제 차단, 게시글/댓글 작성자 인가, 이미지 2개 이상·MIME 위조 거부, 현재 비밀번호 불일치, 탈퇴 사용자 수정 차단, ISO 시간 직렬화, 동시 Refresh Token Rotation과 재사용 탐지를 자동화한다.
+북마크 중복·타인 삭제 차단, 게시글/댓글 작성자 인가, 이미지 2개 이상·MIME 위조 거부, 현재 비밀번호 불일치, 탈퇴 사용자 수정 차단, ISO 시간 직렬화, 동시 갱신 토큰 교체와 재사용 탐지를 자동화한다.
