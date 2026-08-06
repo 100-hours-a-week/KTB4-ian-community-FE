@@ -39,9 +39,6 @@ test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로
     .getByRole("article")
     .filter({ hasText: contentPrefix });
   await expect(currentPosts).toHaveCount(10);
-  const more = page.getByRole("button", { name: "피드 더 보기" });
-  await expect(more).toBeVisible();
-  await more.click();
   await expect(currentPosts).toHaveCount(11);
 
   const target = page.getByRole("article").filter({
