@@ -1,11 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 test("실제 Backend에서 댓글을 삭제하고 새로고침 후 다시 조회한다", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
   const suffix = `${Date.now()}`.slice(-9);
   const postContent = `댓글 삭제용 피드 ${suffix}`;
   const comment = `삭제할 댓글 ${suffix}`;

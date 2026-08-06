@@ -1,12 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 test("실제 Backend 회원가입은 HttpOnly Cookie 인증 후 현재 사용자를 표시한다", async ({
   page,
   context,
 }) => {
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
   const suffix = `${Date.now()}`.slice(-9);
   const email = `e2e-${suffix}@example.com`;
   const nickname = `실사용${suffix.slice(-4)}`;
@@ -38,18 +35,24 @@ test("실제 Backend 회원가입은 HttpOnly Cookie 인증 후 현재 사용자
     page.locator(".lnb-user").getByAltText(`${nickname} 프로필`),
   ).toBeVisible();
 
-  const cookies = await context.cookies("http://127.0.0.1:8081/api/users");
-  expect(cookies.find((cookie) => cookie.name === "accessToken")).toMatchObject(
-    {
-      httpOnly: true,
-    },
+  const cookieUrl = new URL(
+    "/api/users",
+    process.env.E2E_API_BASE_URL ?? "http://127.0.0.1:8081",
   );
-  expect(
-    cookies.find((cookie) => cookie.name === "refreshToken"),
-  ).toMatchObject({
-    httpOnly: true,
-  });
-  expect(await page.evaluate(() => localStorage.length)).toBe(0);
+  const cookies = await context.cookies(cookieUrl.toString());
+  const accessCookie = cookies.find((cookie) => cookie.name === "accessToken");
+  const refreshCookie = cookies.find(
+    (cookie) => cookie.name === "refreshToken",
+  );
+  expect(accessCookie).toMatchObject({ httpOnly: true });
+  expect(refreshCookie).toMatchObject({ httpOnly: true });
+  const browserStorage = await page.evaluate(() =>
+    Object.fromEntries(Object.entries(localStorage)),
+  );
+  expect(browserStorage).not.toHaveProperty("accessToken");
+  expect(browserStorage).not.toHaveProperty("refreshToken");
+  expect(Object.values(browserStorage)).not.toContain(accessCookie.value);
+  expect(Object.values(browserStorage)).not.toContain(refreshCookie.value);
   expect(consoleErrors).toEqual([]);
   expect(failedResponses).toEqual([]);
 });

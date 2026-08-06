@@ -1,11 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 test("실제 Backend에서 비밀번호를 변경하고 새 비밀번호로 로그인한다", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
   const suffix = `${Date.now()}`.slice(-9);
   const email = `password-${suffix}@example.com`;
   const nickname = `암호${suffix.slice(-4)}`;

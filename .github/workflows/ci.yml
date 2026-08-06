@@ -1,0 +1,249 @@
+name: FE / CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fe-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-test:
+    name: FE / quality-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.18.0
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Format
+        run: npm run format:check
+      - name: Build
+        run: npm run build:react
+      - name: Unit tests
+        run: npm run test:unit
+      - name: Integration tests
+        run: npm run test:integration
+      - name: Production bundle policy
+        run: ./scripts/verify-build.sh
+      - name: Workflow and gate policy tests
+        run: |
+          ./scripts/verify-workflows.sh
+          ./scripts/test-required-gate.sh
+
+  ui-test:
+    name: FE / ui-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.18.0
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Chromium UI tests (111)
+        run: npm run test:ui
+      - name: Upload failure traces and report
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fe-ui-failure-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  image-build:
+    name: FE / image-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+      - name: Build linux/amd64 candidate
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --load \
+            --tag community-frontend:${GITHUB_SHA} \
+            --build-arg OCI_REVISION=${GITHUB_SHA} \
+            --build-arg OCI_VERSION=${GITHUB_SHA} \
+            .
+      - name: Verify static-origin runtime
+        env:
+          IMAGE_TAG: community-frontend:${{ github.sha }}
+        run: ./scripts/verify-image.sh
+
+  compose-smoke:
+    name: FE / compose-smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      BACKEND_BOOTSTRAP_SHA: 69fb7225ae0e2681b12721c0020d9152021a48d7
+      DEPLOYMENT_BOOTSTRAP_SHA: 69fb7225ae0e2681b12721c0020d9152021a48d7
+      CI_HTTP_PORT: "18080"
+    steps:
+      - name: Checkout frontend candidate
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: frontend
+      - name: Checkout trusted deployment assets
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: 100-hours-a-week/KTB4-ian-week4
+          ref: ${{ vars.DEPLOYMENT_BASELINE_SHA || '69fb7225ae0e2681b12721c0020d9152021a48d7' }}
+          path: backend-deployment
+      - name: Checkout backend bootstrap source
+        if: vars.BACKEND_BASELINE_IMAGE == ''
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: 100-hours-a-week/KTB4-ian-week4
+          ref: ${{ vars.BACKEND_BASELINE_SHA || '69fb7225ae0e2681b12721c0020d9152021a48d7' }}
+          path: backend-source
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.18.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+      - name: Build candidate frontend
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --load \
+            --tag community-frontend:${GITHUB_SHA} \
+            --build-arg OCI_REVISION=${GITHUB_SHA} \
+            --build-arg OCI_VERSION=${GITHUB_SHA} \
+            frontend
+      - name: Prepare approved backend baseline
+        env:
+          APPROVED_IMAGE: ${{ vars.BACKEND_BASELINE_IMAGE }}
+          APPROVED_SHA: ${{ vars.BACKEND_BASELINE_SHA }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${APPROVED_IMAGE}" ]]; then
+            [[ "${APPROVED_IMAGE}" =~ ^ghcr\.io/100-hours-a-week/ktb4-ian-week4-community-backend@sha256:[0-9a-f]{64}$ ]]
+            docker pull --platform linux/amd64 "${APPROVED_IMAGE}"
+            docker tag "${APPROVED_IMAGE}" community-backend:baseline
+          else
+            sha="${APPROVED_SHA:-${BACKEND_BOOTSTRAP_SHA}}"
+            [[ "${sha}" =~ ^[0-9a-f]{40}$ ]]
+            docker buildx build \
+              --platform linux/amd64 \
+              --load \
+              --tag community-backend:baseline \
+              --build-arg OCI_REVISION=${sha} \
+              --build-arg OCI_VERSION=${sha} \
+              backend-source
+          fi
+      - name: Pull pinned infrastructure images
+        run: |
+          docker pull --platform linux/amd64 mysql:8.4.11@sha256:1d6b6a8fcee8ff758ff151d017f5203cd06792a0e698f0a593c9dfcb14609cf0
+          docker pull --platform linux/amd64 nginx:1.28.3-alpine3.23@sha256:0dcc88822d45581e65ae329f8be769762bf628d3b2bb7d2a077d4aa5c98b30e3
+      - name: Start four-service stack
+        run: |
+          set -Eeuo pipefail
+          root="${RUNNER_TEMP}/community-fe-smoke"
+          compose_root="${GITHUB_WORKSPACE}/backend-deployment/deployment/ec2-compose"
+          project="community-fe-${GITHUB_RUN_ID}"
+          install -d -m 0750 "${root}"
+          sudo install -d -o 999 -g 999 -m 0750 "${root}/data/mysql"
+          sudo install -d -o 10001 -g 10001 -m 0750 "${root}/data/uploads"
+          sudo install -d -o root -g 20000 -m 0750 "${root}/secrets"
+          sudo install -d -o root -g root -m 0755 "${root}/acme"
+          printf '%s\n' 'ci-root-password' | sudo tee "${root}/secrets/mysql-root-password" >/dev/null
+          printf '%s\n' 'ci-app-password' | sudo tee "${root}/secrets/mysql-app-password" >/dev/null
+          printf '%s\n' 'Y2ktb25seS1qd3Qtc2VjcmV0LTMyLWJ5dGVzISEhISE=' | sudo tee "${root}/secrets/jwt-secret" >/dev/null
+          sudo chown root:20000 \
+            "${root}/secrets/mysql-root-password" \
+            "${root}/secrets/mysql-app-password" \
+            "${root}/secrets/jwt-secret"
+          sudo chmod 0640 \
+            "${root}/secrets/mysql-root-password" \
+            "${root}/secrets/mysql-app-password" \
+            "${root}/secrets/jwt-secret"
+          cat >"${root}/candidate.env" <<EOF
+          MYSQL_IMAGE=mysql:8.4.11@sha256:1d6b6a8fcee8ff758ff151d017f5203cd06792a0e698f0a593c9dfcb14609cf0
+          BACKEND_IMAGE=community-backend:baseline
+          FRONTEND_IMAGE=community-frontend:${GITHUB_SHA}
+          NGINX_IMAGE=nginx:1.28.3-alpine3.23@sha256:0dcc88822d45581e65ae329f8be769762bf628d3b2bb7d2a077d4aa5c98b30e3
+          IMAGE_PULL_POLICY=never
+          DATA_ROOT=${root}/data
+          SECRETS_DIR=${root}/secrets
+          TLS_DIR=${root}/tls
+          ACME_ROOT=${root}/acme
+          COMPOSE_ROOT=${compose_root}
+          FRONTEND_ORIGIN=http://127.0.0.1:${CI_HTTP_PORT}
+          COOKIE_SECURE=false
+          CI_HTTP_PORT=${CI_HTTP_PORT}
+          EOF
+          echo "SMOKE_ROOT=${root}" >>"${GITHUB_ENV}"
+          echo "SMOKE_PROJECT=${project}" >>"${GITHUB_ENV}"
+          docker compose --project-name "${project}" \
+            --env-file "${root}/candidate.env" \
+            -f "${compose_root}/compose.yaml" \
+            -f "${compose_root}/compose.ci.yaml" \
+            up --detach --remove-orphans --wait --wait-timeout 300
+      - name: Verify edge and Backend E2E
+        env:
+          E2E_BASE_URL: http://127.0.0.1:18080
+          E2E_API_BASE_URL: http://127.0.0.1:18080
+          E2E_EXTERNAL_SERVER: "1"
+        working-directory: frontend
+        run: |
+          curl --fail --silent --show-error "${E2E_BASE_URL}/healthz"
+          curl --fail --silent --show-error "${E2E_BASE_URL}/api/csrf" >/dev/null
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run test:e2e:backend
+      - name: Stack diagnostics
+        if: failure() && env.SMOKE_ROOT != ''
+        run: |
+          docker compose --project-name "${SMOKE_PROJECT}" \
+            --env-file "${SMOKE_ROOT}/candidate.env" \
+            -f backend-deployment/deployment/ec2-compose/compose.yaml \
+            -f backend-deployment/deployment/ec2-compose/compose.ci.yaml \
+            ps --all || true
+          docker compose --project-name "${SMOKE_PROJECT}" \
+            --env-file "${SMOKE_ROOT}/candidate.env" \
+            -f backend-deployment/deployment/ec2-compose/compose.yaml \
+            -f backend-deployment/deployment/ec2-compose/compose.ci.yaml \
+            logs --no-color --tail 200 || true
+      - name: Stop stack
+        if: always() && env.SMOKE_ROOT != ''
+        run: |
+          docker compose --project-name "${SMOKE_PROJECT}" \
+            --env-file "${SMOKE_ROOT}/candidate.env" \
+            -f backend-deployment/deployment/ec2-compose/compose.yaml \
+            -f backend-deployment/deployment/ec2-compose/compose.ci.yaml \
+            down --volumes --remove-orphans
+
+  required-gate:
+    name: FE / required-gate
+    if: always()
+    needs: [quality-test, ui-test, image-build, compose-smoke]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Require exact success from every prerequisite
+        run: >-
+          ./scripts/required-gate.sh
+          '${{ needs.quality-test.result }}'
+          '${{ needs.ui-test.result }}'
+          '${{ needs.image-build.result }}'
+          '${{ needs.compose-smoke.result }}'

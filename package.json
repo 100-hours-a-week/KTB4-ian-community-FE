@@ -26,7 +26,7 @@
   "scripts": {
     "build:react": "webpack --mode production",
     "build:watch": "webpack --mode development --watch",
-    "format:check": "prettier --check index.html 'src/**/*.{js,jsx,css}' 'tests/**/*.js' 'docs/**/*.md' package.json playwright.config.js vitest.config.js webpack.config.js",
+    "format:check": "prettier --check --no-error-on-unmatched-pattern index.html 'src/**/*.{js,jsx,css}' 'tests/**/*.js' 'docs/**/*.md' package.json playwright.config.js vitest.config.js webpack.config.js",
     "test": "npm run test:unit",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",

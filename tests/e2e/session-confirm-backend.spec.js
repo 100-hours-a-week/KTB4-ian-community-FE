@@ -1,9 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 async function signup(page, prefix) {
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
   const suffix = `${Date.now()}-${prefix}`;
   await page.goto("/signup");
   await page.getByLabel("이메일").fill(`${suffix}@example.com`);

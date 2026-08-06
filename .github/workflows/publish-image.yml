@@ -1,0 +1,101 @@
+name: FE / publish-image
+
+on:
+  workflow_run:
+    workflows: [FE / CI]
+    types: [completed]
+
+permissions:
+  attestations: write
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: fe-publish-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      digest: ${{ steps.publish.outputs.digest }}
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - name: Validate trusted source identity
+        id: source
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_REPOSITORY: ${{ github.event.workflow_run.head_repository.full_name }}
+        run: |
+          set -Eeuo pipefail
+          [[ "${HEAD_REPOSITORY}" == "${GITHUB_REPOSITORY}" ]]
+          [[ "${HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          echo "sha=${HEAD_SHA}" >>"${GITHUB_OUTPUT}"
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+          persist-credentials: false
+      - name: Confirm exact checkout
+        env:
+          EXPECTED_SHA: ${{ steps.source.outputs.sha }}
+        run: test "$(git rev-parse HEAD)" = "${EXPECTED_SHA}"
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+      - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Publish immutable SHA image
+        id: publish
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/100-hours-a-week/ktb4-ian-community-fe:${{ steps.source.outputs.sha }}
+          build-args: |
+            OCI_REVISION=${{ steps.source.outputs.sha }}
+            OCI_VERSION=${{ steps.source.outputs.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.source.outputs.sha }}
+            org.opencontainers.image.version=${{ steps.source.outputs.sha }}
+          cache-from: type=gha,scope=fe-production
+          cache-to: type=gha,mode=max,scope=fe-production
+      - name: Attest provenance
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        with:
+          subject-name: ghcr.io/100-hours-a-week/ktb4-ian-community-fe
+          subject-digest: ${{ steps.publish.outputs.digest }}
+          push-to-registry: true
+
+  dispatch-backend:
+    needs: publish
+    if: vars.PRODUCTION_DISPATCH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch verified frontend digest to central CD
+        env:
+          GH_TOKEN: ${{ secrets.BACKEND_DISPATCH_TOKEN }}
+          SOURCE_SHA: ${{ needs.publish.outputs.source_sha }}
+          IMAGE_DIGEST: ${{ needs.publish.outputs.digest }}
+        run: |
+          set -Eeuo pipefail
+          [[ -n "${GH_TOKEN}" ]]
+          [[ "${SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
+          jq -n \
+            --arg component frontend \
+            --arg source_repository 100-hours-a-week/KTB4-ian-community-FE \
+            --arg source_sha "${SOURCE_SHA}" \
+            --arg image_digest "${IMAGE_DIGEST}" \
+            '{event_type:"frontend-image-published",client_payload:{component:$component,source_repository:$source_repository,source_sha:$source_sha,image_digest:$image_digest}}' \
+            | gh api --method POST repos/100-hours-a-week/KTB4-ian-week4/dispatches --input -

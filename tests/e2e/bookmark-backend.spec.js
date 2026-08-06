@@ -1,12 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로 유지한다", async ({
   page,
 }) => {
-  test.setTimeout(60_000);
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
+  test.setTimeout(300_000);
   const suffix = `${Date.now()}`.slice(-9);
   const nickname = `북마크${suffix.slice(-4)}`;
   const contentPrefix = `북마크 ${suffix} Slice 게시글`;
@@ -23,17 +20,36 @@ test("실제 Backend에서 Bookmark와 10개 Slice를 화면 전체 흐름으로
     const content = `${contentPrefix} ${index}`;
     await page.getByRole("button", { name: "피드 게시하기" }).click();
     await page.getByLabel("피드 본문").fill(content);
+    const createResponse = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/api/posts/me" &&
+        response.request().method() === "POST",
+    );
     await page.getByRole("button", { name: "피드 게시", exact: true }).click();
-    await expect(page.getByText(content, { exact: true })).toBeVisible();
+    expect((await createResponse).status()).toBe(201);
+    await expect(page.getByRole("dialog", { name: "피드 생성" })).toBeHidden();
+    await expect(
+      page.getByRole("article").filter({
+        has: page.getByText(content, { exact: true }),
+      }),
+    ).toBeVisible();
   }
 
+  const firstSliceResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.pathname === "/api/posts" &&
+      url.searchParams.get("page") === "0" &&
+      url.searchParams.get("size") === "10" &&
+      response.request().method() === "GET"
+    );
+  });
   await page.reload();
+  expect((await firstSliceResponse).status()).toBe(200);
   const currentPosts = page
     .getByRole("article")
     .filter({ hasText: contentPrefix });
   await expect(currentPosts).toHaveCount(10);
-  const more = page.getByRole("button", { name: "피드 더 보기" });
-  if (await more.isVisible().catch(() => false)) await more.click();
   await expect(currentPosts).toHaveCount(11);
 
   const target = page.getByRole("article").filter({

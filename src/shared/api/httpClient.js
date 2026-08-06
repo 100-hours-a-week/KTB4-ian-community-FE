@@ -147,18 +147,21 @@ function toApiError(response, body) {
   });
 }
 
-async function csrfToken(signal) {
-  let token = readCookie("XSRF-TOKEN");
-  if (!token) {
-    const response = await fetch(`${apiBaseUrl()}/api/csrf`, {
-      credentials: "include",
-      signal,
-    });
-    if (!response.ok) throw toApiError(response, await parse(response));
-    token = readCookie("XSRF-TOKEN");
-  }
+function csrfToken() {
+  const token = readCookie("XSRF-TOKEN");
   if (!token) throw new ApiError("XSRF-TOKEN 쿠키를 확인할 수 없습니다.");
   return decodeURIComponent(token);
+}
+
+async function ensureCsrfCookie(signal) {
+  if (readCookie("XSRF-TOKEN")) return;
+  const response = await fetch(`${apiBaseUrl()}/api/csrf`, {
+    credentials: "include",
+    signal,
+  });
+  if (!response.ok) throw toApiError(response, await parse(response));
+  if (!readCookie("XSRF-TOKEN"))
+    throw new ApiError("XSRF-TOKEN 쿠키를 확인할 수 없습니다.");
 }
 
 async function send(path, options = {}) {
@@ -168,8 +171,12 @@ async function send(path, options = {}) {
     if (!headers.has("Content-Type"))
       headers.set("Content-Type", "application/json");
   }
-  if (UNSAFE_METHODS.has(method))
-    headers.set("X-XSRF-TOKEN", await csrfToken(options.signal));
+  if (UNSAFE_METHODS.has(method)) {
+    await ensureCsrfCookie(options.signal);
+    // 쿠키를 읽은 뒤 비동기 경계를 두지 않고 요청을 시작해야, 다른 응답이
+    // 토큰 쿠키를 갱신해 헤더와 쿠키가 불일치하는 경쟁 조건을 피할 수 있다.
+    headers.set("X-XSRF-TOKEN", csrfToken());
+  }
   const { __retried, ...fetchOptions } = options;
   return fetch(`${apiBaseUrl()}${path}`, {
     ...fetchOptions,

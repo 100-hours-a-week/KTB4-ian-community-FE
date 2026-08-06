@@ -1,11 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.js";
 
 test("실제 Backend에서 피드를 생성하고 새로고침 후 다시 조회한다", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    globalThis.__API_BASE_URL__ = "http://127.0.0.1:8081";
-  });
   const suffix = `${Date.now()}`.slice(-9);
   const nickname = `작성${suffix.slice(-4)}`;
   const content = `실제 Backend 피드 ${suffix}`;
